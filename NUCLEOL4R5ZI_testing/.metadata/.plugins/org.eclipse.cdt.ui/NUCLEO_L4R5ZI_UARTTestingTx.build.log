@@ -1,0 +1,20 @@
+01:24:54 **** Incremental Build of configuration Debug for project NUCLEO_L4R5ZI_UARTTestingTx ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32L4R5xx -DDEBUG -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "NUCLEO_L4R5ZI_UARTTestingTx.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\James\Documents\Calgary to Space\OBC_software\NUCLEOL4R5ZI_testing\NUCLEO_L4R5ZI_UARTTestingTx\STM32L4R5ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="NUCLEO_L4R5ZI_UARTTestingTx.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: NUCLEO_L4R5ZI_UARTTestingTx.elf
+ 
+arm-none-eabi-objdump -h -S  NUCLEO_L4R5ZI_UARTTestingTx.elf  > "NUCLEO_L4R5ZI_UARTTestingTx.list"
+arm-none-eabi-objcopy  -O binary  NUCLEO_L4R5ZI_UARTTestingTx.elf  "NUCLEO_L4R5ZI_UARTTestingTx.bin"
+arm-none-eabi-size   NUCLEO_L4R5ZI_UARTTestingTx.elf 
+   text	   data	    bss	    dec	    hex	filename
+  17160	     20	   3020	  20200	   4ee8	NUCLEO_L4R5ZI_UARTTestingTx.elf
+Finished building: default.size.stdout
+ 
+Finished building: NUCLEO_L4R5ZI_UARTTestingTx.bin
+ 
+Finished building: NUCLEO_L4R5ZI_UARTTestingTx.list
+ 
+
+01:24:55 Build Finished. 0 errors, 0 warnings. (took 941ms)
+
