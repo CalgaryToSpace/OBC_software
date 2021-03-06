@@ -2,7 +2,7 @@
 /**
   ******************************************************************************
   * @file           : main.c
-  * @brief          : Main program body
+  * @brief          : transmit uart code testing
   ******************************************************************************
   * @attention
   *
@@ -106,12 +106,12 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  strcpy((char*)UART1_rxBuffer, "Message transmitting at 255400 baud\r\n");
-	  HAL_UART_Transmit(&hlpuart1, UART1_rxBuffer, strlen((char*)UART1_rxBuffer), HAL_MAX_DELAY);
+	  strcpy((char*)UART1_rxBuffer, "Message transmitting at 230400 baud from device 2\r\n");
+	  HAL_UART_Transmit(&huart5, UART1_rxBuffer, 100, HAL_MAX_DELAY);
 
-	  //flash blue led to indicate its running
+	  //flash red led to indicate its running
 	  	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_14);
-	  	HAL_Delay(250);
+	  	HAL_Delay(1000);
 
     /* USER CODE END WHILE */
 
@@ -195,8 +195,8 @@ static void MX_LPUART1_UART_Init(void)
 
   /* USER CODE END LPUART1_Init 1 */
   hlpuart1.Instance = LPUART1;
-  hlpuart1.Init.BaudRate = 209700;
-  hlpuart1.Init.WordLength = UART_WORDLENGTH_7B;
+  hlpuart1.Init.BaudRate = 230400;
+  hlpuart1.Init.WordLength = UART_WORDLENGTH_8B;
   hlpuart1.Init.StopBits = UART_STOPBITS_1;
   hlpuart1.Init.Parity = UART_PARITY_NONE;
   hlpuart1.Init.Mode = UART_MODE_TX_RX;
