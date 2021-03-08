@@ -1,4 +1,4 @@
-13:05:09 **** Incremental Build of configuration Debug for project NUCLEO_L4R5ZI_UARTTestingTx ****
+16:14:01 **** Incremental Build of configuration Debug for project NUCLEO_L4R5ZI_UARTTestingTx ****
 make -j8 all 
 arm-none-eabi-size   NUCLEO_L4R5ZI_UARTTestingTx.elf 
    text	   data	    bss	    dec	    hex	filename
@@ -6,5 +6,5 @@ arm-none-eabi-size   NUCLEO_L4R5ZI_UARTTestingTx.elf
 Finished building: default.size.stdout
  
 
-13:05:09 Build Finished. 0 errors, 0 warnings. (took 217ms)
+16:14:01 Build Finished. 0 errors, 0 warnings. (took 222ms)
 
