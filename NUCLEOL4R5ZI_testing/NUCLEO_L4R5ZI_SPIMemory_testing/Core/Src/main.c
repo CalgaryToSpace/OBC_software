@@ -158,7 +158,7 @@ int main(void)
 	HAL_SPI_Transmit(&hspi1, (uint8_t*)&addr, 3, 100);			//write address
 	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
 
-	//check to see if status reg
+	//check to see status reg
 	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
 	HAL_SPI_Transmit(&hspi1, (uint8_t *)&FLASH_STATREG1, 1, 100);	//opcode for read
 	HAL_SPI_Receive(&hspi1, (uint8_t *)spiRX_buf, 1, 100);	//Receive data
@@ -169,7 +169,7 @@ int main(void)
 	HAL_SPI_Transmit(&hspi1, (uint8_t*)&FLASH_WREN, 1, 100);
 	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
 
-	//check to see if status reg
+	//check to see status reg
 	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
 	HAL_SPI_Transmit(&hspi1, (uint8_t *)&FLASH_STATREG1, 1, 100);	//opcode for read
 	HAL_SPI_Receive(&hspi1, (uint8_t *)spiRX_buf, 1, 100);	//Receive data

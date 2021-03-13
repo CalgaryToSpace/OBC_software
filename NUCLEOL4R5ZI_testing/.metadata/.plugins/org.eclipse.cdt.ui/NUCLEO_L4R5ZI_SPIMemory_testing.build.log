@@ -1,24 +1,10 @@
-16:52:29 **** Incremental Build of configuration Debug for project NUCLEO_L4R5ZI_SPIMemory_testing ****
+20:47:34 **** Incremental Build of configuration Debug for project NUCLEO_L4R5ZI_SPIMemory_testing ****
 make -j8 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32L4R5xx -DDEBUG -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-../Core/Src/main.c: In function 'main':
-../Core/Src/main.c:180:10: warning: unused variable 'buflen' [-Wunused-variable]
-  uint8_t buflen = strlen((char*)spiTX_buf);
-          ^~~~~~
-arm-none-eabi-gcc -o "NUCLEO_L4R5ZI_SPIMemory_testing.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\James\Documents\Calgary to Space\OBC_software\NUCLEOL4R5ZI_testing\NUCLEO_L4R5ZI_SPIMemory_testing\STM32L4R5ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="NUCLEO_L4R5ZI_SPIMemory_testing.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: NUCLEO_L4R5ZI_SPIMemory_testing.elf
- 
-arm-none-eabi-objdump -h -S  NUCLEO_L4R5ZI_SPIMemory_testing.elf  > "NUCLEO_L4R5ZI_SPIMemory_testing.list"
-arm-none-eabi-objcopy  -O binary  NUCLEO_L4R5ZI_SPIMemory_testing.elf  "NUCLEO_L4R5ZI_SPIMemory_testing.bin"
 arm-none-eabi-size   NUCLEO_L4R5ZI_SPIMemory_testing.elf 
    text	   data	    bss	    dec	    hex	filename
   21444	     20	   2980	  24444	   5f7c	NUCLEO_L4R5ZI_SPIMemory_testing.elf
 Finished building: default.size.stdout
  
-Finished building: NUCLEO_L4R5ZI_SPIMemory_testing.bin
- 
-Finished building: NUCLEO_L4R5ZI_SPIMemory_testing.list
- 
 
-16:52:30 Build Finished. 0 errors, 1 warnings. (took 999ms)
+20:47:34 Build Finished. 0 errors, 0 warnings. (took 232ms)
 

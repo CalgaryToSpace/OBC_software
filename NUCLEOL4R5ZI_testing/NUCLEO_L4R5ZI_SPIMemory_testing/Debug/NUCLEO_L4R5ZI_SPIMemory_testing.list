@@ -560,7 +560,7 @@ int main(void)
  8000650:	4868      	ldr	r0, [pc, #416]	; (80007f4 <main+0x2e8>)
  8000652:	f001 f807 	bl	8001664 <HAL_GPIO_WritePin>
 
-	//check to see if status reg
+	//check to see status reg
 	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
  8000656:	2200      	movs	r2, #0
  8000658:	f44f 4180 	mov.w	r1, #16384	; 0x4000
@@ -602,7 +602,7 @@ int main(void)
  80006a6:	4853      	ldr	r0, [pc, #332]	; (80007f4 <main+0x2e8>)
  80006a8:	f000 ffdc 	bl	8001664 <HAL_GPIO_WritePin>
 
-	//check to see if status reg
+	//check to see status reg
 	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
  80006ac:	2200      	movs	r2, #0
  80006ae:	f44f 4180 	mov.w	r1, #16384	; 0x4000
