@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Extract pages_written" description="Extract Local Variable Refactoring" fileName="file:/C:/Users/James/Documents/Calgary%20to%20Space/OBC_software/NUCLEOL4R5ZI_testing/NUCLEO_L4R5ZI_MPI_demo/Core/Src/main.c" flags="4" id="org.eclipse.cdt.internal.ui.refactoring.extractlocalvariable.ExtractLocalVariableRefactoring" name="pagesWritten" selection="14102,13" stamp="1617408328103"/>
+</session>

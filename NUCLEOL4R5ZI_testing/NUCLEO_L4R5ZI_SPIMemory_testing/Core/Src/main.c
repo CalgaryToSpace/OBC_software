@@ -91,6 +91,8 @@ int main(void)
 	char spiTX_buf[100] = {0};
 	char spiRX_buf[100] = {0};
 	uint8_t addr[3];
+	uint8_t wip;
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -119,15 +121,15 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
 
-  //flash red led to indicate its running
+  //flash blue led to indicate its running
   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, GPIO_PIN_SET);
 
   //chip select high
   HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
 
   // Send something to UART
-  strcpy((char*)uart_buf, "Testing SPI\r\n");
-   HAL_UART_Transmit(&hlpuart1, (uint8_t *)uart_buf, strlen((char*)uart_buf), 100);
+	strcpy((char*)uart_buf, "Testing SPI\r\n");
+	HAL_UART_Transmit(&hlpuart1, (uint8_t *)uart_buf, strlen((char*)uart_buf), 100);
 
    //check to see if status reg
    	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
@@ -158,6 +160,20 @@ int main(void)
 	HAL_SPI_Transmit(&hspi1, (uint8_t*)&addr, 3, 100);			//write address
 	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
 
+	wip = 1;
+	while (wip)
+	{
+		// Read status register
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
+		HAL_SPI_Transmit(&hspi1, (uint8_t *)&FLASH_STATREG1, 1, 100);	//opcode for read
+		HAL_SPI_Receive(&hspi1, (uint8_t *)spiRX_buf, 1, 100);	//Receive data
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
+
+		// Mask out WIP bit
+		wip = spiRX_buf[0] & 0b00000001;
+	}
+
+
 	//check to see status reg
 	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
 	HAL_SPI_Transmit(&hspi1, (uint8_t *)&FLASH_STATREG1, 1, 100);	//opcode for read
@@ -187,10 +203,18 @@ int main(void)
 	HAL_SPI_Transmit(&hspi1, (uint8_t*)&spiTX_buf, 100, 100);//data
 	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
 
-	//write disable
-	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
-	HAL_SPI_Transmit(&hspi1, (uint8_t*)&FLASH_WRDI, 1, 100);
-	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
+	wip = 1;
+	while (wip)
+	{
+		// Read status register
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
+		HAL_SPI_Transmit(&hspi1, (uint8_t *)&FLASH_STATREG1, 1, 100);	//opcode for read
+		HAL_SPI_Receive(&hspi1, (uint8_t *)spiRX_buf, 1, 100);	//Receive data
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
+
+		// Mask out WIP bit
+		wip = spiRX_buf[0] & 0b00000001;
+	}
 
 	//check to see if status reg
 	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
@@ -207,6 +231,9 @@ int main(void)
 
 	//print the data to UART
 	HAL_UART_Transmit(&hlpuart1, (uint8_t *)spiRX_buf, strlen((char*)spiRX_buf), 100);
+
+	//turn off blue led to indicate its done
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, GPIO_PIN_RESET);
 
 
   /* USER CODE END 2 */

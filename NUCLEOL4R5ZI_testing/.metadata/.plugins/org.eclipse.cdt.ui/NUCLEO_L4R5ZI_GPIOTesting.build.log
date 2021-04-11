@@ -1,0 +1,10 @@
+22:11:31 **** Incremental Build of configuration Debug for project NUCLEO_L4R5ZI_GPIOTesting ****
+make -j8 all 
+arm-none-eabi-size   NUCLEO_L4R5ZI_GPIOTesting.elf 
+   text	   data	    bss	    dec	    hex	filename
+  16408	     20	   2884	  19312	   4b70	NUCLEO_L4R5ZI_GPIOTesting.elf
+Finished building: default.size.stdout
+ 
+
+22:11:31 Build Finished. 0 errors, 0 warnings. (took 226ms)
+

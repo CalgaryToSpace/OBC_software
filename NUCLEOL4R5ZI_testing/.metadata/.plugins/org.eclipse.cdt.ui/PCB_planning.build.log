@@ -1,0 +1,10 @@
+22:11:34 **** Incremental Build of configuration Debug for project PCB_planning ****
+make -j8 all 
+arm-none-eabi-size   PCB_planning.elf 
+   text	   data	    bss	    dec	    hex	filename
+  19188	     20	   2204	  21412	   53a4	PCB_planning.elf
+Finished building: default.size.stdout
+ 
+
+22:11:34 Build Finished. 0 errors, 0 warnings. (took 227ms)
+

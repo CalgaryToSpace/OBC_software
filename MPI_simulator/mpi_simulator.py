@@ -1,49 +1,127 @@
 import serial
+import time
+import threading
 
-class Frame:
-    def __init__(self):
-        """
-        initialize sample telemetry frame
-        """
-        self.sync_bytes = [0x0c, 0xff, 0xff, 0x0c]
-        self.frame_counter = [0x00, 0x01]
-        self.temperature = [0xaa, 0xaa]
-        self.firmware_version = [0x01]
-        self.mpi_unit_id = [0x01]
-        self.detector_status = [0x00, 0x50]
-        self.dome_voltage_set = [0xf0, 0x6a]
-        self.spib = [0x01]
-        self.dome_index = [0xdd]
-        self.face_plate_voltage_set = [0xd5, 0x65]
-        self.face_plate_voltage = [0xd5, 0x65]
-        self.dome_voltage = [0xf0, 0x6a]
 
-        self.image = []
-        for i in range(0, 68*2):
-            self.image.append(i)
+def load_sample_data(file):
+    sample_telemetry_data_bin = open(file, 'rb')
 
-        self.crc = [0x02, 0x02]
+    all_bytes_ls = []
+    sample_telemetry_data_ls = []
 
-        self.full_frame = self.sync_bytes + self.frame_counter + self.temperature + self.firmware_version + \
-                          self.mpi_unit_id + self.detector_status + self.dome_voltage_set + self.spib + \
-                          self.dome_index + self.face_plate_voltage_set + self.face_plate_voltage + \
-                          self.dome_voltage + self.image + self.crc
-        self.frame_bytes = bytes(self.full_frame)
+    # go through and add all bytes into list
+    byte = sample_telemetry_data_bin.read(1)
+    while byte:
+        all_bytes_ls.append(int.from_bytes(byte, 'big'))
+        byte = sample_telemetry_data_bin.read(1)
+
+    for frame_number in range(0, len(all_bytes_ls) // 160):
+        sample_telemetry_data_ls.append(all_bytes_ls[frame_number * 160:(frame_number + 1) * 160])
+
+    return sample_telemetry_data_ls
+
+
+def send_frames(data, ser,  n_frames):
+    for i in range(0, n_frames):
+        time.sleep(1 / 32)
+        ser.write(bytes(data[i]))
+        print(i)
+        print(data[i])
+
+
+def listen(ser):
+    print('Listening for incoming serial messages...')
+    while 1:
+        line = ser.readline()
+        rx = list(line)
+
+        # print any incoming data
+        if rx:
+            print('Message bytes:')
+            print(rx)
+
+            msg = "".join(map(chr, rx))
+            print('Message as text:')
+            print(msg)
+
+
+def start_mpi_simulator(ser, mode):
+    print('Loading test data')
+    test_data = load_sample_data('CalgaryToSpace_Satellite1_MPI_Telemery_Example_ICD_V1.1.bin')
+    print('Test data loaded')
+
+    print('Listening for incoming serial messages...')
+    while 1:
+        line = ser.read(160)
+        rx = list(line)
+
+        # print any incoming data
+        if rx:
+            print("**********************************")
+            print('Raw bytes: ')
+            print(line)
+            print('Message bytes:')
+            print(rx)
+
+            msg = "".join(map(chr, rx))
+            print('Message as text:')
+            print(msg)
+            print("**********************************")
+
+            # if TC for start sending data
+            if rx[0] == 84 and rx[1] == 67 and rx[2] == 9:
+                if mode == 1:
+                    print('Sending success echo')
+                    echo = rx[:]
+                    echo.append(1)
+                    ser.write(bytes(echo))
+                    print('Echo sent!')
+
+                    print('Starting to send frames...')
+                    print('Sending...')
+                    send_frames(test_data)
+                    print('Frames all sent!')
+
+                if mode == 2:
+                    time.sleep(1)
+                    # print('Sending success echo')
+                    # echo = rx[:]
+                    # echo.append(1)
+                    # ser.write(bytes(echo))
+                    # print('Echo sent!')
+
+                    print('Starting to send 50 frames')
+                    send_frames(test_data, ser, 50)
+
+                    print('Frames sent!')
+
+            # unknown TC!!!
+            elif rx[0] == 84 and rx[1] == 67:  # if its a TC
+                print('Unknown TC... sending failed Echo')
+                echo = rx[:]
+                echo.append(0)
+                ser.write(bytes(echo))
+                print('Echo sent!')
 
 
 if __name__ == '__main__':
-    Frame1 = Frame()
-
-    print("Frame is: ")
-    print(Frame1.frame_bytes)
-
-    print("Frame Length is: ", end='')
-    print(len(Frame1.frame_bytes))
-
     try:
         port = 'COM3'
         ser = serial.Serial(port, 230400, timeout=1)
         ser.flush()
-        ser.write(Frame1.frame_bytes)
-    except:
-        print("Serial print failed")
+        print('Serial port opened')
+
+    except serial.serialutil.SerialException:
+        print("Serial open failed")
+        exit()
+
+    start_mpi_simulator(ser, 2)
+
+    # Create new threads
+
+    # thread1 = ListenThread(1, "Thread-1", ser)
+    # thread2 = RunThread(2, "Thread-2", ser)
+    #
+    # # Start new Threads
+    # thread1.start()
+    # thread2.start()

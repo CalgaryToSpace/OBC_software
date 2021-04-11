@@ -1,0 +1,10 @@
+22:11:31 **** Incremental Build of configuration Debug for project NUCLEO_L4R5ZI_MPI_demo ****
+make -j8 all 
+arm-none-eabi-size   NUCLEO_L4R5ZI_MPI_demo.elf 
+   text	   data	    bss	    dec	    hex	filename
+  20920	     24	   2752	  23696	   5c90	NUCLEO_L4R5ZI_MPI_demo.elf
+Finished building: default.size.stdout
+ 
+
+22:11:31 Build Finished. 0 errors, 0 warnings. (took 227ms)
+

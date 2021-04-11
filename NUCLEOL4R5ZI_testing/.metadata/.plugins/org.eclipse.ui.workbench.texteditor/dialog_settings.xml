@@ -6,7 +6,12 @@
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
+		<item key="selection" value="read_flash_memory"/>
 		<list key="findhistory">
+			<item value="read_flash_memory"/>
+			<item value="HAL_UART_RxCpltCallback"/>
+			<item value="address"/>
+			<item value="HAL_GPIO_TogglePin"/>
 			<item value="adress"/>
 		</list>
 		<list key="replacehistory">
