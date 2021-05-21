@@ -1625,7 +1625,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *hlpuart1)
  8000cda:	4a2f      	ldr	r2, [pc, #188]	; (8000d98 <HAL_UART_RxCpltCallback+0x220>)
  8000cdc:	6013      	str	r3, [r2, #0]
 
-				if(page_number == 15){	//once 30 pages have been written
+				if(page_number == 15){	//once 15 pages have been written
  8000cde:	4b2e      	ldr	r3, [pc, #184]	; (8000d98 <HAL_UART_RxCpltCallback+0x220>)
  8000ce0:	681b      	ldr	r3, [r3, #0]
  8000ce2:	2b0f      	cmp	r3, #15

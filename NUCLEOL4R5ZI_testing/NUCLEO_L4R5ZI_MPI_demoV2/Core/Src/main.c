@@ -606,7 +606,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *hlpuart1)
 
 				page_number+=1;
 
-				if(page_number == 15){	//once 30 pages have been written
+				if(page_number == 15){	//once 15 pages have been written
 
 					read_address[0] = (0*0xff)& 0x000000ff;
 					read_address[1] = (0*0xff)& 0x0000ff00;

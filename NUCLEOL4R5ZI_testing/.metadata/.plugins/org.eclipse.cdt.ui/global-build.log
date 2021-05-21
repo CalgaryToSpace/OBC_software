@@ -8544,3 +8544,48 @@ arm-none-eabi-size   NUCLEO_L4R5ZI_MPI_demoV2.elf
   23860	     24	  11736	  35620	   8b24	NUCLEO_L4R5ZI_MPI_demoV2.elf
 Finished building: default.size.stdout
  
+17:09:38 **** Incremental Build of configuration Debug for project NUCLEO_L4R5ZI_MPI_demoV2 ****
+make -j8 all 
+arm-none-eabi-size   NUCLEO_L4R5ZI_MPI_demoV2.elf 
+   text	   data	    bss	    dec	    hex	filename
+  23860	     24	  11736	  35620	   8b24	NUCLEO_L4R5ZI_MPI_demoV2.elf
+Finished building: default.size.stdout
+ 
+17:17:16 **** Incremental Build of configuration Debug for project NUCLEO_L4R5ZI_MPI_demoV2 ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32L4R5xx -DDEBUG -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "NUCLEO_L4R5ZI_MPI_demoV2.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\James\Documents\Calgary to Space\OBC_software\NUCLEOL4R5ZI_testing\NUCLEO_L4R5ZI_MPI_demoV2\STM32L4R5ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="NUCLEO_L4R5ZI_MPI_demoV2.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: NUCLEO_L4R5ZI_MPI_demoV2.elf
+ 
+arm-none-eabi-objdump -h -S  NUCLEO_L4R5ZI_MPI_demoV2.elf  > "NUCLEO_L4R5ZI_MPI_demoV2.list"
+arm-none-eabi-objcopy  -O binary  NUCLEO_L4R5ZI_MPI_demoV2.elf  "NUCLEO_L4R5ZI_MPI_demoV2.bin"
+arm-none-eabi-size   NUCLEO_L4R5ZI_MPI_demoV2.elf 
+   text	   data	    bss	    dec	    hex	filename
+  23860	     24	  11736	  35620	   8b24	NUCLEO_L4R5ZI_MPI_demoV2.elf
+Finished building: default.size.stdout
+ 
+Finished building: NUCLEO_L4R5ZI_MPI_demoV2.bin
+ 
+Finished building: NUCLEO_L4R5ZI_MPI_demoV2.list
+ 
+17:31:05 **** Incremental Build of configuration Debug for project NUCLEO_L4R5ZI_MPI_demoV2 ****
+make -j8 all 
+arm-none-eabi-size   NUCLEO_L4R5ZI_MPI_demoV2.elf 
+   text	   data	    bss	    dec	    hex	filename
+  23860	     24	  11736	  35620	   8b24	NUCLEO_L4R5ZI_MPI_demoV2.elf
+Finished building: default.size.stdout
+ 
+17:36:44 **** Incremental Build of configuration Debug for project NUCLEO_L4R5ZI_MPI_demoV2 ****
+make -j8 all 
+arm-none-eabi-size   NUCLEO_L4R5ZI_MPI_demoV2.elf 
+   text	   data	    bss	    dec	    hex	filename
+  23860	     24	  11736	  35620	   8b24	NUCLEO_L4R5ZI_MPI_demoV2.elf
+Finished building: default.size.stdout
+ 
+17:40:55 **** Incremental Build of configuration Debug for project NUCLEO_L4R5ZI_MPI_demoV2 ****
+make -j8 all 
+arm-none-eabi-size   NUCLEO_L4R5ZI_MPI_demoV2.elf 
+   text	   data	    bss	    dec	    hex	filename
+  23860	     24	  11736	  35620	   8b24	NUCLEO_L4R5ZI_MPI_demoV2.elf
+Finished building: default.size.stdout
+ 
