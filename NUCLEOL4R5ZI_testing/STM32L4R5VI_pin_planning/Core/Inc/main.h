@@ -58,6 +58,8 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define NCS_FRAM_Pin GPIO_PIN_7
+#define NCS_FRAM_GPIO_Port GPIOE
 #define NCS_FLASH_Pin GPIO_PIN_8
 #define NCS_FLASH_GPIO_Port GPIOE
 /* USER CODE BEGIN Private defines */
