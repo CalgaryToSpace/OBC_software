@@ -50,6 +50,17 @@ PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
 /* USER CODE BEGIN PV */
 
+//some memory opcodes
+const uint8_t FLASH_READ = 0x03;
+const uint8_t FLASH_WRITE = 0x02;
+const uint8_t FLASH_WREN = 0x06;
+const uint8_t FLASH_WRDI = 0x04;
+const uint8_t FLASH_ER4 = 0x20;
+const uint8_t FLASH_ER32 = 0x52;
+const uint8_t FLASH_ER64 = 0xd8;
+const uint8_t FLASH_ERCP = 0xC7;
+const uint8_t FLASH_STATREG1 = 0X05;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -67,6 +78,9 @@ static void MX_SPI1_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+// You can put your buffers here, I'll get you started
+uint8_t UART1_rxBuffer[160] = {0};
+
 /* USER CODE END 0 */
 
 /**
@@ -76,6 +90,8 @@ static void MX_SPI1_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+
+	//Write your code here!
 
   /* USER CODE END 1 */
 
@@ -104,6 +120,24 @@ int main(void)
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
 
+  //start UART DMA, change buffer name if you want
+  HAL_UART_Receive_DMA(&hlpuart1, UART1_rxBuffer, 160);
+
+  /*
+   Code here! You should:
+
+   Probably write something to uart to convince your self that it works
+
+   Erase the memory chip (via SPI), you can do the entire thing, or part of it
+
+
+   Transmit [0, 0, 0] (in byte form) over hlpuart1, this will begin the test data transmission.
+
+   The Python script will receive this and then you will need to go to the bottom and write code in
+   void HAL_UART_RxCpltCallback(UART_HandleTypeDef *hlpuart1) to receive the transmitted data
+
+   */
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -111,6 +145,8 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+
+	  //Don't bother putting the stuff into a loop, just do it in main()
 
     /* USER CODE BEGIN 3 */
   }
@@ -425,7 +461,22 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *hlpuart1)
+{
+	/*
+	You will add some code here, this function gets called every time the STM gets a UART message
+	Data is stored into UART1_rxBuffer
 
+	store this data into the memory module.
+
+	I will remove power from the memory chip in between this step so we know its actually been written.
+
+	read it back out, and send it back to the PC for verification
+
+	*/
+
+    HAL_UART_Receive_DMA(hlpuart1, UART1_rxBuffer, 160);
+}
 /* USER CODE END 4 */
 
 /**
