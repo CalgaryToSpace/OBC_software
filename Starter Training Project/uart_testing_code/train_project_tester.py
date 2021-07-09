@@ -1,4 +1,6 @@
 """
+Thomas Train
+
 This script will open a serial port at 230400 baud, and wait for message starting with [0, 0, 0] bytes. It will
 then send one sample MPI frame to be stored into the memory. Once it does this it will wait for the user to send the
 data back, and verify that it has not changed.
