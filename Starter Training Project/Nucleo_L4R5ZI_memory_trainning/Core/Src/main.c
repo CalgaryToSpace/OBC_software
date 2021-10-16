@@ -80,6 +80,9 @@ static void MX_SPI1_Init(void);
 
 // You can put your buffers here, I'll get you started
 uint8_t UART1_rxBuffer[160] = {0};
+uint8_t SPI_txBuffer[128] = {0};
+uint8_t SPI_rxBuffer[128] = {0};
+
 
 /* USER CODE END 0 */
 
@@ -119,6 +122,7 @@ int main(void)
   MX_USB_OTG_FS_PCD_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_14, GPIO_PIN_SET);
 
   //start UART DMA, change buffer name if you want
   HAL_UART_Receive_DMA(&hlpuart1, UART1_rxBuffer, 160);
@@ -126,9 +130,14 @@ int main(void)
   /*
    Code here! You should:
 
-   Probably write something to uart to convince your self that it works
+   Probably write something to uart to convince your self that it works.
+   Trigger python script to send simulator data*/
+    UART1_rxBuffer[0] = 3;
+    UART1_rxBuffer[1] = 1;
+    UART1_rxBuffer[2] = 4;
+	HAL_UART_Transmit(&hlpuart1, (uint8_t *)UART1_rxBuffer, strlen((char*)UART1_rxBuffer), 160);
 
-   Erase the memory chip (via SPI), you can do the entire thing, or part of it
+	/*Erase the memory chip (via SPI), you can do the entire thing, or part of it
 
 
    Transmit [0, 0, 0] (in byte form) over hlpuart1, this will begin the test data transmission.
@@ -137,7 +146,7 @@ int main(void)
    void HAL_UART_RxCpltCallback(UART_HandleTypeDef *hlpuart1) to receive the transmitted data
 
    */
-
+	SPI_rxBuffer[0] = FLASH_ERCP;
   /* USER CODE END 2 */
 
   /* Infinite loop */

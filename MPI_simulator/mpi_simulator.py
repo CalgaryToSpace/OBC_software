@@ -69,7 +69,7 @@ def start_mpi_simulator(ser, mode):
             print("**********************************")
 
             # if TC for start sending data
-            if rx[0] == 84 and rx[1] == 67 and rx[2] == 9:
+            if rx[0] == 3 and rx[1] == 1 and rx[2] == 4:
                 if mode == 1:
                     print('Sending success echo')
                     echo = rx[:]
