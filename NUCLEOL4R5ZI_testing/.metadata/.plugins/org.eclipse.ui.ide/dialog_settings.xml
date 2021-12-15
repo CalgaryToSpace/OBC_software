@@ -3,4 +3,6 @@
 	<section name="ExternalProjectImportWizard">
 		<item key="WizardProjectsImportPage.STORE_NESTED_PROJECTS" value="true"/>
 	</section>
+	<section name="NewWizardAction">
+	</section>
 </section>
