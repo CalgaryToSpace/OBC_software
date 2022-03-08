@@ -1,3 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">&#x0A;<refactoring comment="Delete resource &apos;Nucleo_L4R5ZI_memory_trainning&apos;" deleteContents="true" description="Delete resource &apos;Nucleo_L4R5ZI_memory_trainning&apos;" element1="/Nucleo_L4R5ZI_memory_trainning" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1625793706160"/>&#x0A;<refactoring comment="Rename resource &apos;STM32_trainning&apos; to &apos;Nucleo_L4R5ZI_memory_trainning&apos;" description="Rename resource &apos;STM32_trainning&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="/STM32_trainning" name="Nucleo_L4R5ZI_memory_trainning" stamp="1625793910740" updateReferences="true"/>
-</session>
