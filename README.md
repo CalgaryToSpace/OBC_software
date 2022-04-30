@@ -1,16 +1,15 @@
 # CalgarytoSpace Software 
 
 ## Folder Structure
-[Nucleo_L4R5ZI]   - The Operating System for the Satellite
-[Examples] 	            - Contains demo projects for specific functions such as UART,, SPI,  Task Management, etc
-[Tools]						- Simulators and other testing tools
+  [Workspace]  	- The Operating System for the Satellite
+  [Examples] 	- Contains demo projects for specific functions such as UART, SPI,  Task Management, etc
+  [Tools]	- Simulators and other testing tools
 
 ## Getting Started
   #### Downloads 
 - [STM32 CubeIDE - Integrated Development Environment Download](https://www.st.com/en/development-tools/stm32cubeide.html)
 - [Git Bash Download ](https://git-scm.com/downloads)
 - [Visual Studio Code](https://code.visualstudio.com/) (Optional) 
-- 
 
 #### Hardware
 - STM32L4R5ZI Nucleo-144
