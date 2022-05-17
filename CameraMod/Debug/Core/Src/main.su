@@ -1,0 +1,11 @@
+main.c:124:22:Change_Bitrate	16	static
+main.c:72:5:main	168	static
+main.c:172:11:hex	24	static
+main.c:177:7:to_byte_array	40	static
+main.c:255:6:SystemClock_Config	96	static
+main.c:304:13:MX_LPUART1_UART_Init	8	static
+main.c:352:13:MX_UART5_Init	8	static
+main.c:400:13:MX_USART3_UART_Init	8	static
+main.c:448:13:MX_USB_OTG_FS_PCD_Init	8	static
+main.c:482:13:MX_GPIO_Init	56	static
+main.c:539:6:Error_Handler	4	static,ignoring_inline_asm
