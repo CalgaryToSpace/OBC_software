@@ -1,0 +1,59 @@
+!SESSION 2022-06-16 18:32:29.429 -----------------------------------------------
+eclipse.buildId=Version 1.8.0
+java.version=11.0.11
+java.vendor=AdoptOpenJDK
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_CA
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2022-06-16 18:32:53.702
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2022-06-16 18:32:53.738
+!MESSAGE Log4j initialized with config file C:\Users\asjad\Documents\@CUBESAT\clone\OBC_software\.metadata\.log4j.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2022-06-16 18:32:55.342
+!MESSAGE Started RMI Server, listening on port 41337
+!SESSION 2022-06-16 18:34:57.980 -----------------------------------------------
+eclipse.buildId=Version 1.8.0
+java.version=11.0.11
+java.vendor=AdoptOpenJDK
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_CA
+Framework arguments:  C:\Users\asjad\Documents\@CUBESAT\clone\OBC_software\External\.project
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 C:\Users\asjad\Documents\@CUBESAT\clone\OBC_software\External\.project
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2022-06-16 18:35:10.018
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2022-06-16 18:35:10.053
+!MESSAGE Log4j initialized with config file C:\Users\asjad\Documents\@CUBESAT\clone\OBC_software\.metadata\.log4j.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2022-06-16 18:35:12.348
+!MESSAGE Started RMI Server, listening on port 41337
+
+!ENTRY org.eclipse.core.resources 4 77 2022-06-16 18:35:12.502
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2022-06-16 18:35:12.502
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2022-06-16 18:35:12.502
+!MESSAGE C:\Users\asjad\Documents\@CUBESAT\clone\OBC_software\External overlaps the location of another project: 'External'
+!SESSION 2022-06-16 18:38:18.572 -----------------------------------------------
+eclipse.buildId=Version 1.8.0
+java.version=11.0.11
+java.vendor=AdoptOpenJDK
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_CA
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2022-06-16 18:38:25.923
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2022-06-16 18:38:25.959
+!MESSAGE Log4j initialized with config file C:\Users\asjad\Documents\@CUBESAT\clone\OBC_software\.metadata\.log4j.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2022-06-16 18:38:28.318
+!MESSAGE Started RMI Server, listening on port 41337
+
+!ENTRY org.eclipse.cdt.core 1 0 2022-06-16 18:39:04.887
+!MESSAGE Indexed 'Internal' (30 sources, 116 headers) in 3.25 sec: 12,962 declarations; 68,593 references; 3 unresolved inclusions; 46 syntax errors; 171 unresolved names (0.21%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2022-06-16 18:39:07.105
+!MESSAGE Indexed 'External' (28 sources, 112 headers) in 2.21 sec: 11,662 declarations; 59,881 references; 3 unresolved inclusions; 46 syntax errors; 171 unresolved names (0.24%)

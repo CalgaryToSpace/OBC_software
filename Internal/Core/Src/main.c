@@ -86,7 +86,7 @@ uint8_t dataRec[65];
 #define v30															0.76
 #define vtemp 														30
 #define vrefplus 													3.5
-
+#define something_stupid
 
 float temperature;
 float sensorValue;
