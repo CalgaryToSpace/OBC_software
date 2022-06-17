@@ -22,7 +22,6 @@
 #include <stdio.h>
 #include <stm32l4xx_hal_i2c.h>
 #include <stm32l4xx_hal_i2c_ex.h>
-// random comment
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
