@@ -57,3 +57,10 @@ Command-line arguments:  -os win32 -ws win32 -arch x86_64
 
 !ENTRY org.eclipse.cdt.core 1 0 2022-06-16 18:39:07.105
 !MESSAGE Indexed 'External' (28 sources, 112 headers) in 2.21 sec: 11,662 declarations; 59,881 references; 3 unresolved inclusions; 46 syntax errors; 171 unresolved names (0.24%)
+
+!ENTRY org.eclipse.core.resources 4 77 2022-06-16 20:15:22.600
+!MESSAGE Invalid project description.
+!SUBENTRY 1 unknown 0 0 2022-06-16 20:15:22.600
+!MESSAGE OK
+!SUBENTRY 1 org.eclipse.core.resources 4 77 2022-06-16 20:15:22.600
+!MESSAGE C:\Users\asjad\Documents\@CUBESAT\clone\OBC_software\External overlaps the location of another project: 'External'
