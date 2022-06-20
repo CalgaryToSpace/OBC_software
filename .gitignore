@@ -1,1 +1,4 @@
-**/.metadata/
+# ignoring .metadata and subdirectories
+# .metadata/
+# **/.metadata/.plugins/
+**/.metadata/*
