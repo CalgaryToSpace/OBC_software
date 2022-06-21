@@ -1,6 +1,10 @@
 # ignoring .metadata and subdirectories
 # .metadata/
 # **/.metadata/.plugins/
-**/.metadata/*
+# **/.metadata/*
+
+# This ignores all .metadata folders found in this directory
+*/.metadata/*
+.metadata/*
+
 # ignoring the Bulid files
-External/Debug/
