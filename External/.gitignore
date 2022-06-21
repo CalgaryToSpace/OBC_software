@@ -5,3 +5,5 @@
 .settings/
 # Build Files that are modified when building project in STM32 IDE
 **/Debug/
+
+*.snap
