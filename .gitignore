@@ -2,3 +2,5 @@
 # .metadata/
 # **/.metadata/.plugins/
 **/.metadata/*
+# ignoring the Bulid files
+External/Debug/
