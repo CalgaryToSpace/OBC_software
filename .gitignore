@@ -7,4 +7,5 @@
 */.metadata/*
 .metadata/*
 
+*.ini
 # ignoring the Bulid files
