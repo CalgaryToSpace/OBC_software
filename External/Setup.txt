@@ -1,0 +1,34 @@
+This is outlining the instructions to connect the i2c mcp9808 thermometer from a red board to the STM32 L4R5ZI.
+
+ON THE BREADBOARD:
+
+Connect pins to the Vdd, GNnd, SCL, and SDA.
+
+ON THE STM32 BOARD:
+
+** there are multiple combinations that could work as we are just connecting lines, however, the one listed below is ONE POSSIBLE and USABLE combination **
+
+** Look at data sheet for thermometer on Google Drive **
+
+USING the CN8 Pins:
+
+    VDD goes into either 3V3 or 5V pin
+
+    GND goes into any GND pin, such as the one below 5V
+
+    SCL goes into the middle I2C pins (near the bottom left CN8 column, there are 3 pins dedicated for I2C) (Pin PF1 on the STM32 board)
+
+    SDA goes into  the last I2C pin (underneath SCL) (PIN PF0 on the STM32 board)
+
+In the STM32 IDE:
+    ** This only applies to the SCL and SDA lines, thus, if you used differnt pins for VDD and/or GND, this wont effect anything below
+    however, if you used different SCL and/or SDA pins than the ones listed above, then you will need to go to the STM32 pinout document 
+    to find which pinout correlates correctly to the one you used **
+
+        Go to the PF0 pinout and select the option: "I2C2_SDA"
+
+        Go to the PF1 pinout and select the option: "I2C2_SCL"
+    
+
+    
+
