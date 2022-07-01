@@ -8,4 +8,4 @@ uart.c:274:13:MX_DMA_Init	16	static
 uart.c:293:13:MX_GPIO_Init	56	static
 uart.c:350:6:HAL_TIM_PeriodElapsedCallback	16	static
 uart.c:363:6:HAL_UART_RxCpltCallback	16	static
-uart.c:370:6:sendUartMessage	16	static
+uart.c:371:6:sendUartMessage	16	static
