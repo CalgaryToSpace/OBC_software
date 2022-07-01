@@ -8,13 +8,20 @@
 #ifndef INC_UART_H_
 #define INC_UART_H_
 
-// Configure the clock
+/**
+ * Configures the clock. This was an auto-built function (I think).
+ */
 void SystemClock_Config(void);
 
-// Calls UART initialization functions
+/**
+ * Function that handles all UART initialization.
+ */
 void startUart();
 
-// Transmits a UART message of a set length
+/**
+ * Function that transmits a message via UART. It takes in the message as a char pointer and an
+ * integer representing the length of the char.
+ */
 void sendUartMessage(char* message, int length);
 
 #endif /* INC_UART_H_ */

@@ -365,8 +365,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *hlpuart1)
 
 }
 
-// Function that takes in a char pointer with a UART message to transmit and
-// the length of said message
+/**
+ * Function definition of sendUartMessage.
+ */
 void sendUartMessage(char* message, int length){
 	HAL_UART_Transmit(&hlpuart1, (uint8_t*)message, length, HAL_MAX_DELAY);
 }

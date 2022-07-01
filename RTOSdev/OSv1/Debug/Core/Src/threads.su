@@ -1,4 +1,4 @@
-threads.c:22:6:mainThread	24	static
-threads.c:58:6:test1	16	static
-threads.c:77:6:test2	16	static
-threads.c:96:6:test3	16	static
+threads.c:22:6:mainThread	16	static
+threads.c:39:6:test1	16	static
+threads.c:59:6:test2	16	static
+threads.c:78:6:test3	16	static

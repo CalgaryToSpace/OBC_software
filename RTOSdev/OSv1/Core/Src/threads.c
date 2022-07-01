@@ -20,51 +20,66 @@ extern struct threadNode* head;
 //PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
 void mainThread(void *argument){
-	int mainProcessCount = 2;
-	startThread(test1, osPriorityLow, "Mem", 4*64);
-	startThread(test2, osPriorityHigh, "GPS", 4*64);
+	startThread(test1, osPriorityLow, "One", 4*64);
 	for(;;){
-		vTaskDelay(pdMS_TO_TICKS(1000));
+		//vTaskDelay(pdMS_TO_TICKS(1000));
+		sendUartMessage("zro", 3);
 		printAllThreadInfo();
 		sendUartMessage("\n", 1);
 		sendUartMessage("\r", 1);
-		vTaskDelay(pdMS_TO_TICKS(5000));
-		killThread(findNode(osThreadGetId())->children[0]);
-		if(mainProcessCount != childCount(head)){
-
-		}
+		vTaskDelay(pdMS_TO_TICKS(50));
+//		killThread(findNode(osThreadGetId())->children[0]);
+//		if(mainProcessCount != childCount(head)){
+//
+//		}
 	}
 }
 
 //Test function
 void test1(void *argument)
 {
+  startThread(test2, osPriorityLow, "Two", 4*64);
+  //vTaskDelay(pdMS_TO_TICKS(2000));
+  sendUartMessage("Uno", 3);
+  printAllThreadInfo();
+  sendUartMessage("\n", 1);
+  sendUartMessage("\r", 1);
   for(;;)
   {
 	sendUartMessage("\n", 1);
 	sendUartMessage("\r", 1);
-	sendUartMessage("BBBBBB", 6);
+	sendUartMessage("111111", 6);
 	sendUartMessage("\n", 1);
 	sendUartMessage("\r", 1);
-    vTaskDelay(pdMS_TO_TICKS(1000));
+    vTaskDelay(pdMS_TO_TICKS(50));
   }
 }
 
 //Test function
 void test2(void *argument)
 {
+	//startThread(test3, osPriorityHigh, "fre", 4*64);
+	//vTaskDelay(pdMS_TO_TICKS(3000));
+	sendUartMessage("duo", 3);
+	printAllThreadInfo();
+	sendUartMessage("\n", 1);
+	sendUartMessage("\r", 1);
 	for(;;)
 	{
 		sendUartMessage("\n", 1);
 		sendUartMessage("\r", 1);
-		sendUartMessage("AAAAAA", 6);
+		sendUartMessage("222222", 6);
 		sendUartMessage("\n", 1);
 		sendUartMessage("\r", 1);
-		vTaskDelay(pdMS_TO_TICKS(1000));
+		vTaskDelay(pdMS_TO_TICKS(50));
 	}
 }
 
 void test3(void *argument){
+	vTaskDelay(pdMS_TO_TICKS(4000));
+	printAllThreadInfo();
+	sendUartMessage("\n", 1);
+	sendUartMessage("\r", 1);
 	for(;;)
 	{
 

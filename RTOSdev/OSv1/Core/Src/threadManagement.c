@@ -14,7 +14,9 @@
 #include <stdio.h>
 
 
-
+/**
+ * Function definition of addChildNodeToParent.
+ */
 void addChildNodeToParent(struct threadNode* parentNode, struct threadNode* child){
 	if(parentNode == NULL)
 		return;
@@ -35,6 +37,9 @@ void addChildNodeToParent(struct threadNode* parentNode, struct threadNode* chil
 	}
 }
 
+/**
+ * Function definition of removeChildNodeFromParent.
+ */
 void removeChildNodeFromParent(struct threadNode* parentNode, struct threadNode* doomed){
 	parentNode->childCount -= 1;
 	struct threadNode** temp = parentNode->children;
@@ -54,6 +59,9 @@ void checkMainModuleNodesStatus(){
 
 }
 
+/**
+ * Function definition of initializeThreadNode.
+ */
 void initializeThreadNode(struct threadNode* parent, osThreadId_t handle, struct threadInfo* theInfo){
 	struct threadNode* theNode = (struct threadNode*)malloc(sizeof(struct threadNode));
 	theNode->parent = parent;
@@ -70,6 +78,9 @@ void initializeThreadNode(struct threadNode* parent, osThreadId_t handle, struct
 
 }
 
+/**
+ * Function definition of checkChildrenDebug.
+ */
 void checkChildrenDebug(osThreadId_t handle){
 	struct threadNode* theNode = findNode(handle);
 	int childCount = theNode->childCount;
@@ -84,10 +95,16 @@ void checkChildrenDebug(osThreadId_t handle){
 	sendUartMessage("\r", 1);
 }
 
+/**
+ * Function definition of childCount.
+ */
 int childCount(struct threadNode* theNode){
 	return theNode->childCount;
 }
 
+/**
+ * Function definition of threadStateDebug.
+ */
 void threadStateDebug(osThreadId_t handle){
 	sendUartMessage("\n", 1);
 	sendUartMessage("\r", 1);
@@ -121,10 +138,9 @@ void threadStateDebug(osThreadId_t handle){
 	sendUartMessage("\r", 1);
 }
 
-// Function that puts thread information into a struct of type threadInfo, starts
-// the thread, and returns the struct. Requires a function pointer to the function
-// the new thread will run, the priority to set the new thread to, the name of the
-// new thread, and the stack size of the new thread.
+/**
+ * Function definition of startThread.
+ */
 void startThread(void (*funPtr), int tp, char* tn, int stackSize){
 	struct threadInfo info;
 	info.threadPriority = tp;
@@ -147,7 +163,9 @@ void startThread(void (*funPtr), int tp, char* tn, int stackSize){
 }
 
 
-
+/**
+ * Function definition of amIMain.
+ */
 void amIMain(){
 	if(head->handle == osThreadGetId()){
 		sendUartMessage("\n", 1);
@@ -156,6 +174,9 @@ void amIMain(){
 	}
 }
 
+/**
+ * Function definition of newTreeQueue.
+ */
 struct treeQueue* newTreeQueue(){
 	struct treeQueue *queue = (struct treeQueue*) malloc(sizeof(struct treeQueue));
 	queue->maxSize = 100;
@@ -166,6 +187,9 @@ struct treeQueue* newTreeQueue(){
 	return queue;
 };
 
+/**
+ * Function definition of enqueue.
+ */
 void enqueue(struct treeQueue* queue, struct threadNode* toAdd){
 	if(queue->itemCount == queue->maxSize){
 
@@ -178,6 +202,9 @@ void enqueue(struct treeQueue* queue, struct threadNode* toAdd){
 	return;
 }
 
+/**
+ * Function definition of dequeue.
+ */
 struct threadNode* dequeue(struct treeQueue* queue){
 	if(queue->itemCount == 0){
 
@@ -189,6 +216,9 @@ struct threadNode* dequeue(struct treeQueue* queue){
 	return temp;
 }
 
+/**
+ * Function definition of findNode.
+ */
 struct threadNode* findNode(osThreadId_t handle){
 	if(handle == NULL){
 			return NULL;
@@ -213,6 +243,9 @@ struct threadNode* findNode(osThreadId_t handle){
 	return NULL;
 }
 
+/**
+ * Function definition of killThread.
+ */
 void killThread(struct threadNode* theNode){
 	if(theNode->children == NULL){
 			removeChildNodeFromParent(theNode->parent, theNode);
@@ -233,7 +266,9 @@ void killThread(struct threadNode* theNode){
 	return;
 }
 
-
+/**
+ * Function definition of findAndKillThread.
+ */
 void findAndkillThread(osThreadId_t handle){
 	struct threadNode* theNode = findNode(handle);
 	killThread(theNode);
@@ -243,15 +278,19 @@ int verifyAllAlive(){
 
 }
 
+/**
+ * Function definition of printAllThreadInfo.
+ */
 void printAllThreadInfo(){
 	sendUartMessage("\n", 1);
 	sendUartMessage("\r", 1);
 	sendUartMessage("I am the: ", 10);
-	sendUartMessage(head->threadName, 4);
-	for(int i = 0; i < head->childCount; i++){
+	struct threadNode* current = findNode(osThreadGetId());
+	sendUartMessage(current->threadName, 4);
+	for(int i = 0; i < current->childCount; i++){
 		sendUartMessage("\n", 1);
 		sendUartMessage("\r", 1);
-		sendUartMessage(head->children[i]->threadName, 3);
+		sendUartMessage(current->children[i]->threadName, 3);
 	}
 }
 
