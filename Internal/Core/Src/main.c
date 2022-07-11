@@ -18,9 +18,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include <string.h>
-#include <stdlib.h>
-#include <math.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -179,7 +176,18 @@ uint16_t temp_value = 0;
   	  HAL_ADC_Stop( &hadc1 );
 
   	  //char tem[4];
-
+  	  char str[5];
+//  	  char tempStr[18];
+  	  char endStr[2] = "\r\n";
+  	  short int tempInt = (int) temperature;
+  	  itoa(tempInt, (char*) str, 10);
+//  	  gcvt(temperature, 2, str);
+//  	  gcvt(tempInt, 2, (char *)str);
+//  	  strncat(str, endStr, 2);
+//  	  strncat(tempStr, endStr, 2);
+//  	  strcpy((char*) str, tempStr);
+  	  HAL_UART_Transmit(&hlpuart1, str,strlen((char*)str), HAL_MAX_DELAY);
+  	  HAL_Delay(750);
   	  //memcpy(tem, &temperature, 4);
 //  	  int temp = (int)temperature;
   	  //int * temp;
@@ -230,6 +238,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
@@ -248,6 +257,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+
   /** Initializes the CPU, AHB and APB buses clocks
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
@@ -281,6 +291,7 @@ static void MX_ADC1_Init(void)
   /* USER CODE BEGIN ADC1_Init 1 */
 
   /* USER CODE END ADC1_Init 1 */
+
   /** Common config
   */
   hadc1.Instance = ADC1;
@@ -302,6 +313,7 @@ static void MX_ADC1_Init(void)
   {
     Error_Handler();
   }
+
   /** Configure Analog WatchDog 1
   */
   AnalogWDGConfig.WatchdogNumber = ADC_ANALOGWATCHDOG_1;
@@ -314,6 +326,7 @@ static void MX_ADC1_Init(void)
   {
     Error_Handler();
   }
+
   /** Configure Regular Channel
   */
   sConfig.Channel = ADC_CHANNEL_TEMPSENSOR;
@@ -349,7 +362,7 @@ static void MX_LPUART1_UART_Init(void)
   /* USER CODE END LPUART1_Init 1 */
   hlpuart1.Instance = LPUART1;
   hlpuart1.Init.BaudRate = 209700;
-  hlpuart1.Init.WordLength = UART_WORDLENGTH_8B;
+  hlpuart1.Init.WordLength = UART_WORDLENGTH_7B;
   hlpuart1.Init.StopBits = UART_STOPBITS_1;
   hlpuart1.Init.Parity = UART_PARITY_NONE;
   hlpuart1.Init.Mode = UART_MODE_TX_RX;
@@ -605,4 +618,3 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
-
