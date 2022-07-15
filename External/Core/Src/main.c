@@ -1,20 +1,20 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2022 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.c
+ * @brief          : Main program body
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2022 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
@@ -52,7 +52,7 @@ PCD_HandleTypeDef hpcd_USB_OTG_FS;
 static const uint8_t SENS_ADDR = 0x18;
 static const uint8_t REG_TEMP = 0x05;
 uint8_t ACK;
- uint8_t NAK;
+uint8_t NAK;
 uint8_t UpperByte;
 uint8_t LowerByte;
 
@@ -75,463 +75,486 @@ static void MX_I2C2_Init(void);
 /* USER CODE END 0 */
 
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
-int main(void)
-{
-  /* USER CODE BEGIN 1 */
-	HAL_StatusTypeDef ret;
-	uint8_t buf[18];
-	int16_t val;
-	float Temperature;
-  /* USER CODE END 1 */
+ * @brief  The application entry point.
+ * @retval int
+ */
+int main(void) {
+	/* USER CODE BEGIN 1 */
+	uint8_t buf[3];
+	/* USER CODE END 1 */
 
-  /* MCU Configuration--------------------------------------------------------*/
+	/* MCU Configuration--------------------------------------------------------*/
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+	HAL_Init();
 
-  /* USER CODE BEGIN Init */
+	/* USER CODE BEGIN Init */
 
-  /* USER CODE END Init */
+	/* USER CODE END Init */
 
-  /* Configure the system clock */
-  SystemClock_Config();
+	/* Configure the system clock */
+	SystemClock_Config();
 
-  /* USER CODE BEGIN SysInit */
+	/* USER CODE BEGIN SysInit */
 
-  /* USER CODE END SysInit */
+	/* USER CODE END SysInit */
 
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_LPUART1_UART_Init();
-  MX_USART3_UART_Init();
-  MX_USB_OTG_FS_PCD_Init();
-  MX_I2C2_Init();
-  /* USER CODE BEGIN 2 */
+	/* Initialize all configured peripherals */
+	MX_GPIO_Init();
+	MX_LPUART1_UART_Init();
+	MX_USART3_UART_Init();
+	MX_USB_OTG_FS_PCD_Init();
+	MX_I2C2_Init();
+	/* USER CODE BEGIN 2 */
 
+	/* USER CODE END 2 */
 
-  /* USER CODE END 2 */
+	/* Infinite loop */
+	/* USER CODE BEGIN WHILE */
+	while (1) {
+		// represents the the required ending for transmitting
+		// string through uart
+//		char strEnd[3] = "\r\n";
+		char newLine[2] = "\n";
 
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-	  // represents the the required ending for tranmimtting
-	  // string through uart
-	  char strEnd[3] = "\r\n";
-	  strcpy((char*)buf, "Stort\r\n");
+//		HAL_UART_Transmit(&hlpuart1, buf, strlen((char*) buf), HAL_MAX_DELAY);
+		buf[0] = REG_TEMP;
+		// send acknowledge bit
+		ACK = HAL_I2C_Master_Transmit(&hi2c2, SENS_ADDR << 1, buf, 1,
+				HAL_MAX_DELAY);
+		uint8_t signal = HAL_I2C_Master_Receive(&hi2c2, SENS_ADDR << 1, buf, 2,
+				HAL_MAX_DELAY);
+		// The 16 bits that represent the information for the Ta (Ambiant Temperature) are stored in
+		// buf as the first to bytes (as it 16 bits long, so 2 bytes)
 
+		// First most significant byte
+		UpperByte = buf[0];
+		short upper = UpperByte; // Here for debugging purposes
 
-	  	  	  HAL_UART_Transmit(&hlpuart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
-//	  	  	  buf[0] = REG_TEMP;
-	  	  	// send acknowledge bit
-	  	  		  ACK = HAL_I2C_Master_Transmit(&hi2c2, SENS_ADDR, buf, 1, HAL_MAX_DELAY);
-//		  	  	  HAL_UART_Transmit(&hlpuart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
+		// Less significant byte
+		LowerByte = buf[1];
+		short lower = LowerByte; // Here for debugging purposes
 
-	  // represents the full 16 bits recieved from the thermometer
-//      uint8_t signal = HAL_I2C_Master_Receive(&hi2c2, REG_TEMP, buf, 8, HAL_MAX_DELAY);
+		// If 0, then temp is positive, if 1, temp is negative
+		short negCheckMask = 0x10; // 0001 0000
+		short negCheck = UpperByte & negCheckMask;
 
-	  int * regAddress = (int*)REG_TEMP; // 0x05, defined in MCP9808 data sheet section 5.1.3
-	  short AmbiantTemp = *regAddress;
-	  short signal = AmbiantTemp;
+		// Grabs bits 11-8,
+		short sigUpperbitsMask = 0x0F; //0000 1111
+		short sigUpperbits = UpperByte & sigUpperbitsMask;
+		// As these bits are meant to represent (2^7, 2^6, 2^5, 2^4), I must multiply value by 16
+		short upperBitsTemp = sigUpperbits << 4;
 
-	  /*
-       * This finds the signed bit (bit 12)
-       *
-       */
+		// Represents (2^3, 2^2, 2^1, 2^0)
+		short firstLowerBitsTemp = lower >> 4;
+		// Represents the decimal bits (2^-1, 2^-2, 2^-3, 2^-4),
+		// thus, equivalent to dividing num by 16
+		float decimalNums = ((float) (0x0F & lower)) / 16;
 
-      short negCheckMask = 0x1000; // 0001 0000 0000 0000
-      short negCheck = signal & negCheckMask;
+		float temp = upperBitsTemp + firstLowerBitsTemp + decimalNums;
 
-      // sets up string so we can check what it is
-      char str[4];
-      itoa((int)negCheck, str, 10);
-      // need to append carriage return and new line char at the end of the string
-      strncat(str, strEnd, 2);
-      HAL_UART_Transmit(&hlpuart1, str,strlen((char*)str), HAL_MAX_DELAY);
+		char tempBuf[8];
+		gcvt(temp, 7, tempBuf);
 
-      // if negCheck is a 0 , it means it is positive
-      // defined in MCP9808 datasheet section 5.1.3
-      if (negCheck == 0){
-    	  strcpy((char*)buf, "Positive Number\r\n");
-    	  HAL_UART_Transmit(&hlpuart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
+		// Prints Temp to COM port
+		HAL_UART_Transmit(&hlpuart1, tempBuf, strlen((char*) tempBuf),
+				HAL_MAX_DELAY);
+		// Print new line for clarity
+		HAL_UART_Transmit(&hlpuart1, newLine, strlen((char*)newLine), HAL_MAX_DELAY);
 
-      }
-      // if negCheck is a 1, it means it is a negative number
-      // defined in MCP9808 datasheet section 5.1.3
-      if (negCheck == 1){
-    	  strcpy((char*)buf, "Negative Number\r\n");
-    	  HAL_UART_Transmit(&hlpuart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
-      }
+////		  	  	  HAL_UART_Transmit(&hlpuart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
+//
+//	  // represents the full 16 bits recieved from the thermometer
+////      uint8_t signal = HAL_I2C_Master_Receive(&hi2c2, REG_TEMP, buf, 8, HAL_MAX_DELAY);
+//
+////	  int * regAddress = (int*)REG_TEMP; // 0x05, defined in MCP9808 data sheet section 5.1.3
+////	  short AmbiantTemp = *regAddress;
+////	  short signal = AmbiantTemp;
+//
+//	  /*
+//       * This finds the signed bit (bit 12)
+//       *
+//       */
+//
+////      short negCheckMask = 0x1000; // 0001 0000 0000 0000
+////      short negCheck = signal & negCheckMask;
+//      short negCheck = UpperByte
+//      // sets up string so we can check what it is
+//      char str[4];
+//      itoa((int)negCheck, str, 10);
+//      // need to append carriage return and new line char at the end of the string
+//      strncat(str, strEnd, 2);
+//      HAL_UART_Transmit(&hlpuart1, str,strlen((char*)str), HAL_MAX_DELAY);
+//
+//      // if negCheck is a 0 , it means it is positive
+//      // defined in MCP9808 datasheet section 5.1.3
+//      if (negCheck == 0){
+//    	  strcpy((char*)buf, "Positive Number\r\n");
+//    	  HAL_UART_Transmit(&hlpuart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
+//
+//      }
+//      // if negCheck is a 1, it means it is a negative number
+//      // defined in MCP9808 datasheet section 5.1.3
+//      if (negCheck == 1){
+//    	  strcpy((char*)buf, "Negative Number\r\n");
+//    	  HAL_UART_Transmit(&hlpuart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
+//      }
+//
+//      // need to shift left 4 bits as stipulated in mcp9808 data sheet
+//      uint16_t shiftedSignal = signal << 4;
+//
+//      // now, 8 most signficant bits is the upper byte
+//      // lower 8 bits is the lower byte
+//
+//      // grabs bits 15 to 8
+//      short UpperByteMask = 0xFF00; // 1111 1111 0000 0000
+//      UpperByte = shiftedSignal & UpperByteMask;
+//      short upperByteTest = UpperByte;
+//
+//      // grabs bits 7 to 0
+//      short LowerByteMask = 0x00FF; // 0000 0000 1111 1111
+//      LowerByte = shiftedSignal & LowerByteMask;
+//      short lowerByteTest = LowerByte;
+//
+//      // UpperByte is 0 when the temperature read is less than 32
+//      if ( UpperByte != HAL_OK ) {
+//	          strcpy((char*)buf, "Temperature is greater that 32 degrees\r\n");
+//	  	  	  HAL_UART_Transmit(&hlpuart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
+//	  }
+//
+//
+//
+//	  char tempStr[19];
+//	  /*
+//	   * The following block of if statments and temperature
+//	   * calculation is from the MCP9808 Datasheet
+//	   *
+//	   * Added transmit statements for clarity
+//	   *
+//	   * Section: 5.1.3.1, example 5-1
+//	   *
+//	   */
+//	  if ((UpperByte & 0x80) == 0x80){ //TA ³ TCRIT
+//		  gcvt(Temperature, 3, tempStr);
+//	  	  strncat(tempStr, strEnd, 2);
+//		  strcpy((char*) str, tempStr);
+//		  HAL_UART_Transmit(&hlpuart1, str,strlen((char*)str), HAL_MAX_DELAY);
+//
+//	  }
+//	  if ((UpperByte & 0x40) == 0x40){ //TA > TUPPER
+//		  gcvt(Temperature, 3, tempStr);
+//
+//	  	  strncat(tempStr, strEnd, 2);
+//		  strcpy((char*) str, tempStr);
+//		  HAL_UART_Transmit(&hlpuart1, str,strlen((char*)str), HAL_MAX_DELAY);
+//
+//	  }
+//	  if ((UpperByte & 0x20) == 0x20){ //TA < TLOWER
+//		  gcvt(Temperature, 3, tempStr);
+//
+//	  	  strncat(tempStr, strEnd, 2);
+//		  strcpy((char*) str, tempStr);
+//		  HAL_UART_Transmit(&hlpuart1, str,strlen((char*)str), HAL_MAX_DELAY);
+//
+//	  }
+//	  UpperByte = UpperByte & 0x1F; //Clear flag bits
+//	  if ((UpperByte & 0x10) == 0x10){ //TA < 0°C
+//	  UpperByte = UpperByte & 0x0F; //Clear SIGN
+//	  Temperature = 256 - (UpperByte * 16 + LowerByte / 16);
+//	  }else{ //TA ³ 0°C
+//	  Temperature = (UpperByte * 16 + LowerByte / 16);
+//	  }
+//
+//	  gcvt(Temperature, 16, tempStr);
+//
+//  	  strncat(tempStr, strEnd, 2);
+//	  strcpy((char*) str, tempStr);
+//	  HAL_UART_Transmit(&hlpuart1, str,strlen((char*)str), HAL_MAX_DELAY);
 
-      // need to shift left 4 bits as stipulated in mcp9808 data sheet
-      uint16_t shiftedSignal = signal << 4;
+		HAL_Delay(750);
 
-      // now, 8 most signficant bits is the upper byte
-      // lower 8 bits is the lower byte
+//		NAK = HAL_I2C_Master_Transmit(&hi2c2, SENS_ADDR << 1, buf, 1,
+//				HAL_MAX_DELAY);
+		/* USER CODE END WHILE */
 
-      // grabs bits 15 to 8
-      short UpperByteMask = 0xFF00; // 1111 1111 0000 0000
-      UpperByte = shiftedSignal & UpperByteMask;
-      short upperByteTest = UpperByte;
-
-      // grabs bits 7 to 0
-      short LowerByteMask = 0x00FF; // 0000 0000 1111 1111
-      LowerByte = shiftedSignal & LowerByteMask;
-      short lowerByteTest = LowerByte;
-
-      // UpperByte is 0 when the temperature read is less than 32
-      if ( UpperByte != HAL_OK ) {
-	          strcpy((char*)buf, "Temperature is greater that 32 degrees\r\n");
-	  	  	  HAL_UART_Transmit(&hlpuart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
-	  }
-
-	  NAK = HAL_I2C_Master_Transmit(&hi2c2, SENS_ADDR, buf, 1, HAL_MAX_DELAY);
-
-
-	  char tempStr[19];
-	  /*
-	   * The following block of if statments and temperature
-	   * calculation is from the MCP9808 Datasheet
-	   *
-	   * Added transmit statements for clarity
-	   *
-	   * Section: 5.1.3.1, example 5-1
-	   *
-	   */
-	  if ((UpperByte & 0x80) == 0x80){ //TA ³ TCRIT
-		  gcvt(Temperature, 3, tempStr);
-	  	  strncat(tempStr, strEnd, 2);
-		  strcpy((char*) str, tempStr);
-		  HAL_UART_Transmit(&hlpuart1, str,strlen((char*)str), HAL_MAX_DELAY);
-
-	  }
-	  if ((UpperByte & 0x40) == 0x40){ //TA > TUPPER
-		  gcvt(Temperature, 3, tempStr);
-
-	  	  strncat(tempStr, strEnd, 2);
-		  strcpy((char*) str, tempStr);
-		  HAL_UART_Transmit(&hlpuart1, str,strlen((char*)str), HAL_MAX_DELAY);
-
-	  }
-	  if ((UpperByte & 0x20) == 0x20){ //TA < TLOWER
-		  gcvt(Temperature, 3, tempStr);
-
-	  	  strncat(tempStr, strEnd, 2);
-		  strcpy((char*) str, tempStr);
-		  HAL_UART_Transmit(&hlpuart1, str,strlen((char*)str), HAL_MAX_DELAY);
-
-	  }
-	  UpperByte = UpperByte & 0x1F; //Clear flag bits
-	  if ((UpperByte & 0x10) == 0x10){ //TA < 0°C
-	  UpperByte = UpperByte & 0x0F; //Clear SIGN
-	  Temperature = 256 - (UpperByte * 16 + LowerByte / 16);
-	  }else{ //TA ³ 0°C
-	  Temperature = (UpperByte * 16 + LowerByte / 16);
-	  }
-
-	  gcvt(Temperature, 16, tempStr);
-
-  	  strncat(tempStr, strEnd, 2);
-	  strcpy((char*) str, tempStr);
-	  HAL_UART_Transmit(&hlpuart1, str,strlen((char*)str), HAL_MAX_DELAY);
-
-	  HAL_Delay(750);
-    /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
-  }
-  /* USER CODE END 3 */
+		/* USER CODE BEGIN 3 */
+	}
+	/* USER CODE END 3 */
 }
 
 /**
-  * @brief System Clock Configuration
-  * @retval None
-  */
-void SystemClock_Config(void)
-{
-  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+ * @brief System Clock Configuration
+ * @retval None
+ */
+void SystemClock_Config(void) {
+	RCC_OscInitTypeDef RCC_OscInitStruct = { 0 };
+	RCC_ClkInitTypeDef RCC_ClkInitStruct = { 0 };
 
-  /** Configure the main internal regulator output voltage
-  */
-  if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1_BOOST) != HAL_OK)
-  {
-    Error_Handler();
-  }
+	/** Configure the main internal regulator output voltage
+	 */
+	if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1_BOOST)
+			!= HAL_OK) {
+		Error_Handler();
+	}
 
-  /** Initializes the RCC Oscillators according to the specified parameters
-  * in the RCC_OscInitTypeDef structure.
-  */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48|RCC_OSCILLATORTYPE_HSI;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSI48State = RCC_HSI48_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLM = 2;
-  RCC_OscInitStruct.PLL.PLLN = 30;
-  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
-  RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
-  RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
-    Error_Handler();
-  }
+	/** Initializes the RCC Oscillators according to the specified parameters
+	 * in the RCC_OscInitTypeDef structure.
+	 */
+	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48
+			| RCC_OSCILLATORTYPE_HSI;
+	RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+	RCC_OscInitStruct.HSI48State = RCC_HSI48_ON;
+	RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+	RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+	RCC_OscInitStruct.PLL.PLLM = 2;
+	RCC_OscInitStruct.PLL.PLLN = 30;
+	RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
+	RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
+	RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;
+	if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
+		Error_Handler();
+	}
 
-  /** Initializes the CPU, AHB and APB buses clocks
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+	/** Initializes the CPU, AHB and APB buses clocks
+	 */
+	RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
+			| RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+	RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+	RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+	RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK)
-  {
-    Error_Handler();
-  }
+	if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK) {
+		Error_Handler();
+	}
 }
 
 /**
-  * @brief I2C2 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_I2C2_Init(void)
-{
+ * @brief I2C2 Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_I2C2_Init(void) {
 
-  /* USER CODE BEGIN I2C2_Init 0 */
+	/* USER CODE BEGIN I2C2_Init 0 */
 
-  /* USER CODE END I2C2_Init 0 */
+	/* USER CODE END I2C2_Init 0 */
 
-  /* USER CODE BEGIN I2C2_Init 1 */
+	/* USER CODE BEGIN I2C2_Init 1 */
 
-  /* USER CODE END I2C2_Init 1 */
-  hi2c2.Instance = I2C2;
-  hi2c2.Init.Timing = 0x107075B0;
-  hi2c2.Init.OwnAddress1 = 0;
-  hi2c2.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
-  hi2c2.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
-  hi2c2.Init.OwnAddress2 = 0;
-  hi2c2.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
-  hi2c2.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
-  hi2c2.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-  if (HAL_I2C_Init(&hi2c2) != HAL_OK)
-  {
-    Error_Handler();
-  }
+	/* USER CODE END I2C2_Init 1 */
+	hi2c2.Instance = I2C2;
+	hi2c2.Init.Timing = 0x107075B0;
+	hi2c2.Init.OwnAddress1 = 0;
+	hi2c2.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+	hi2c2.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+	hi2c2.Init.OwnAddress2 = 0;
+	hi2c2.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+	hi2c2.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+	hi2c2.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+	if (HAL_I2C_Init(&hi2c2) != HAL_OK) {
+		Error_Handler();
+	}
 
-  /** Configure Analogue filter
-  */
-  if (HAL_I2CEx_ConfigAnalogFilter(&hi2c2, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
-  {
-    Error_Handler();
-  }
+	/** Configure Analogue filter
+	 */
+	if (HAL_I2CEx_ConfigAnalogFilter(&hi2c2, I2C_ANALOGFILTER_ENABLE)
+			!= HAL_OK) {
+		Error_Handler();
+	}
 
-  /** Configure Digital filter
-  */
-  if (HAL_I2CEx_ConfigDigitalFilter(&hi2c2, 0) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN I2C2_Init 2 */
+	/** Configure Digital filter
+	 */
+	if (HAL_I2CEx_ConfigDigitalFilter(&hi2c2, 0) != HAL_OK) {
+		Error_Handler();
+	}
+	/* USER CODE BEGIN I2C2_Init 2 */
 
-  /* USER CODE END I2C2_Init 2 */
-
-}
-
-/**
-  * @brief LPUART1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_LPUART1_UART_Init(void)
-{
-
-  /* USER CODE BEGIN LPUART1_Init 0 */
-
-  /* USER CODE END LPUART1_Init 0 */
-
-  /* USER CODE BEGIN LPUART1_Init 1 */
-
-  /* USER CODE END LPUART1_Init 1 */
-  hlpuart1.Instance = LPUART1;
-  hlpuart1.Init.BaudRate = 209700;
-  hlpuart1.Init.WordLength = UART_WORDLENGTH_8B;
-  hlpuart1.Init.StopBits = UART_STOPBITS_1;
-  hlpuart1.Init.Parity = UART_PARITY_NONE;
-  hlpuart1.Init.Mode = UART_MODE_TX_RX;
-  hlpuart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  hlpuart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-  hlpuart1.Init.ClockPrescaler = UART_PRESCALER_DIV1;
-  hlpuart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-  hlpuart1.FifoMode = UART_FIFOMODE_DISABLE;
-  if (HAL_UART_Init(&hlpuart1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_UARTEx_SetTxFifoThreshold(&hlpuart1, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_UARTEx_SetRxFifoThreshold(&hlpuart1, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_UARTEx_DisableFifoMode(&hlpuart1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN LPUART1_Init 2 */
-
-  /* USER CODE END LPUART1_Init 2 */
+	/* USER CODE END I2C2_Init 2 */
 
 }
 
 /**
-  * @brief USART3 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_USART3_UART_Init(void)
-{
+ * @brief LPUART1 Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_LPUART1_UART_Init(void) {
 
-  /* USER CODE BEGIN USART3_Init 0 */
+	/* USER CODE BEGIN LPUART1_Init 0 */
 
-  /* USER CODE END USART3_Init 0 */
+	/* USER CODE END LPUART1_Init 0 */
 
-  /* USER CODE BEGIN USART3_Init 1 */
+	/* USER CODE BEGIN LPUART1_Init 1 */
 
-  /* USER CODE END USART3_Init 1 */
-  huart3.Instance = USART3;
-  huart3.Init.BaudRate = 115200;
-  huart3.Init.WordLength = UART_WORDLENGTH_8B;
-  huart3.Init.StopBits = UART_STOPBITS_1;
-  huart3.Init.Parity = UART_PARITY_NONE;
-  huart3.Init.Mode = UART_MODE_TX_RX;
-  huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart3.Init.OverSampling = UART_OVERSAMPLING_16;
-  huart3.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-  huart3.Init.ClockPrescaler = UART_PRESCALER_DIV1;
-  huart3.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-  if (HAL_UART_Init(&huart3) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_UARTEx_SetTxFifoThreshold(&huart3, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_UARTEx_SetRxFifoThreshold(&huart3, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_UARTEx_DisableFifoMode(&huart3) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN USART3_Init 2 */
+	/* USER CODE END LPUART1_Init 1 */
+	hlpuart1.Instance = LPUART1;
+	hlpuart1.Init.BaudRate = 209700;
+	hlpuart1.Init.WordLength = UART_WORDLENGTH_8B;
+	hlpuart1.Init.StopBits = UART_STOPBITS_1;
+	hlpuart1.Init.Parity = UART_PARITY_NONE;
+	hlpuart1.Init.Mode = UART_MODE_TX_RX;
+	hlpuart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+	hlpuart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+	hlpuart1.Init.ClockPrescaler = UART_PRESCALER_DIV1;
+	hlpuart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+	hlpuart1.FifoMode = UART_FIFOMODE_DISABLE;
+	if (HAL_UART_Init(&hlpuart1) != HAL_OK) {
+		Error_Handler();
+	}
+	if (HAL_UARTEx_SetTxFifoThreshold(&hlpuart1, UART_TXFIFO_THRESHOLD_1_8)
+			!= HAL_OK) {
+		Error_Handler();
+	}
+	if (HAL_UARTEx_SetRxFifoThreshold(&hlpuart1, UART_RXFIFO_THRESHOLD_1_8)
+			!= HAL_OK) {
+		Error_Handler();
+	}
+	if (HAL_UARTEx_DisableFifoMode(&hlpuart1) != HAL_OK) {
+		Error_Handler();
+	}
+	/* USER CODE BEGIN LPUART1_Init 2 */
 
-  /* USER CODE END USART3_Init 2 */
+	/* USER CODE END LPUART1_Init 2 */
 
 }
 
 /**
-  * @brief USB_OTG_FS Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_USB_OTG_FS_PCD_Init(void)
-{
+ * @brief USART3 Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_USART3_UART_Init(void) {
 
-  /* USER CODE BEGIN USB_OTG_FS_Init 0 */
+	/* USER CODE BEGIN USART3_Init 0 */
 
-  /* USER CODE END USB_OTG_FS_Init 0 */
+	/* USER CODE END USART3_Init 0 */
 
-  /* USER CODE BEGIN USB_OTG_FS_Init 1 */
+	/* USER CODE BEGIN USART3_Init 1 */
 
-  /* USER CODE END USB_OTG_FS_Init 1 */
-  hpcd_USB_OTG_FS.Instance = USB_OTG_FS;
-  hpcd_USB_OTG_FS.Init.dev_endpoints = 6;
-  hpcd_USB_OTG_FS.Init.phy_itface = PCD_PHY_EMBEDDED;
-  hpcd_USB_OTG_FS.Init.Sof_enable = ENABLE;
-  hpcd_USB_OTG_FS.Init.low_power_enable = DISABLE;
-  hpcd_USB_OTG_FS.Init.lpm_enable = DISABLE;
-  hpcd_USB_OTG_FS.Init.battery_charging_enable = ENABLE;
-  hpcd_USB_OTG_FS.Init.use_dedicated_ep1 = DISABLE;
-  hpcd_USB_OTG_FS.Init.vbus_sensing_enable = ENABLE;
-  if (HAL_PCD_Init(&hpcd_USB_OTG_FS) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN USB_OTG_FS_Init 2 */
+	/* USER CODE END USART3_Init 1 */
+	huart3.Instance = USART3;
+	huart3.Init.BaudRate = 115200;
+	huart3.Init.WordLength = UART_WORDLENGTH_8B;
+	huart3.Init.StopBits = UART_STOPBITS_1;
+	huart3.Init.Parity = UART_PARITY_NONE;
+	huart3.Init.Mode = UART_MODE_TX_RX;
+	huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+	huart3.Init.OverSampling = UART_OVERSAMPLING_16;
+	huart3.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+	huart3.Init.ClockPrescaler = UART_PRESCALER_DIV1;
+	huart3.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+	if (HAL_UART_Init(&huart3) != HAL_OK) {
+		Error_Handler();
+	}
+	if (HAL_UARTEx_SetTxFifoThreshold(&huart3, UART_TXFIFO_THRESHOLD_1_8)
+			!= HAL_OK) {
+		Error_Handler();
+	}
+	if (HAL_UARTEx_SetRxFifoThreshold(&huart3, UART_RXFIFO_THRESHOLD_1_8)
+			!= HAL_OK) {
+		Error_Handler();
+	}
+	if (HAL_UARTEx_DisableFifoMode(&huart3) != HAL_OK) {
+		Error_Handler();
+	}
+	/* USER CODE BEGIN USART3_Init 2 */
 
-  /* USER CODE END USB_OTG_FS_Init 2 */
+	/* USER CODE END USART3_Init 2 */
 
 }
 
 /**
-  * @brief GPIO Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_GPIO_Init(void)
-{
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
+ * @brief USB_OTG_FS Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_USB_OTG_FS_PCD_Init(void) {
 
-  /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOC_CLK_ENABLE();
-  __HAL_RCC_GPIOF_CLK_ENABLE();
-  __HAL_RCC_GPIOH_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
-  __HAL_RCC_GPIOD_CLK_ENABLE();
-  __HAL_RCC_GPIOG_CLK_ENABLE();
-  HAL_PWREx_EnableVddIO2();
+	/* USER CODE BEGIN USB_OTG_FS_Init 0 */
 
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, LD3_Pin|LD2_Pin, GPIO_PIN_RESET);
+	/* USER CODE END USB_OTG_FS_Init 0 */
 
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(USB_PowerSwitchOn_GPIO_Port, USB_PowerSwitchOn_Pin, GPIO_PIN_RESET);
+	/* USER CODE BEGIN USB_OTG_FS_Init 1 */
 
-  /*Configure GPIO pin : B1_Pin */
-  GPIO_InitStruct.Pin = B1_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
+	/* USER CODE END USB_OTG_FS_Init 1 */
+	hpcd_USB_OTG_FS.Instance = USB_OTG_FS;
+	hpcd_USB_OTG_FS.Init.dev_endpoints = 6;
+	hpcd_USB_OTG_FS.Init.phy_itface = PCD_PHY_EMBEDDED;
+	hpcd_USB_OTG_FS.Init.Sof_enable = ENABLE;
+	hpcd_USB_OTG_FS.Init.low_power_enable = DISABLE;
+	hpcd_USB_OTG_FS.Init.lpm_enable = DISABLE;
+	hpcd_USB_OTG_FS.Init.battery_charging_enable = ENABLE;
+	hpcd_USB_OTG_FS.Init.use_dedicated_ep1 = DISABLE;
+	hpcd_USB_OTG_FS.Init.vbus_sensing_enable = ENABLE;
+	if (HAL_PCD_Init(&hpcd_USB_OTG_FS) != HAL_OK) {
+		Error_Handler();
+	}
+	/* USER CODE BEGIN USB_OTG_FS_Init 2 */
 
-  /*Configure GPIO pins : PA2 PA3 */
-  GPIO_InitStruct.Pin = GPIO_PIN_2|GPIO_PIN_3;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-  GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+	/* USER CODE END USB_OTG_FS_Init 2 */
 
-  /*Configure GPIO pins : LD3_Pin LD2_Pin */
-  GPIO_InitStruct.Pin = LD3_Pin|LD2_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+}
 
-  /*Configure GPIO pin : USB_PowerSwitchOn_Pin */
-  GPIO_InitStruct.Pin = USB_PowerSwitchOn_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(USB_PowerSwitchOn_GPIO_Port, &GPIO_InitStruct);
+/**
+ * @brief GPIO Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_GPIO_Init(void) {
+	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 
-  /*Configure GPIO pin : USB_OverCurrent_Pin */
-  GPIO_InitStruct.Pin = USB_OverCurrent_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(USB_OverCurrent_GPIO_Port, &GPIO_InitStruct);
+	/* GPIO Ports Clock Enable */
+	__HAL_RCC_GPIOC_CLK_ENABLE();
+	__HAL_RCC_GPIOF_CLK_ENABLE();
+	__HAL_RCC_GPIOH_CLK_ENABLE();
+	__HAL_RCC_GPIOA_CLK_ENABLE();
+	__HAL_RCC_GPIOB_CLK_ENABLE();
+	__HAL_RCC_GPIOD_CLK_ENABLE();
+	__HAL_RCC_GPIOG_CLK_ENABLE();
+	HAL_PWREx_EnableVddIO2();
+
+	/*Configure GPIO pin Output Level */
+	HAL_GPIO_WritePin(GPIOB, LD3_Pin | LD2_Pin, GPIO_PIN_RESET);
+
+	/*Configure GPIO pin Output Level */
+	HAL_GPIO_WritePin(USB_PowerSwitchOn_GPIO_Port, USB_PowerSwitchOn_Pin,
+			GPIO_PIN_RESET);
+
+	/*Configure GPIO pin : B1_Pin */
+	GPIO_InitStruct.Pin = B1_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
+
+	/*Configure GPIO pins : PA2 PA3 */
+	GPIO_InitStruct.Pin = GPIO_PIN_2 | GPIO_PIN_3;
+	GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+	GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+	/*Configure GPIO pins : LD3_Pin LD2_Pin */
+	GPIO_InitStruct.Pin = LD3_Pin | LD2_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+	/*Configure GPIO pin : USB_PowerSwitchOn_Pin */
+	GPIO_InitStruct.Pin = USB_PowerSwitchOn_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	HAL_GPIO_Init(USB_PowerSwitchOn_GPIO_Port, &GPIO_InitStruct);
+
+	/*Configure GPIO pin : USB_OverCurrent_Pin */
+	GPIO_InitStruct.Pin = USB_OverCurrent_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(USB_OverCurrent_GPIO_Port, &GPIO_InitStruct);
 
 }
 
@@ -540,18 +563,16 @@ static void MX_GPIO_Init(void)
 /* USER CODE END 4 */
 
 /**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
-void Error_Handler(void)
-{
-  /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  while (1)
-  {
-  }
-  /* USER CODE END Error_Handler_Debug */
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
+void Error_Handler(void) {
+	/* USER CODE BEGIN Error_Handler_Debug */
+	/* User can add his own implementation to report the HAL error return state */
+	__disable_irq();
+	while (1) {
+	}
+	/* USER CODE END Error_Handler_Debug */
 }
 
 #ifdef  USE_FULL_ASSERT
