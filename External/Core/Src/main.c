@@ -112,20 +112,23 @@ int main(void) {
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
-		// represents the the required ending for transmitting
-		// string through uart
-//		char strEnd[3] = "\r\n";
+		// new line char, for clarity
 		char newLine[2] = "\n";
 
-//		HAL_UART_Transmit(&hlpuart1, buf, strlen((char*) buf), HAL_MAX_DELAY);
+		/*
+		 * Here, we are sending the address of the Ambiant Temperature information
+		 * (Stored in REG_TEMP), to the Sensor where it will repopulate the buf
+		 * with the 2 bytes which contain the information about the Ambiant Temperature
+		 *
+		 */
 		buf[0] = REG_TEMP;
-		// send acknowledge bit
-		ACK = HAL_I2C_Master_Transmit(&hi2c2, SENS_ADDR << 1, buf, 1,
-				HAL_MAX_DELAY);
-		uint8_t signal = HAL_I2C_Master_Receive(&hi2c2, SENS_ADDR << 1, buf, 2,
-				HAL_MAX_DELAY);
+		HAL_I2C_Master_Transmit(&hi2c2, SENS_ADDR << 1, buf, 1,
+		HAL_MAX_DELAY);
+
 		// The 16 bits that represent the information for the Ta (Ambiant Temperature) are stored in
-		// buf as the first to bytes (as it 16 bits long, so 2 bytes)
+		// buf as the first two bytes (as it 16 bits long, so 2 bytes)
+		HAL_I2C_Master_Receive(&hi2c2, SENS_ADDR << 1, buf, 2,
+		HAL_MAX_DELAY);
 
 		// First most significant byte
 		UpperByte = buf[0];
@@ -135,146 +138,63 @@ int main(void) {
 		LowerByte = buf[1];
 		short lower = LowerByte; // Here for debugging purposes
 
+		/*
+		 * Note that the following section is better understood by looking the MCP9808 documentation
+		 * Specifically, page 17, which outlines the purpose of each bit (of 16) for the Ambiant Temperature
+		 *
+		 * Also, page 24 and 25 are quite useful as well for outlining the details of the 2 bytes recieved
+		 */
+
 		// If 0, then temp is positive, if 1, temp is negative
-		short negCheckMask = 0x10; // 0001 0000
-		short negCheck = UpperByte & negCheckMask;
+		uint8_t negCheckMask = 0x10; // 0001 0000
+		uint8_t negCheck = upper & negCheckMask;
 
 		// Grabs bits 11-8,
-		short sigUpperbitsMask = 0x0F; //0000 1111
-		short sigUpperbits = UpperByte & sigUpperbitsMask;
+		uint8_t sigUpperbitsMask = 0x0F; //0000 1111
+		uint8_t sigUpperbits = UpperByte & sigUpperbitsMask;
 		// As these bits are meant to represent (2^7, 2^6, 2^5, 2^4), I must multiply value by 16
-		short upperBitsTemp = sigUpperbits << 4;
+		uint8_t upperBitsTemp = sigUpperbits << 4;
 
 		// Represents (2^3, 2^2, 2^1, 2^0)
-		short firstLowerBitsTemp = lower >> 4;
+		uint8_t firstLowerBitsTemp = lower >> 4;
+
 		// Represents the decimal bits (2^-1, 2^-2, 2^-3, 2^-4),
 		// thus, equivalent to dividing num by 16
 		float decimalNums = ((float) (0x0F & lower)) / 16;
 
 		float temp = upperBitsTemp + firstLowerBitsTemp + decimalNums;
 
-		char tempBuf[8];
+		// if negative number, subtract by 256
+		if (negCheck == 1){
+			temp -= 256;
+		}
+//		//First Check flag bits
+//		if ((UpperByte & 0x80) == 0x80) { //TA ³ TCRIT
+//		}
+//		if ((UpperByte & 0x40) == 0x40) { //TA > TUPPER
+//		}
+//		if ((UpperByte & 0x20) == 0x20) { //TA < TLOWER
+//		}
+//		UpperByte = UpperByte & 0x1F; //Clear flag bits
+//		if ((UpperByte & 0x10) == 0x10) { //TA < 0°C
+//			UpperByte = UpperByte & 0x0F;//Clear SIGN
+//			Temperature = 256 - (UpperByte * 16 + LowerByte / 16);
+//		} else //TA ³ 0°C
+//		Temperature = (UpperByte * 16 + LowerByte / 16);
+
+		// The largest number is going to have 8 characters + end of string character
+		char tempBuf[9];
 		gcvt(temp, 7, tempBuf);
 
 		// Prints Temp to COM port
 		HAL_UART_Transmit(&hlpuart1, tempBuf, strlen((char*) tempBuf),
-				HAL_MAX_DELAY);
+		HAL_MAX_DELAY);
 		// Print new line for clarity
-		HAL_UART_Transmit(&hlpuart1, newLine, strlen((char*)newLine), HAL_MAX_DELAY);
-
-////		  	  	  HAL_UART_Transmit(&hlpuart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
-//
-//	  // represents the full 16 bits recieved from the thermometer
-////      uint8_t signal = HAL_I2C_Master_Receive(&hi2c2, REG_TEMP, buf, 8, HAL_MAX_DELAY);
-//
-////	  int * regAddress = (int*)REG_TEMP; // 0x05, defined in MCP9808 data sheet section 5.1.3
-////	  short AmbiantTemp = *regAddress;
-////	  short signal = AmbiantTemp;
-//
-//	  /*
-//       * This finds the signed bit (bit 12)
-//       *
-//       */
-//
-////      short negCheckMask = 0x1000; // 0001 0000 0000 0000
-////      short negCheck = signal & negCheckMask;
-//      short negCheck = UpperByte
-//      // sets up string so we can check what it is
-//      char str[4];
-//      itoa((int)negCheck, str, 10);
-//      // need to append carriage return and new line char at the end of the string
-//      strncat(str, strEnd, 2);
-//      HAL_UART_Transmit(&hlpuart1, str,strlen((char*)str), HAL_MAX_DELAY);
-//
-//      // if negCheck is a 0 , it means it is positive
-//      // defined in MCP9808 datasheet section 5.1.3
-//      if (negCheck == 0){
-//    	  strcpy((char*)buf, "Positive Number\r\n");
-//    	  HAL_UART_Transmit(&hlpuart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
-//
-//      }
-//      // if negCheck is a 1, it means it is a negative number
-//      // defined in MCP9808 datasheet section 5.1.3
-//      if (negCheck == 1){
-//    	  strcpy((char*)buf, "Negative Number\r\n");
-//    	  HAL_UART_Transmit(&hlpuart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
-//      }
-//
-//      // need to shift left 4 bits as stipulated in mcp9808 data sheet
-//      uint16_t shiftedSignal = signal << 4;
-//
-//      // now, 8 most signficant bits is the upper byte
-//      // lower 8 bits is the lower byte
-//
-//      // grabs bits 15 to 8
-//      short UpperByteMask = 0xFF00; // 1111 1111 0000 0000
-//      UpperByte = shiftedSignal & UpperByteMask;
-//      short upperByteTest = UpperByte;
-//
-//      // grabs bits 7 to 0
-//      short LowerByteMask = 0x00FF; // 0000 0000 1111 1111
-//      LowerByte = shiftedSignal & LowerByteMask;
-//      short lowerByteTest = LowerByte;
-//
-//      // UpperByte is 0 when the temperature read is less than 32
-//      if ( UpperByte != HAL_OK ) {
-//	          strcpy((char*)buf, "Temperature is greater that 32 degrees\r\n");
-//	  	  	  HAL_UART_Transmit(&hlpuart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
-//	  }
-//
-//
-//
-//	  char tempStr[19];
-//	  /*
-//	   * The following block of if statments and temperature
-//	   * calculation is from the MCP9808 Datasheet
-//	   *
-//	   * Added transmit statements for clarity
-//	   *
-//	   * Section: 5.1.3.1, example 5-1
-//	   *
-//	   */
-//	  if ((UpperByte & 0x80) == 0x80){ //TA ³ TCRIT
-//		  gcvt(Temperature, 3, tempStr);
-//	  	  strncat(tempStr, strEnd, 2);
-//		  strcpy((char*) str, tempStr);
-//		  HAL_UART_Transmit(&hlpuart1, str,strlen((char*)str), HAL_MAX_DELAY);
-//
-//	  }
-//	  if ((UpperByte & 0x40) == 0x40){ //TA > TUPPER
-//		  gcvt(Temperature, 3, tempStr);
-//
-//	  	  strncat(tempStr, strEnd, 2);
-//		  strcpy((char*) str, tempStr);
-//		  HAL_UART_Transmit(&hlpuart1, str,strlen((char*)str), HAL_MAX_DELAY);
-//
-//	  }
-//	  if ((UpperByte & 0x20) == 0x20){ //TA < TLOWER
-//		  gcvt(Temperature, 3, tempStr);
-//
-//	  	  strncat(tempStr, strEnd, 2);
-//		  strcpy((char*) str, tempStr);
-//		  HAL_UART_Transmit(&hlpuart1, str,strlen((char*)str), HAL_MAX_DELAY);
-//
-//	  }
-//	  UpperByte = UpperByte & 0x1F; //Clear flag bits
-//	  if ((UpperByte & 0x10) == 0x10){ //TA < 0°C
-//	  UpperByte = UpperByte & 0x0F; //Clear SIGN
-//	  Temperature = 256 - (UpperByte * 16 + LowerByte / 16);
-//	  }else{ //TA ³ 0°C
-//	  Temperature = (UpperByte * 16 + LowerByte / 16);
-//	  }
-//
-//	  gcvt(Temperature, 16, tempStr);
-//
-//  	  strncat(tempStr, strEnd, 2);
-//	  strcpy((char*) str, tempStr);
-//	  HAL_UART_Transmit(&hlpuart1, str,strlen((char*)str), HAL_MAX_DELAY);
+		HAL_UART_Transmit(&hlpuart1, newLine, strlen((char*) newLine),
+		HAL_MAX_DELAY);
 
 		HAL_Delay(750);
 
-//		NAK = HAL_I2C_Master_Transmit(&hi2c2, SENS_ADDR << 1, buf, 1,
-//				HAL_MAX_DELAY);
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
