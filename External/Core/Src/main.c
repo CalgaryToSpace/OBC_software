@@ -81,6 +81,8 @@ static void MX_I2C2_Init(void);
 int main(void) {
 	/* USER CODE BEGIN 1 */
 	uint8_t buf[3];
+	char str[100];
+	float Temperature;
 	/* USER CODE END 1 */
 
 	/* MCU Configuration--------------------------------------------------------*/
@@ -145,46 +147,70 @@ int main(void) {
 		 * Also, page 24 and 25 are quite useful as well for outlining the details of the 2 bytes recieved
 		 */
 
-		// If 0, then temp is positive, if 1, temp is negative
-		uint8_t negCheckMask = 0x10; // 0001 0000
-		uint8_t negCheck = upper & negCheckMask;
+//		// If 0, then temp is positive, if 1, temp is negative
+//		uint8_t negCheckMask = 0x10; // 0001 0000
+//		uint8_t negCheck = upper & negCheckMask;
+//
+//		// Grabs bits 11-8,
+//		uint8_t sigUpperbitsMask = 0x0F; //0000 1111
+//		uint8_t sigUpperbits = UpperByte & sigUpperbitsMask;
+//		// As these bits are meant to represent (2^7, 2^6, 2^5, 2^4), I must multiply value by 16
+//		uint8_t upperBitsTemp = sigUpperbits << 4;
+//
+//		// Represents (2^3, 2^2, 2^1, 2^0)
+//		uint8_t firstLowerBitsTemp = lower >> 4;
+//
+//		// Represents the decimal bits (2^-1, 2^-2, 2^-3, 2^-4),
+//		// thus, equivalent to dividing num by 16
+//		float decimalNums = ((float) (0x0F & lower)) / 16;
+//
+//		float temp = upperBitsTemp + firstLowerBitsTemp + decimalNums;
+//
+//		// if negative number, subtract by 256
+//		if (negCheck == 1){
+//			temp -= 256;
+//		}
+		/*
+		 * Following block of code can be found on page 25
+		 * of the MCP9808 Data Sheet
+		 *
+		 *
+		 */
 
-		// Grabs bits 11-8,
-		uint8_t sigUpperbitsMask = 0x0F; //0000 1111
-		uint8_t sigUpperbits = UpperByte & sigUpperbitsMask;
-		// As these bits are meant to represent (2^7, 2^6, 2^5, 2^4), I must multiply value by 16
-		uint8_t upperBitsTemp = sigUpperbits << 4;
+		//First Check flag bits
+		if ((UpperByte & 0x80) == 0x80) { //TA ³ TCRIT
+			// 1000 0000, checks the most significant bit
 
-		// Represents (2^3, 2^2, 2^1, 2^0)
-		uint8_t firstLowerBitsTemp = lower >> 4;
-
-		// Represents the decimal bits (2^-1, 2^-2, 2^-3, 2^-4),
-		// thus, equivalent to dividing num by 16
-		float decimalNums = ((float) (0x0F & lower)) / 16;
-
-		float temp = upperBitsTemp + firstLowerBitsTemp + decimalNums;
-
-		// if negative number, subtract by 256
-		if (negCheck == 1){
-			temp -= 256;
 		}
-//		//First Check flag bits
-//		if ((UpperByte & 0x80) == 0x80) { //TA ³ TCRIT
-//		}
-//		if ((UpperByte & 0x40) == 0x40) { //TA > TUPPER
-//		}
-//		if ((UpperByte & 0x20) == 0x20) { //TA < TLOWER
-//		}
-//		UpperByte = UpperByte & 0x1F; //Clear flag bits
-//		if ((UpperByte & 0x10) == 0x10) { //TA < 0°C
-//			UpperByte = UpperByte & 0x0F;//Clear SIGN
-//			Temperature = 256 - (UpperByte * 16 + LowerByte / 16);
-//		} else //TA ³ 0°C
-//		Temperature = (UpperByte * 16 + LowerByte / 16);
+		if ((UpperByte & 0x40) == 0x40) { //TA > TUPPER
+			// Need to configure upper limit
+
+			// 0100 0000, checks bit 7
+//			char str[] = "Ambient Temperature is greater than Upper Limit.";
+//			HAL_UART_Transmit(&hlpuart1, str, strlen((char*) str),
+//					HAL_MAX_DELAY);
+		}
+		if ((UpperByte & 0x20) == 0x20) { //TA < TLOWER
+			// need to configure lower limit
+
+			//			char str[] = "Ambient Temperature is less than lower Limit.";
+//			HAL_UART_Transmit(&hlpuart1, str, strlen((char*) str),
+//					HAL_MAX_DELAY);
+
+		}
+		// UpperByte & 0001 1111, first 3 bits of UpperByte are flag bits
+		upper = upper & 0x1F; //Clear flag bits
+
+		if ((UpperByte & 0x10) == 0x10) { //TA < 0°C
+			upper = upper & 0x0F; //Clear SIGN
+			Temperature = 256 - (upper * 16 + (float) lower / 16);
+		} else
+			//TA >= 0°C
+			Temperature = (upper * 16 + (float) lower / 16);
 
 		// The largest number is going to have 8 characters + end of string character
 		char tempBuf[9];
-		gcvt(temp, 7, tempBuf);
+		gcvt(Temperature, 7, tempBuf);
 
 		// Prints Temp to COM port
 		HAL_UART_Transmit(&hlpuart1, tempBuf, strlen((char*) tempBuf),
