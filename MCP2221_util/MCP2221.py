@@ -1,5 +1,5 @@
 """
-test.py
+MCP2221.py
 
 Author: James Chen
 
