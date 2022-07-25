@@ -141,36 +141,6 @@ int main(void) {
 		short lower = LowerByte; // Here for debugging purposes
 
 		/*
-		 * Note that the following section is better understood by looking the MCP9808 documentation
-		 * Specifically, page 17, which outlines the purpose of each bit (of 16) for the Ambiant Temperature
-		 *
-		 * Also, page 24 and 25 are quite useful as well for outlining the details of the 2 bytes recieved
-		 */
-
-//		// If 0, then temp is positive, if 1, temp is negative
-//		uint8_t negCheckMask = 0x10; // 0001 0000
-//		uint8_t negCheck = upper & negCheckMask;
-//
-//		// Grabs bits 11-8,
-//		uint8_t sigUpperbitsMask = 0x0F; //0000 1111
-//		uint8_t sigUpperbits = UpperByte & sigUpperbitsMask;
-//		// As these bits are meant to represent (2^7, 2^6, 2^5, 2^4), I must multiply value by 16
-//		uint8_t upperBitsTemp = sigUpperbits << 4;
-//
-//		// Represents (2^3, 2^2, 2^1, 2^0)
-//		uint8_t firstLowerBitsTemp = lower >> 4;
-//
-//		// Represents the decimal bits (2^-1, 2^-2, 2^-3, 2^-4),
-//		// thus, equivalent to dividing num by 16
-//		float decimalNums = ((float) (0x0F & lower)) / 16;
-//
-//		float temp = upperBitsTemp + firstLowerBitsTemp + decimalNums;
-//
-//		// if negative number, subtract by 256
-//		if (negCheck == 1){
-//			temp -= 256;
-//		}
-		/*
 		 * Following block of code can be found on page 25
 		 * of the MCP9808 Data Sheet
 		 *
