@@ -65,6 +65,7 @@ static void MX_ADC1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+uint8_t dataRec[65];
 #define Avg_Slope 2.5
 #define v30	0.76
 #define vtemp 30
@@ -118,22 +119,26 @@ int main(void) {
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
+		char newLine[2] = "\n";
 
 		HAL_ADC_Start(&hadc1);
 		HAL_ADC_PollForConversion(&hadc1, 1000);
-		readValue = HAL_ADC_GetValue(&hadc1);
+		uint16_t readValue = HAL_ADC_GetValue(&hadc1);
 		temperature = (float) __LL_ADC_CALC_TEMPERATURE_TYP_PARAMS(Avg_Slope,
 				v30, vtemp, vrefplus, readValue, LL_ADC_RESOLUTION_12B);
 
 		HAL_ADC_Stop(&hadc1);
 
 		uint8_t tempBuf[3];
-//  	  gcvt(temperature, 7, tempBuf);
 		int temp = (int) temperature;
 		itoa(temp, tempBuf, 10);
 		HAL_UART_Transmit(&hlpuart1, tempBuf, strlen((char*) tempBuf),
-				HAL_MAX_DELAY);
+		HAL_MAX_DELAY);
 
+		// Print new line for clarity
+		HAL_UART_Transmit(&hlpuart1, newLine, strlen((char*) newLine),
+		HAL_MAX_DELAY);
+		HAL_Delay(700);
 	}
 	/* USER CODE END 3 */
 }
