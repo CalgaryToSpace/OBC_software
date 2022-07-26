@@ -1,6 +1,6 @@
 ################################################################################
 # Automatically-generated file. Do not edit!
-# Toolchain: GNU Tools for STM32 (9-2020-q2-update)
+# Toolchain: GNU Tools for STM32 (10.3-2021.10)
 ################################################################################
 
 -include ../makefile.init
@@ -34,34 +34,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := PizzaTime8D
+BUILD_ARTIFACT_NAME := Internal
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-PizzaTime8D.elf \
+Internal.elf \
+
+MAP_FILES += \
+Internal.map \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-PizzaTime8D.list \
-
-OBJCOPY_BIN += \
-PizzaTime8D.bin \
+Internal.list \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: PizzaTime8D.elf secondary-outputs
+main-build: Internal.elf secondary-outputs
 
 # Tool invocations
-PizzaTime8D.elf: $(OBJS) $(USER_OBJS) C:\Users\asjad\STM32CubeIDE\workspace_1.7.0\PizzaTime8D\STM32L4R5ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "PizzaTime8D.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\asjad\STM32CubeIDE\workspace_1.7.0\PizzaTime8D\STM32L4R5ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="PizzaTime8D.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Internal.elf Internal.map: $(OBJS) $(USER_OBJS) C:\Users\h3cti\dev\CalgaryToSpace\OBC_software\Internal\STM32L4R5ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Internal.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\h3cti\dev\CalgaryToSpace\OBC_software\Internal\STM32L4R5ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Internal.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -70,22 +70,17 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-PizzaTime8D.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "PizzaTime8D.list"
-	@echo 'Finished building: $@'
-	@echo ' '
-
-PizzaTime8D.bin: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "PizzaTime8D.bin"
+Internal.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "Internal.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) PizzaTime8D.bin PizzaTime8D.elf PizzaTime8D.list default.size.stdout
+	-$(RM) Internal.elf Internal.list Internal.map default.size.stdout
 	-@echo ' '
 
-secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_BIN)
+secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
 
 fail-specified-linker-script-missing:
 	@echo 'Error: Cannot find the specified linker script. Check the linker settings in the build configuration.'
