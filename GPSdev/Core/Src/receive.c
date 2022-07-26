@@ -36,6 +36,9 @@ char** gpsParseReceive(char* received){
 		}
 	}
 	//TODO - implement CRC check
+
+
+	return toReturn;
 }
 
 

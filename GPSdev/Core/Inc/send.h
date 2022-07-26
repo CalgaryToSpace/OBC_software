@@ -8,6 +8,6 @@
 #ifndef INC_SEND_H_
 #define INC_SEND_H_
 
-gpsSendMessage();
+void sendGpsCommand(char* command);
 
 #endif /* INC_SEND_H_ */
