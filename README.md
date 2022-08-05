@@ -2,7 +2,9 @@
 
 ## Folder Structure
   [Workspace]  	- The Operating System for the Satellite
+  
   [Examples] 	- Contains demo projects for specific functions such as UART, SPI,  Task Management, etc
+  
   [Tools]	- Simulators and other testing tools
 
 ## Getting Started
@@ -23,12 +25,12 @@
 ## Code Push and Review Process
 
 #### Creating and Submitting a Pull Request
-1) Update your local repo with git pull origin master 
-2) Create a working branch with git checkout -b MyNewBranch
-3) Make your changes on your branch and stage them with git add . to stage all changes. 
-4) Commit your changes locally with git commit -m "description of your commit"
+1) Update your local repo with `git pull origin master` 
+2) Create a working branch with `git checkout -b MyNewBranch`
+3) Make your changes on your branch and stage them with `git add .` to stage all changes. 
+4) Commit your changes locally with `git commit -m "description of your commit"`
 5) Make as many commit as needed to implement the change/feature 
-6) Upload the changes (including your new branch) to GitHub with git push origin MyNewBranch
+6) Upload the changes (including your new branch) to GitHub with `git push origin MyNewBranch`
 7) Go to the main repo on GitHub where you should now see your new branch
 8) Click on your branch name
 9) Click on “Pull Request” button to 
@@ -42,9 +44,9 @@
 - Testing used to verify the change
 
 #### Modifying an Existing Pull Request
-1) Make changes and stage them with git add . 
-2) Then use git commit –-amend --no-edit to modify the previous commit without changing the commit message
-3) Upload the changes (including your new branch) to GitHub with git push origin MyNewBranch
+1) Make changes and stage them with `git add .` 
+2) Then use `git commit –-amend --no-edit` to modify the previous commit without changing the commit message
+3) Upload the changes (including your new branch) to GitHub with `git push origin MyNewBranch`
 4) Update the pull request with the new changes
 
 #### Reviewing a Pull Request:
