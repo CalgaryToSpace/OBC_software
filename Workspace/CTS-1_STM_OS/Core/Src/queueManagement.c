@@ -8,7 +8,7 @@
 #include "queueManagement.h"
 #include "uart.h"
 
-UART_HandleTypeDef hlpuart1;
+extern UART_HandleTypeDef hlpuart1;
 
 void vSenderTask(void *arg) {
 

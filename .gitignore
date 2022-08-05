@@ -1,2 +1,15 @@
-Workspace/.metadata
-Workspace/CTS-1_STM_OS/.settings
+### Eclipse ###
+**/.metadata/*
+*/bin/**
+*/tmp/**
+*.tmp
+*.bak
+*.swp
+*~.nib
+**/.settings/*
+*.o
+*.d
+*.su
+*.list
+
+
