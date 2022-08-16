@@ -8,6 +8,10 @@
 #ifndef INC_GPSCOMMANDS_H_
 #define INC_GPSCOMMANDS_H_
 
+enum bufferSize{
+	Buffer = 32,
+};
+
 void antennaPower(int on);
 
 void approxPosTimeout(int timeout);
@@ -18,43 +22,43 @@ void bestVelType(char* mode);
 
 void dataDecodeSignal(char* signalType, int on);
 
-dllTimeConst();
+void dllTimeConst(char* signalType, float timeConst);
 
-dynamics();
+void dynamics(char* settings);
 
-eCutoff();
+void eCutoff(float angle);
 
-elevationCutoff();
+void elevationCutoff(char* constellation, float angle);
 
-fix();
+void fix(char* type, float param1, float param2, float param3);
 
-freSet();
+void freSet(char* target);
 
-geodeticDatum();
+void geodeticDatum(char* theSwitch, char* name, float epsgCode, char* anchor, float semimajorAxis, float flattening);
 
-itDetectConfig();
+void itDetectConfig(char* rfPath);
 
-log();
+void log(char* port, char* message, char* trigger, float period, float offset, char* hold);
 
-posTimeOut();
+void posTimeOut(float seconds);
 
-ppsControl();
+void ppsControl(char* theSwitch, char* polarity, float period, float pulseWidth);
 
-reset();
+void reset(float delay);
 
-saveConfig();
+void saveConfig();
 
-serialProtocol();
+void serialProtocol(char* port, char* protocol);
 
-setApproxPos();
+void setApproxPos(float lat, float lon, float height);
 
-setApproxTime();
+void setApproxTime(float week, float second);
 
-setionoType();
+void setionoType(char* model);
 
-statusConfig();
+void statusConfig(char* type, char* word, float mask);
 
-tiltCompensationontrol();
+void tiltCompensationControl(char* theSwitch);
 
 
 
