@@ -150,6 +150,7 @@ void geodeticDatum(char* theSwitch, char* name, float epsgCode, char* anchor, fl
 	strcat(temp1, command);
 	strcat(" ", command);
 	strcat(anchor, command);
+	strcat(" ", command);
 	sprintf(temp2, sizeof(temp1), "%f", semimajorAxis);
 	strcat(temp2, command);
 	strcat(" ", command);
