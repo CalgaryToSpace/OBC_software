@@ -9,7 +9,42 @@
 #include "send.h"
 #include <string.h>
 
-void antennaPower(int on){
+
+void gps_bestxyz(){
+	char* command = "log bestxyza once";
+	sendGpsCommand(command);
+	return;
+}
+
+void gps_time(){
+	char* command = "log timea once";
+	sendGpsCommand(command);
+	return;
+}
+
+void gps_itdetectstatus(){
+	char* command = "log itdetectstatusa once";
+	sendGpsCommand(command);
+	return;
+}
+
+void gps_rxstatus(){
+	char* command = "log rxstatusa once";
+	sendGpsCommand(command);
+	return;
+}
+
+void gps_rxconfig(){
+	char* command = "log rxconfiga once";
+	sendGpsCommand(command);
+	return;
+}
+
+
+
+// CURENTLY NOT NEEDED COMMANDS
+
+void gps_antennaPower(int on){
 	char* command = "ANTENNAPOWER ";
 	if(on == 1){
 		strcat("ON", command);
@@ -23,7 +58,7 @@ void antennaPower(int on){
 	return;
 }
 
-void approxPosTimeout(int timeout){
+void gps_approxPosTimeout(int timeout){
 	char* command = "APPROXPOSTIMEOUT ";
 	char temp[Buffer];
 	sprintf(temp, "%c", timeout);
@@ -32,7 +67,7 @@ void approxPosTimeout(int timeout){
 	return;
 }
 
-void bdseCutoff(float angle){
+void gps_bdseCutoff(float angle){
 	char* command = "BDSECUTOFF ";
 	char temp[Buffer];
 	sprintf(temp, sizeof(temp), "%f", angle);
@@ -41,14 +76,14 @@ void bdseCutoff(float angle){
 	return;
 }
 
-void bestVelType(char* mode){
+void gps_bestVelType(char* mode){
 	char* command = "BESTVELTYPE ";
 	strcat(mode, command);
 	sendGpsCommand(command);
 	return;
 }
 
-void dataDecodeSignal(char* signalType, int on){
+void gps_dataDecodeSignal(char* signalType, int on){
 	char* command = "DATADECODESIGNAL ";
 	strcat(signalType, command);
 	if(on == 1){
@@ -63,7 +98,7 @@ void dataDecodeSignal(char* signalType, int on){
 	return;
 }
 
-void dllTimeConst(char* signalType, float timeConst){
+void gps_dllTimeConst(char* signalType, float timeConst){
 	char* command = "DLLTIMECONST ";
 	strcar(signalType, command);
 	strcat(" ", command);
@@ -74,14 +109,14 @@ void dllTimeConst(char* signalType, float timeConst){
 	return;
 }
 
-void dynamics(char* settings){
+void gps_dynamics(char* settings){
 	char* command = "DYNAMICS ";
 	strcar(settings, command);
 	sendGpsCommand(command);
 	return;
 }
 
-void eCutoff(float angle){
+void gps_eCutoff(float angle){
 	char* command = "ECUTOFF ";
 	char temp[Buffer];
 	sprintf(temp, sizeof(temp), "%f", angle);
@@ -90,7 +125,7 @@ void eCutoff(float angle){
 	return;
 }
 
-void elevationCutoff(char* constellation, float angle){
+void gps_elevationCutoff(char* constellation, float angle){
 	char* command = "ELEVATIONCUTOFF ";
 	strcar(constellation, command);
 	strcat(" ", command);
@@ -101,7 +136,7 @@ void elevationCutoff(char* constellation, float angle){
 	return;
 }
 
-void fix(char* type, float param1, float param2, float param3){
+void gps_fix(char* type, float param1, float param2, float param3){
 	char* command = "FIX ";
 	strcat(type, command);
 	if(strcomp(type, "HEIGHT")){
@@ -126,14 +161,14 @@ void fix(char* type, float param1, float param2, float param3){
 	return;
 }
 
-void freSet(char* target){
+void gps_freSet(char* target){
 	char* command = "FRESET ";
 	strcat(target, command);
 	sendGpsCommand(command);
 	return;
 }
 
-void geodeticDatum(char* theSwitch, char* name, float epsgCode, char* anchor, float semimajorAxis, float flattening){
+void gps_geodeticDatum(char* theSwitch, char* name, float epsgCode, char* anchor, float semimajorAxis, float flattening){
 	char* command = " GEODETICDATUM ";
 	strcat(theSwitch, command);
 	strcat(" ", command);
@@ -160,14 +195,14 @@ void geodeticDatum(char* theSwitch, char* name, float epsgCode, char* anchor, fl
 	return;
 }
 
-void itDetectConfig(char* rfPath){
+void gps_itDetectConfig(char* rfPath){
 	char* command = "ITDETECTCONFIG ";
 	strcat(rfPath, command);
 	sendGpsCommand(command);
 	return;
 }
 
-void log(char* port, char* message, char* trigger, float period, float offset, char* hold){
+void gps_log(char* port, char* message, char* trigger, float period, float offset, char* hold){
 	char* command = "LOG ";
 	char temp1[Buffer];
 	char temp2[Buffer];
@@ -188,7 +223,7 @@ void log(char* port, char* message, char* trigger, float period, float offset, c
 	return;
 }
 
-void posTimeOut(float seconds){
+void gps_posTimeOut(float seconds){
 	char* command = "POSTIMEOUT ";
 	char temp[Buffer];
 	sprintf(temp, sizeof(temp), "%f", seconds);
@@ -197,7 +232,7 @@ void posTimeOut(float seconds){
 	return;
 }
 
-void ppsControl(char* theSwitch, char* polarity, float period, float pulseWidth){
+void gps_ppsControl(char* theSwitch, char* polarity, float period, float pulseWidth){
 	char* command = "PPSCONTROL ";
 	char temp1[Buffer];
 	char temp2[Buffer];
@@ -214,7 +249,7 @@ void ppsControl(char* theSwitch, char* polarity, float period, float pulseWidth)
 	return;
 }
 
-void reset(float delay){
+void gps_reset(float delay){
 	char* command = "RESET ";
 	char temp[Buffer];
 	sprintf(temp, sizeof(temp), "%f", delay);
@@ -223,13 +258,13 @@ void reset(float delay){
 	return;
 }
 
-void saveConfig(){
+void gps_saveConfig(){
 	char* command = " SAVECONFIG";
 	sendGpsCommand(command);
 	return;
 }
 
-void serialProtocol(char* port, char* protocol){
+void gps_serialProtocol(char* port, char* protocol){
 	char* command = " SERIALPROTOCOL ";
 	strcat(port, command);
 	strcat(" ", command);
@@ -238,7 +273,7 @@ void serialProtocol(char* port, char* protocol){
 	return;
 }
 
-void setApproxPos(float lat, float lon, float height){
+void gps_setApproxPos(float lat, float lon, float height){
 	char* command = "SETAPPROXPOS ";
 	char temp1[Buffer];
 	char temp2[Buffer];
@@ -255,7 +290,7 @@ void setApproxPos(float lat, float lon, float height){
 	return;
 }
 
-void setApproxTime(float week, float second){
+void gps_setApproxTime(float week, float second){
 	char* command = "SETAPPROXTIME ";
 	char temp1[Buffer];
 	char temp2[Buffer];
@@ -268,14 +303,14 @@ void setApproxTime(float week, float second){
 	return;
 }
 
-void setionoType(char* model){
+void gps_setionoType(char* model){
 	char* command = " SETIONOTYPE ";
 	strcat(model, command);
 	sendGpsCommand(command);
 	return;
 }
 
-void statusConfig(char* type, char* word, float mask){
+void gps_statusConfig(char* type, char* word, float mask){
 	char* command = "STATUSCONFIG ";
 	char temp[Buffer];
 	strcat(type, command);
@@ -288,7 +323,7 @@ void statusConfig(char* type, char* word, float mask){
 	return;
 }
 
-void tiltCompensationControl(char* theSwitch){
+void gps_tiltCompensationControl(char* theSwitch){
 	char* command = "TILTCOMPENSATIONCONTROL ";
 	strcat(theSwitch, command);
 	sendGpsCommand(command);

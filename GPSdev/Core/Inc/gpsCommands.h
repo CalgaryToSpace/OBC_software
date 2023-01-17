@@ -12,53 +12,67 @@ enum bufferSize{
 	Buffer = 32,
 };
 
-void antennaPower(int on);
 
-void approxPosTimeout(int timeout);
+void gps_bestxyz();
 
-void bdseCutoff(float angle);
+void gps_time();
 
-void bestVelType(char* mode);
+void gps_itdetectstatus();
 
-void dataDecodeSignal(char* signalType, int on);
+void gps_rxstatus();
 
-void dllTimeConst(char* signalType, float timeConst);
+void gps_rxconfig();
 
-void dynamics(char* settings);
 
-void eCutoff(float angle);
+// CURENTLY NOT NEEDED COMMANDS
 
-void elevationCutoff(char* constellation, float angle);
+void gps_antennaPower(int on);
 
-void fix(char* type, float param1, float param2, float param3);
+void gps_approxPosTimeout(int timeout);
 
-void freSet(char* target);
+void gps_bdseCutoff(float angle);
 
-void geodeticDatum(char* theSwitch, char* name, float epsgCode, char* anchor, float semimajorAxis, float flattening);
+void gps_bestVelType(char* mode);
 
-void itDetectConfig(char* rfPath);
+void gps_dataDecodeSignal(char* signalType, int on);
 
-void log(char* port, char* message, char* trigger, float period, float offset, char* hold);
+void gps_dllTimeConst(char* signalType, float timeConst);
 
-void posTimeOut(float seconds);
+void gps_dynamics(char* settings);
 
-void ppsControl(char* theSwitch, char* polarity, float period, float pulseWidth);
+void gps_eCutoff(float angle);
 
-void reset(float delay);
+void gps_elevationCutoff(char* constellation, float angle);
 
-void saveConfig();
+void gps_fix(char* type, float param1, float param2, float param3);
 
-void serialProtocol(char* port, char* protocol);
+void gps_freSet(char* target);
 
-void setApproxPos(float lat, float lon, float height);
+void gps_geodeticDatum(char* theSwitch, char* name, float epsgCode, char* anchor, float semimajorAxis, float flattening);
 
-void setApproxTime(float week, float second);
+void gps_itDetectConfig(char* rfPath);
 
-void setionoType(char* model);
+void gps_log(char* port, char* message, char* trigger, float period, float offset, char* hold);
 
-void statusConfig(char* type, char* word, float mask);
+void gps_posTimeOut(float seconds);
 
-void tiltCompensationControl(char* theSwitch);
+void gps_ppsControl(char* theSwitch, char* polarity, float period, float pulseWidth);
+
+void gps_reset(float delay);
+
+void gps_saveConfig();
+
+void gps_serialProtocol(char* port, char* protocol);
+
+void gps_setApproxPos(float lat, float lon, float height);
+
+void gps_setApproxTime(float week, float second);
+
+void gps_setionoType(char* model);
+
+void gps_statusConfig(char* type, char* word, float mask);
+
+void gps_tiltCompensationControl(char* theSwitch);
 
 
 

@@ -351,4 +351,3 @@ VP_SYS_VS_tim3.Mode=TIM3
 VP_SYS_VS_tim3.Signal=SYS_VS_tim3
 board=NUCLEO-L4R5ZI
 boardIOC=true
-isbadioc=false

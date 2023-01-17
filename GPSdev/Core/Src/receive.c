@@ -10,14 +10,20 @@
 
 char** gpsParseReceive(char* received){
 	if(received[0] != '#'){											// Messages should start with "#'
-		return NULL;
+		return (void *) 0;
 	}
 
 	char** toReturn = (char**) malloc(sizeof(char*) * 11);			// Allocate mem for fields of the response
-	char* current = received;
+	char* current = received + 1;									// Do not include the starting "#"
 	int cursor = 0;
 	int index = 0;
 	int fieldStart = 0;
+
+	// Loop through all the characters of the message.
+	// Once a segment is passed, look back to see how
+	// big it was and then add all the member characters
+	// to the return variable.
+
 	while((*current) != '*'){										// "*" indicates the end of the fields
 		if((*current) == ',' || (*current) ==';'){					// Fields are seperated by "," or ";"
 			toReturn[index] = (char*) malloc((sizeof(char) * (cursor - fieldStart)) + 1);
