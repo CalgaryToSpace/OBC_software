@@ -371,3 +371,13 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *hlpuart1)
 void sendUartMessage(char* message, int length){
 	HAL_UART_Transmit(&hlpuart1, (uint8_t*)message, length, HAL_MAX_DELAY);
 }
+
+void sendGpsCommand(char* command){
+	char* cursor= command;
+	int counter = 0;
+	while(cursor != '\n'){
+		counter++;
+		cursor++;
+	}
+	HAL_UART_Trasmit(&huart3, (uint8_t*)command, counter, HAL_MAX_DELAY);
+}

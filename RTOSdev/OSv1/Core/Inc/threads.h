@@ -12,15 +12,6 @@
 
 void mainThread(void *argument);
 
-// Test function
-void test1(void *argument);
-
-//Test function
-void test2(void *argument);
-
-//Test function
-void test3(void *argument);
-
 
 
 #endif /* INC_THREADS_H_ */

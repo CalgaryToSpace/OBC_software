@@ -24,4 +24,6 @@ void startUart();
  */
 void sendUartMessage(char* message, int length);
 
+void sendGpsCommand(char* command);
+
 #endif /* INC_UART_H_ */
