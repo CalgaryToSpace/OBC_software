@@ -21,7 +21,7 @@ void startMessengeCoordinatorTask(void *messenger_handle){
 
 	for(;;) {
 
-		// Sahithi had this and I don't know why -Matt
+		// Sahithi had this and I don't know why so I'm leaving it here -Matt
 		//if(uxQueueMessagesWaiting(qHandle) != 0) {
 			// Logging here eventually: "Queue should have been empty."
 		//}
