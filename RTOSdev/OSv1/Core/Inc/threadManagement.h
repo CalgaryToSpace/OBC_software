@@ -82,7 +82,7 @@ int childCount(struct threadNode* theNode);
  * @param stacksize: integer holding the size to set the stack of the new thread to.
  * @retval None
  */
-void startThread(void (*funPtr), int tp, char* tn, int stackSize);
+void startThread(void (*funPtr), int tp, char* tn, int stackSize, void* extraData);
 
 /**
  * @brief This function searches the process tree for the thread Node struct that correlates to a passed

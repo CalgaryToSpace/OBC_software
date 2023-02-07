@@ -20,7 +20,8 @@ extern struct threadNode* head;
 //PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
 void mainThread(void *argument){
-	startThread(test1, osPriorityLow, "One", 8*64);
+	QueueHandle_t coordinatorQueue = xQueueCreate(7, sizeof(uint8_t) * 100);
+	startThread(startMessengeCoordinatorTask, osPriorityLow, "One", 8*64, (void*)coordinatorQueue);
 	for(;;){
 
 	}

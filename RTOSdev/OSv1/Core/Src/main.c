@@ -127,6 +127,7 @@ int main(void)
   /* USER CODE BEGIN RTOS_THREADS */
   head = NULL;
   startThread(mainThread, osPriorityHigh, "Main", 8*128);
+
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */

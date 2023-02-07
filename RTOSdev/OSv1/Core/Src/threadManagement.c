@@ -141,7 +141,7 @@ void threadStateDebug(osThreadId_t handle){
 /**
  * Function definition of startThread.
  */
-void startThread(void (*funPtr), int tp, char* tn, int stackSize){
+void startThread(void (*funPtr), int tp, char* tn, int stackSize, void* extraData){
 	struct threadInfo info;
 	info.threadPriority = tp;
 	info.threadName = tn;
@@ -151,7 +151,7 @@ void startThread(void (*funPtr), int tp, char* tn, int stackSize){
 			.stack_size = stackSize
 	};
 	osThreadId_t threadHandle;
-	threadHandle = osThreadNew(funPtr, NULL, &threadAttributes);
+	threadHandle = osThreadNew(funPtr, extraData, &threadAttributes);
 	if(head == NULL){
 		initializeThreadNode(NULL, osThreadGetId(), &info);
 	}
