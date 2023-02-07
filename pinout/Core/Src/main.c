@@ -26,11 +26,20 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+typedef struct {
+	uint8_t data[BUFFER_SIZE];
+	uint16_t head;
+	uint16_t tail;
+	uint16_t count;
+	// add counter for which of 1 out 8 memory modules we are in
+	// the buffersize should be changed to be the size of 1 module
+	// every time it passes it, this variable gets updated by mod 8
+} CircularBuffer;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define BUFFER_SIZE 128
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -54,26 +63,6 @@ UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
 
-/* USER CODE END PV */
-
-/* Private function prototypes -----------------------------------------------*/
-void SystemClock_Config(void);
-static void MX_GPIO_Init(void);
-static void MX_I2C1_Init(void);
-static void MX_I2C2_Init(void);
-static void MX_I2C3_Init(void);
-static void MX_SPI1_Init(void);
-static void MX_TIM15_Init(void);
-static void MX_UART4_Init(void);
-static void MX_USART1_UART_Init(void);
-static void MX_USART2_UART_Init(void);
-static void MX_USART3_UART_Init(void);
-/* USER CODE BEGIN PFP */
-
-/* USER CODE END PFP */
-
-/* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
 
 /* The following are defined in the S25... Manual
  * Section 9.3
@@ -115,7 +104,54 @@ const uint8_t ECCStatusRegRead = 0x18;
  */
 
 
+/* USER CODE END PV */
 
+/* Private function prototypes -----------------------------------------------*/
+void SystemClock_Config(void);
+static void MX_GPIO_Init(void);
+static void MX_I2C1_Init(void);
+static void MX_I2C2_Init(void);
+static void MX_I2C3_Init(void);
+static void MX_SPI1_Init(void);
+static void MX_TIM15_Init(void);
+static void MX_UART4_Init(void);
+static void MX_USART1_UART_Init(void);
+static void MX_USART2_UART_Init(void);
+static void MX_USART3_UART_Init(void);
+/* USER CODE BEGIN PFP */
+
+/* USER CODE END PFP */
+
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
+
+	void init_buffer(CirculurBuffer *cb) {
+		cb->head = 0;
+		cb->tail = 0;
+		cb->count = 0;
+	}
+	bool is_empty(CircularBuffer *cb) {
+		return cb->count == 0;
+	}
+	bool is_full(CircularBuffer *cb) {
+		return cb->count == BUFFER_SIZE;
+	}
+	void enqueue(CircularBuffer *cb, uint8_t data) {
+		if (!is_full(cb)) {
+			cb->data[cb->tail] = data;
+			cb->tail = (cb->tail + 1) % BUFFER_SIZE;
+			cb->count++;
+		}
+	}
+	uint8_t dequeue(CircularBuffer *cb) {
+		if (!is_empty(cb)) {
+			uint8_t data = cb->data[cb->head];
+			cb->head = (cb->head + 1) % BUFFER_SIZE;
+			cb->count--;
+			return data;
+		}
+		return 0;
+	}
 /* USER CODE END 0 */
 
 /**
