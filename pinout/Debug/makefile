@@ -34,34 +34,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := pinout
+BUILD_ARTIFACT_NAME := S70FL01GSMemoryModule
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-pinout.elf \
+S70FL01GSMemoryModule.elf \
 
 MAP_FILES += \
-pinout.map \
+S70FL01GSMemoryModule.map \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-pinout.list \
+S70FL01GSMemoryModule.list \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: pinout.elf secondary-outputs
+main-build: S70FL01GSMemoryModule.elf secondary-outputs
 
 # Tool invocations
-pinout.elf pinout.map: $(OBJS) $(USER_OBJS) C:\Users\h3cti\dev\CalgaryToSpace\OBC_software\pinout\STM32L4R5ZITXP_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "pinout.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\h3cti\dev\CalgaryToSpace\OBC_software\pinout\STM32L4R5ZITXP_FLASH.ld" --specs=nosys.specs -Wl,-Map="pinout.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+S70FL01GSMemoryModule.elf S70FL01GSMemoryModule.map: $(OBJS) $(USER_OBJS) C:\Users\h3cti\dev\CalgaryToSpace\OBC_software\pinout\STM32L4R5ZITXP_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "S70FL01GSMemoryModule.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\h3cti\dev\CalgaryToSpace\OBC_software\pinout\STM32L4R5ZITXP_FLASH.ld" --specs=nosys.specs -Wl,-Map="S70FL01GSMemoryModule.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -70,14 +70,14 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-pinout.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "pinout.list"
+S70FL01GSMemoryModule.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "S70FL01GSMemoryModule.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) default.size.stdout pinout.elf pinout.list pinout.map
+	-$(RM) S70FL01GSMemoryModule.elf S70FL01GSMemoryModule.list S70FL01GSMemoryModule.map default.size.stdout
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)

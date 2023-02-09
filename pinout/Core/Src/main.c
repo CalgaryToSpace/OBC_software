@@ -21,25 +21,28 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdbool.h>
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-typedef struct {
-	uint8_t data[BUFFER_SIZE];
-	uint16_t head;
-	uint16_t tail;
-	uint16_t count;
-	// add counter for which of 1 out 8 memory modules we are in
-	// the buffersize should be changed to be the size of 1 module
-	// every time it passes it, this variable gets updated by mod 8
-} CircularBuffer;
+typedef struct DecoderInput {
+	uint64_t Port;
+	uint16_t Pin;
+	uint8_t State;
+
+} DecoderInput;
+
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define BUFFER_SIZE 128
+
+// 256 KB per sector (256 * 1000) * 256 sectors
+#define MEMORY_MODULE_SIZE (256 * 1000) * 256
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -63,10 +66,25 @@ UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
 
+	// Equal to GPIO_PIN_SET, for this architecture
+	// 1 is the inactive state
+	// 0 is the active state
+	const uint8_t INACTIVE_STATE = 1;
+	const uint8_t ACTIVE_STATE = 0;
+
+	static DecoderInput A0;
+	static DecoderInput A1;
+	static DecoderInput A2;
+
+
+
 
 /* The following are defined in the S25... Manual
- * Section 9.3
+ * Section 7.6.1, 9.3
  */
+const uint8_t ReadTheWriteReg = 0x01;
+const uint8_t ClearStatusReg = 0x30;
+
 const uint8_t ReadStatusReg1 = 0x05;
 const uint8_t ReadStatusReg2 = 0x07;
 const uint8_t ReadConfigReg = 0x35;
@@ -79,8 +97,8 @@ const uint8_t WriteEnable = 0x06;
 const uint8_t WriteDisable = 0x04;
 
 
-const uint8_t ClearStatusReg = 0x30;
 const uint8_t ECCStatusRegRead = 0x18;
+
 
 
 /*
@@ -119,13 +137,34 @@ static void MX_USART1_UART_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_USART3_UART_Init(void);
 /* USER CODE BEGIN PFP */
-
+static void init_DecoderInputs(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+typedef struct CircularBuffer{
+	uint8_t data[BUFFER_SIZE];
+	uint16_t head;
+	uint16_t tail;
+	uint16_t count;
+	// add counter for which of 1 out 8 memory modules we are in
+	// the buffersize should be changed to be the size of 1 module
+	// every time it passes it, this variable gets updated by mod 8
 
-	void init_buffer(CirculurBuffer *cb) {
+	// receive stream of data, must turn into packet of some size (established soon)
+
+
+} CircularBuffer;
+
+
+
+
+
+//	void setMemoryBank()
+
+
+
+	void init_buffer(CircularBuffer *cb) {
 		cb->head = 0;
 		cb->tail = 0;
 		cb->count = 0;
@@ -161,8 +200,9 @@ static void MX_USART3_UART_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
-  /* USER CODE END 1 */
+	uint8_t spiRxBuffer[100];
+	uint8_t spiTxBuffer[100];
+	/* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -192,6 +232,32 @@ int main(void)
   MX_USART2_UART_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
+
+  // look at pin initialization below MX_GPIO
+  // ****** Also look at main.h file to see macro defines ******
+
+
+  // Get blue led running, shows that board is running
+  // Look at main.h to see GPLED1_Port and pin
+  // this is the same as: GPIOE, GPIO_PIN_2, GPIO_PIN_SET
+  HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_SET);
+
+  // Pull Chip Select High so we can use UART safely
+  HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_SET);
+
+  // Test UART
+  char testBuffer[] = "Hello World!";
+  HAL_UART_Transmit(&huart4,(uint8_t *) testBuffer, strlen((char*)testBuffer), 100);
+
+  // To Access FLASH Module 0 (of 7), there are 3 Chip selects, A0, A1, A2
+  // that repesent Chip Selects for decoders
+  // A0 is the LSB
+  // By default, these Chip selects are pulled high,
+  // to access module 0, we need 000, so A0, A1, and A2 is all pulled high
+
+  // Pull Chip Select Low so we can access status register
+  HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_SET);
+  HAL_SPI_Transmit(&hspi1, ReadStatusReg1, 1, 100);
 
   /* USER CODE END 2 */
 
@@ -773,6 +839,43 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+	void init_DecoderInputs(void) {
+		// Same as setting PIN_GPIO_SET
+//		A0.INACTIVE_STATE, A1.INACTIVE_STATE, A2.INACTIVE_STATE = INACTIVE_STATE;
+		// Same as setting PIN_GPIO_RESET
+//		A0.ACTIVE_STATE, A1.ACTIVE_STATE, A2.ACTIVE_STATE = 0;
+
+		A0.Port = FLASH_CS_A0_GPIO_Port;
+		A1.Port = FLASH_NCS_A1_GPIO_Port;
+		A2.Port = FLASH_NCS_A2_GPIO_Port;
+
+		A0.Pin = FLASH_CS_A0_Pin;
+		A1.Pin = FLASH_NCS_A1_Pin;
+		A2.Pin = FLASH_NCS_A2_Pin;
+
+		// They are all initially starting off at 0
+		// This would initially access Memory Module 0, out of 7
+		A0.State, A1.State, A2.State = INACTIVE_STATE;
+	}
+
+//static void init_DecoderInputs(DecoderInput * LSB, DecoderInput * MiddleBit, DecoderInput * MSB) {
+////		LSB->ACTIVE_STATE, MiddleBit->ACTIVE_STATE, MSB->ACTIVE_STATE = 0;
+////		LSB->INACTIVE_STATE, MiddleBit->INACTIVE_STATE, MSB->INACTIVE_STATE = 1;
+//
+//	LSB->Port = FLASH_CS_A0_GPIO_Port;
+//	MiddleBit->Port = FLASH_NCS_A1_GPIO_Port;
+//	MSB->Port = FLASH_NCS_A2_GPIO_Port;
+//
+//	LSB->Pin = FLASH_CS_A0_Pin;
+//	MiddleBit->Pin = FLASH_NCS_A1_Pin;
+//	MSB->Pin = FLASH_NCS_A2_Pin;
+//
+//	// Equivalent to making state = GPIO_PIN_SET
+//	LSB->State, MiddleBit->State, MSB->State = INACTIVE_STATE;
+//}
+//
+
+
 
 /* USER CODE END 4 */
 
