@@ -21,65 +21,69 @@
  * This function is responsible for splitting data into separate memChunks if necessary
  * and then writing those memChunks into the cy15 memory module. It will also have to
  * handle the logic for writing data across the multiple memory modules too.
+ *
+ * @param 	id 		Next data chunk identifier
+ * @param 	data 	Data to split into separate chunks
+ * @param 	size	Total size of incoming date to be split
  */
 cy15ResponseEventEnum memWrite(cy15ChunkDataEnum id, uint8_t *data, uint32_t size){
 
-	//check valid arguments (never trust strangers)
-	if(id > DATA_COUNT || size > maxChunkSize){
+	// Check valid arguments (never trust strangers)
+	if(id > DATA_COUNT){
 		return CY15_ID_ERROR;
-	}else if(size > maxChunkSize){
-		return CY15_SIZE_ERROR;
 	}else if(data == NULL){
 		return CY15_NULL_DATA_ERROR;
 	}
 
-	//create checksum
-	uint32_t crc = memCreateChecksum(0, data, size);
-
-	//create cy15ChunkStruct
-	cy15ChunkStruct newChunk;
-	newChunk.id = id;
-	newChunk.length = size;
-	newChunk.data = data;
-
-	//loop to write until complete
-	uint32_t bytesWritten;
+	seqNum = 1;
+	bytesWritten = 0;
 	while(bytesWritten < size){
-		uint8_t toWrite = 0;
+		// Create cy15ChunkStruct
+		cy15ChunkStruct newChunk;
+		newChunk.id = id;
 
-		//check if new_chunk fits in current memory module
-			//if yes, write full chunk
-				//update module
-				//update bytesWritten
-			//if no, write until module is full
-				//update (and increment) module and bytesWritten
-				//break
-		if( (size - bytesWritten) > (maxMemoryAddress - cy15MemoryModules[currentModule].head) ){
-			/* Case when bytes does not fit in memory module */
-
-			toWrite = maxMemoryAddress - cy15MemoryModules[currentModule].head;
-
-			/* Write to memory module */
-			memWriteOp(data, cy15MemoryModules[currentModule].head, toWrite, currentModule);
-
-			/* Increment Data after writing */
-			data+=toWrite;
-
-			/* Move to the next memory module */
-			currentModule = (currentModule+1)%4;
-			bytesWritten += toWrite;
+		// Check if a chunk can fit in memory in its default size
+		if((cy15MemoryModules[currentModule].tail - cy15MemoryModules[currentModule].head) >= maxChunkSize){
+			newChunk.length = maxChunkSize;
+			newChunk.sequenceNum = seqNum++;
+			memcpy(newChunk.data, data, maxChunkSize);
+			newChunk.checksum = memCreateChecksum(0, newChunk.data, maxChunkSize);
+			bytesWritten+=newChunk.length;
+			//Write chunk to memory
+			memWriteOp();	// Update
+			// move data pointer by maxChunkSize (data we copied over)
+			cy15MemoryModules[currentModule].tail+=bytesWritten;
 		}
+		// Create a chunk that fits in the case there is enough space to create a chunk that still has space for data
+		else if((cy15MemoryModules[currentModule].tail - cy15MemoryModules[currentModule].head) >= minChunkSize){
+			uint32_t thisChunkSize = cy15MemoryModules[currentModule].tail - cy15MemoryModules[currentModule].head;
+			newChunk.length = thisChunkSize;
+			newChunk.sequenceNum = seqNum++;
+			memcpy(newChunk.data, data, thisChunkSize);
+			newChunk.checksum = memCreateChecksum(0, newChunk.data, thisChunkSize);
+			bytesWritten+=newChunk.length;
+			// Write chunk to memory
+			memWriteOp();	// Update
+			// move data pointer by thisChunkSize (data that we copied over)
+			cy15MemoryModules[currentModule].tail+=bytesWritten;
+		}
+		// No space available in memory allocate space
 		else{
-			//if yes, write full chunk
-				//update module
-				//update bytesWritten
+			// Allocate space from the Head by deleting 1 memory chunk and move the head PTR to next memChunk
+			// Go through diff modules
+			uint8_t currentHeadPtr = cy15MemoryModules[currentModule].head;
+			cy15MemoryModules[currentModule].head += cy15MemoryModules[currentModule].head.length;
+			free(currentHeadPtr);
+			// Make SPI call to read memory chunk
+			// Delete created chunk from memory for garbage collection??
 		}
 	}
 
+	// All of the data was written successfully
 	if( bytesWritten == size ){
 		return CY15_EVENT_SUCCESS;
 	}
-
+	// Error writing data to memory
 	return CY15_EVENT_ERROR;
 }
 

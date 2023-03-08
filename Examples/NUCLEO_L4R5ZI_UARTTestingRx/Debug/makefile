@@ -60,8 +60,8 @@ all: main-build
 main-build: NUCLEO_L4R5ZI_UARTTestingRx.elf secondary-outputs
 
 # Tool invocations
-NUCLEO_L4R5ZI_UARTTestingRx.elf NUCLEO_L4R5ZI_UARTTestingRx.map: $(OBJS) $(USER_OBJS) C:\Users\Thomas\Documents\UofC\Calgary\ CubeSat\OBC_software\Examples\NUCLEO_L4R5ZI_UARTTestingRx\STM32L4R5ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "NUCLEO_L4R5ZI_UARTTestingRx.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Thomas\Documents\UofC\Calgary CubeSat\OBC_software\Examples\NUCLEO_L4R5ZI_UARTTestingRx\STM32L4R5ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="NUCLEO_L4R5ZI_UARTTestingRx.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+NUCLEO_L4R5ZI_UARTTestingRx.elf NUCLEO_L4R5ZI_UARTTestingRx.map: $(OBJS) $(USER_OBJS) C:\Users\vaibh\Desktop\University\Projects\P1\OBC_software\Examples\NUCLEO_L4R5ZI_UARTTestingRx\STM32L4R5ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "NUCLEO_L4R5ZI_UARTTestingRx.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\vaibh\Desktop\University\Projects\P1\OBC_software\Examples\NUCLEO_L4R5ZI_UARTTestingRx\STM32L4R5ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="NUCLEO_L4R5ZI_UARTTestingRx.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

@@ -12,6 +12,7 @@
 //--------------------------------------------------------------------------------
 #define maxMemoryAddress 0x100000
 #define maxChunkSize 1024
+#define minChunkSize 128 //Update after calculating the size of chunk header bits & min data we want to send in a packet
 #define numberOfModules
 
 //-----------------------------------STRUCTS--------------------------------------
@@ -32,6 +33,7 @@ typedef enum cy15ChunkDataEnum {
 
 typedef struct cy15ChunkStruct {
 	cy15ChunkDataEnum id;
+	uint8_t sequenceNum;
 	uint32_t length;
 	uint8_t *data;
 	uint32_t checksum;
@@ -45,14 +47,14 @@ typedef struct cy15ModuleStruct {
 //----------------------------------VARIABLES-------------------------------------
 //--------------------------------------------------------------------------------
 int currentModule = 0;
+int bytesWritten = 0;
 cy15ModuleStruct cy15MemoryModules[numberOfModules];
 
 //----------------------------------FUNCTIONS-------------------------------------
 //--------------------------------------------------------------------------------
 //---------------------------------DEFINITIONS------------------------------------
 //--------------------------------------------------------------------------------
-cy15ResponseEventEnum memWrite(cy15ChunkDataEnum id, uint8_t *data,
-		uint32_t size);
+cy15ResponseEventEnum memWrite(cy15ChunkDataEnum id, uint8_t *data, uint32_t size);
 cy15ResponseEventEnum memRead(cy15ChunkStruct *data);
 
 static uint32_t memCreateChecksum(uint32_t crc, const char *buf, uint32_t len);
@@ -61,8 +63,6 @@ static uint8_t memWriteOp(uint8_t *data, uint8_t *address, uint32_t length, uint
 
 static uint8_t memReadOp(uint8_t *data_buffer, uint8_t *address);
 
-cy15ResponseEventEnum memWriteC(cy15ChunkDataEnum id, uint8_t *data,
-		uint32_t size);
-
+cy15ResponseEventEnum memWriteC(cy15ChunkDataEnum id, uint8_t *data, uint32_t size);
 cy15ResponseEventEnum memRead(cy15ChunkStruct *data);
 

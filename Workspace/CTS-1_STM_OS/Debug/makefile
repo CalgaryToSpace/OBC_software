@@ -64,8 +64,8 @@ all: main-build
 main-build: CTS-1_STM_OS.elf secondary-outputs
 
 # Tool invocations
-CTS-1_STM_OS.elf CTS-1_STM_OS.map: $(OBJS) $(USER_OBJS) C:\Users\Thomas\Documents\UofC\Calgary\ CubeSat\OBC_software\Workspace\CTS-1_STM_OS\STM32L4R5ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "CTS-1_STM_OS.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Thomas\Documents\UofC\Calgary CubeSat\OBC_software\Workspace\CTS-1_STM_OS\STM32L4R5ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="CTS-1_STM_OS.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+CTS-1_STM_OS.elf CTS-1_STM_OS.map: $(OBJS) $(USER_OBJS) C:\Users\vaibh\Desktop\University\Projects\P1\OBC_software\Workspace\CTS-1_STM_OS\STM32L4R5ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "CTS-1_STM_OS.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\vaibh\Desktop\University\Projects\P1\OBC_software\Workspace\CTS-1_STM_OS\STM32L4R5ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="CTS-1_STM_OS.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
