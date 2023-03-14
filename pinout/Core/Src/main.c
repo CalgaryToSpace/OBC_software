@@ -91,24 +91,29 @@ static DecoderInput A2;
 
 static CircularBuffer cb;
 
+/***************************************
+ * 	Look at Pages 75, 76, 77
+ *
+ ****************************************/
+
 /* The following are defined in the S25... Manual
  * Section 7.6.1, 9.3
  */
-const uint8_t ReadTheWriteReg = 0x01;
-const uint8_t ClearStatusReg = 0x30;
+const uint8_t WRR_WriteRegister = 0x01;
+const uint8_t CLSR_ClearStatusReg = 0x30;
 
-const uint8_t ReadStatusReg1 = 0x05;
-const uint8_t ReadStatusReg2 = 0x07;
-const uint8_t ReadConfigReg = 0x35;
-const uint8_t ReadBankReg = 0x16;
+const uint8_t RDSR1_ReadStatusReg1 = 0x05;
+const uint8_t RDSR2_ReadStatusReg2 = 0x07;
+const uint8_t RDCR_ReadConfigReg = 0x35;
+const uint8_t BRRD_ReadBankReg = 0x16;
 
-const uint8_t WriteBankReg = 0x17;
-const uint8_t BankRegAccess = 0xB9;
-const uint8_t WriteReg = 0x01;
-const uint8_t WriteEnable = 0x06;
-const uint8_t WriteDisable = 0x04;
+const uint8_t BRWR_WriteBankReg = 0x17;
+const uint8_t BRAC_BankRegAccess = 0xB9;
+//const uint8_t WriteReg = 0x01;
+const uint8_t WREN_WriteEnable = 0x06;
+const uint8_t WRDI_WriteDisable = 0x04;
 
-const uint8_t ECCStatusRegRead = 0x18;
+const uint8_t ECCRD_ECCRead = 0x18;
 
 /*
  * The instruction
@@ -318,7 +323,7 @@ int main(void) {
 
 	// Pull Chip Select Low so we can access status register
 //  HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_SET);
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) &ReadStatusReg1, 1, 100);
+	HAL_SPI_Transmit(&hspi1, (uint8_t*) &RDSR1_ReadStatusReg1, 1, 100);
 	HAL_SPI_Receive(&hspi1, (uint8_t*) spiRxBuffer, 1, 100);
 
 	/* USER CODE END 2 */
