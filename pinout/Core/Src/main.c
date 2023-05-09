@@ -190,44 +190,44 @@ bool is_full(void) {
  * Increments counter based on 8 bits of data
  */
 //Added the if statement to check if it's the first element being added
-	//If it is, we need to keep the tail value the same since we want the tail
-	//to point to the 0th element in data
+//If it is, we need to keep the tail value the same since we want the tail
+//to point to the 0th element in data
 
-	//If it's not the first element being added
-	//add element to the index in front of tail
+//If it's not the first element being added
+//add element to the index in front of tail
 
-	//This was implemented because the tail value would never reach 8 because of the mod BUFFER_SIZE = 8
-	//Could change the mod value to be 9 and revert to previous enqueue function
-	void enqueue(CircularBuffer *cb, uint8_t data) {
-		if (!is_full(cb)) {
+//This was implemented because the tail value would never reach 8 because of the mod BUFFER_SIZE = 8
+//Could change the mod value to be 9 and revert to previous enqueue function
+void enqueue(CircularBuffer *cb, uint8_t data) {
+	if (!is_full(cb)) {
 
-		    if ((cb->count) == 0) {
-		        cb->data[cb->tail] = data;
-		        cb->tail = (cb->tail) % BUFFER_SIZE;
-		    }
-		    else {
-		        cb->data[cb->tail+1] = data;
-		        cb->tail = (cb->tail + 1) % BUFFER_SIZE;
-		    }
-
-		    cb->count++;
+		if ((cb->count) == 0) {
+			cb->data[cb->tail] = data;
+			cb->tail = (cb->tail) % BUFFER_SIZE;
 		}
+		else {
+			cb->data[cb->tail+1] = data;
+			cb->tail = (cb->tail + 1) % BUFFER_SIZE;
+		}
+
+		cb->count++;
 	}
+}
 /*
  * This is to retrieve memory
  */
-	//Just set the head to 0 for the dequeue before incrementing it
-		uint8_t dequeue(CircularBuffer *cb) {
-			if (!is_empty(cb)) {
-				uint8_t data = cb->data[cb->head];
-				cb->data[cb->head] = 0;
-				cb->head = (cb->head + 1) % BUFFER_SIZE;
-				cb->count--;
+//Just set the head to 0 for the dequeue before incrementing it
+uint8_t dequeue(CircularBuffer *cb) {
+	if (!is_empty(cb)) {
+		uint8_t data = cb->data[cb->head];
+		cb->data[cb->head] = 0;
+		cb->head = (cb->head + 1) % BUFFER_SIZE;
+		cb->count--;
 
-				return data;
-			}
-			return 0;
-		}
+		return data;
+	}
+	return 0;
+}
 
 void whichMemoryBank() {
 
@@ -296,6 +296,17 @@ int main(void) {
 	MX_USART2_UART_Init();
 	MX_USART3_UART_Init();
 	/* USER CODE BEGIN 2 */
+
+	//write enable using WREN Command
+	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
+	HAL_SPI_Transmit(&hspi1, (uint8_t*)&WREN_WriteEnable, 1, 100);
+	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
+
+	//Write disable using WRDI Command
+	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
+	HAL_SPI_Transmit(&hspi1, (uint8_t*)&WRDI_WriteDisable, 1, 100);
+	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
+
 
 	// look at pin initialization below MX_GPIO
 	// ****** Also look at main.h file to see macro defines ******
