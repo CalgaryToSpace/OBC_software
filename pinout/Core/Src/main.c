@@ -99,21 +99,34 @@ static CircularBuffer cb;
 /* The following are defined in the S25... Manual
  * Section 7.6.1, 9.3
  */
-const uint8_t WRR_WriteRegister = 0x01;
+//const uint8_t WRR_WriteRegister = 0x01;
 const uint8_t CLSR_ClearStatusReg = 0x30;
+//
+//const uint8_t RDSR1_ReadStatusReg1 = 0x05;
+//const uint8_t RDSR2_ReadStatusReg2 = 0x07;
+//const uint8_t RDCR_ReadConfigReg = 0x35;
+//const uint8_t BRRD_ReadBankReg = 0x16;
+//
+//const uint8_t BRWR_WriteBankReg = 0x17;
+//const uint8_t BRAC_BankRegAccess = 0xB9;
+////const uint8_t WriteReg = 0x01;
+//const uint8_t WREN_WriteEnable = 0x06;
+//const uint8_t WRDI_WriteDisable = 0x04;
+//
+//const uint8_t ECCRD_ECCRead = 0x18;
+//
 
-const uint8_t RDSR1_ReadStatusReg1 = 0x05;
-const uint8_t RDSR2_ReadStatusReg2 = 0x07;
-const uint8_t RDCR_ReadConfigReg = 0x35;
-const uint8_t BRRD_ReadBankReg = 0x16;
 
-const uint8_t BRWR_WriteBankReg = 0x17;
-const uint8_t BRAC_BankRegAccess = 0xB9;
-//const uint8_t WriteReg = 0x01;
-const uint8_t WREN_WriteEnable = 0x06;
-const uint8_t WRDI_WriteDisable = 0x04;
+const uint8_t FLASH_READ = 0x03;
+const uint8_t FLASH_WRITE = 0x02;
+const uint8_t FLASH_WREN = 0x06;
+const uint8_t FLASH_WRDI = 0x04;
+const uint8_t FLASH_ER4 = 0x20;
+const uint8_t FLASH_ER32 = 0x52;
+const uint8_t FLASH_ER64 = 0xd8;
+const uint8_t FLASH_ERCP = 0xC7;
+const uint8_t FLASH_STATREG1 = 0X05;
 
-const uint8_t ECCRD_ECCRead = 0x18;
 
 /*
  * The instruction
@@ -198,36 +211,36 @@ bool is_full(void) {
 
 	//This was implemented because the tail value would never reach 8 because of the mod BUFFER_SIZE = 8
 	//Could change the mod value to be 9 and revert to previous enqueue function
-	void enqueue(CircularBuffer *cb, uint8_t data) {
-		if (!is_full(cb)) {
-
-		    if ((cb->count) == 0) {
-		        cb->data[cb->tail] = data;
-		        cb->tail = (cb->tail) % BUFFER_SIZE;
-		    }
-		    else {
-		        cb->data[cb->tail+1] = data;
-		        cb->tail = (cb->tail + 1) % BUFFER_SIZE;
-		    }
-
-		    cb->count++;
-		}
-	}
+//	void enqueue(CircularBuffer *cb, uint8_t data) {
+//		if (!is_full(cb)) {
+//
+//		    if ((cb->count) == 0) {
+//		        cb->data[cb->tail] = data;
+//		        cb->tail = (cb->tail) % BUFFER_SIZE;
+//		    }
+//		    else {
+//		        cb->data[cb->tail+1] = data;
+//		        cb->tail = (cb->tail + 1) % BUFFER_SIZE;
+//		    }
+//
+//		    cb->count++;
+//		}
+//	}
 /*
  * This is to retrieve memory
  */
 	//Just set the head to 0 for the dequeue before incrementing it
-		uint8_t dequeue(CircularBuffer *cb) {
-			if (!is_empty(cb)) {
-				uint8_t data = cb->data[cb->head];
-				cb->data[cb->head] = 0;
-				cb->head = (cb->head + 1) % BUFFER_SIZE;
-				cb->count--;
-
-				return data;
-			}
-			return 0;
-		}
+//		uint8_t dequeue(CircularBuffer *cb) {
+//			if (!is_empty(cb)) {
+//				uint8_t data = cb->data[cb->head];
+//				cb->data[cb->head] = 0;
+//				cb->head = (cb->head + 1) % BUFFER_SIZE;
+//				cb->count--;
+//
+//				return data;
+//			}
+//			return 0;
+//		}
 
 void whichMemoryBank() {
 
@@ -264,8 +277,8 @@ void whichMemoryBank() {
  */
 int main(void) {
 	/* USER CODE BEGIN 1 */
-	uint8_t spiRxBuffer[100];
-	uint8_t spiTxBuffer[100];
+	uint8_t spiRxBuffer[9];
+	uint8_t spiTxBuffer[9];
 	/* USER CODE END 1 */
 
 	/* MCU Configuration--------------------------------------------------------*/
@@ -303,17 +316,81 @@ int main(void) {
 	// Get blue led running, shows that board is running
 	// Look at main.h to see GPLED1_Port and pin
 	// this is the same as: GPIOE, GPIO_PIN_2, GPIO_PIN_SET
-	HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_SET);
+//	HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_SET);
 
-//	// Pull Chip Select High so we can use UART safely
+
+	strcpy((char*) spiTxBuffer, "He\r\n");
+	HAL_UART_Transmit(&huart1, spiTxBuffer, strlen(spiTxBuffer), 100);
+
+	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_GPIO_Port, GPIO_PIN_SET);
+
+
+	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_GPIO_Port, GPIO_PIN_RESET);
+	HAL_SPI_Transmit(&hspi1, FLASH_STATREG1, 1, 100);
+	HAL_SPI_Receive(&hspi1, spiRxBuffer, 1, 100);
+	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_GPIO_Port, GPIO_PIN_SET);
+
+	HAL_UART_Transmit(&hspi1, &spiRxBuffer[0], 1, 100);
+//	HAL_SPI_Transmit(&hspi1, CLSR_ClearStatusReg, 1, 100);
+//	HAL_SPI_Transmit(&hspi1, (FLASH_WREN), 1, 100);
+
+//	strcpy(spiTxBuffer, spiRxBuffer);
+//	HAL_UART_Transmit(&huart1, &spiRxBuffer[0], 1, 100);
+//	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_GPIO_Port, GPIO_PIN_RESET);
+
+
+//			HAL_Delay(500);
+			HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED2_Pin, GPIO_PIN_SET);
+			HAL_Delay(500);
+
+
+
+
+	HAL_Delay(500);
+			HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED2_Pin, GPIO_PIN_RESET);
+			HAL_Delay(500);
+	for (int i = 0; i < 8; i++) {
+
+//		uint8_t bit = (spiRxBuffer[i] >> i) & 0x01;
+//		uint8_t tx_byte = bit + '0';
+//		HAL_UART_Transmit(&huart1, &tx_byte, 1, 100);
+
+//			HAL_UART_Transmit(&huart1, &spiRxBuffer[i], 1, 100);
+		if (spiRxBuffer[i] == 1) {
+//			HAL_Delay(250);
+			HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_SET);
+		}
+		else if (spiRxBuffer[i] == 0){
+			HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED2_Pin, GPIO_PIN_SET);
+
+		}
+		else {
+			HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED2_Pin, GPIO_PIN_SET);
+//			HAL_Delay(500);
+
+		}
+
+		HAL_Delay(500);
+		HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED2_Pin, GPIO_PIN_RESET);
+		HAL_Delay(500);
+
+
+	}
+
+
+	// Pull Chip Select High so we can use UART safely
 //	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_SET);
 //	HAL_GPIO_WritePin(FLASH_NCS_A1_GPIO_Port, FLASH_NCS_A1_Pin, GPIO_PIN_SET);
 //	HAL_GPIO_WritePin(FLASH_NCS_A1_GPIO_Port, FLASH_NCS_A1_Pin, GPIO_PIN_SET);
 
-	// Test UART
-	char testBuffer[] = "Hello World!";
-	HAL_UART_Transmit(&huart4, (uint8_t*) testBuffer,
-			strlen((char*) testBuffer), 100);
+//	// Test UART
+//	char testBuffer[] = "Hello World!";
+//	HAL_UART_Transmit(&huart4, (uint8_t*) testBuffer,
+//			strlen((char*) testBuffer), 100);
 
 	// To Access FLASH Module 0 (of 7), there are 3 Chip selects, A0, A1, A2
 	// that repesent Chip Selects for decoders
@@ -323,8 +400,8 @@ int main(void) {
 
 	// Pull Chip Select Low so we can access status register
 //  HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_SET);
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) &RDSR1_ReadStatusReg1, 1, 100);
-	HAL_SPI_Receive(&hspi1, (uint8_t*) spiRxBuffer, 1, 100);
+//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &RDSR1_ReadStatusReg1, 1, 100);
+//	HAL_SPI_Receive(&hspi1, (uint8_t*) spiRxBuffer, 1, 100);
 
 	/* USER CODE END 2 */
 
@@ -899,7 +976,9 @@ void init_DecoderInputs(void) {
 
 	// They are all initially starting off at 0
 	// This would initially access Memory Module 0, out of 7
-	A0.State, A1.State, A2.State = INACTIVE_STATE;
+	A0.State = INACTIVE_STATE;
+	A1.State = INACTIVE_STATE;
+	A2.State = INACTIVE_STATE;
 }
 
 //static void init_DecoderInputs(DecoderInput * LSB, DecoderInput * MiddleBit, DecoderInput * MSB) {
