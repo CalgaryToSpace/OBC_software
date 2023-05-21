@@ -13,7 +13,7 @@
  * in the root directory of this software component.
  * If no LICENSE file comes with this software, it is provided AS-IS.
  *
- ******************************************************************************
+ **02****************************************************************************
  */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
@@ -116,7 +116,6 @@ const uint8_t CLSR_ClearStatusReg = 0x30;
 //const uint8_t ECCRD_ECCRead = 0x18;
 //
 
-
 const uint8_t FLASH_READ = 0x03;
 const uint8_t FLASH_WRITE = 0x02;
 const uint8_t FLASH_WREN = 0x06;
@@ -126,7 +125,6 @@ const uint8_t FLASH_ER32 = 0x52;
 const uint8_t FLASH_ER64 = 0xd8;
 const uint8_t FLASH_ERCP = 0xC7;
 const uint8_t FLASH_STATREG1 = 0X05;
-
 
 /*
  * The instruction
@@ -165,6 +163,14 @@ static void MX_USART3_UART_Init(void);
 /* USER CODE BEGIN PFP */
 static void init_DecoderInputs(void);
 static void init_buffer(void);
+
+void PRINT_STRING_UART(void*);
+void PULL_ALL_LOW();
+void PULL_ALL_HIGH();
+void WRITE_NEW_LINE();
+void READ_STATUS_REGISTER(void*);
+void ENABLE_WREN();
+void ENABLE_WRDI();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -183,9 +189,7 @@ static void init_buffer(void);
 //
 //} CircularBuffer;
 //
-
 //	void setMemoryBank()
-
 //	void init_buffer(CircularBuffer *cb) {
 //		cb->head = 0;
 //		cb->tail = 0;
@@ -197,6 +201,7 @@ bool is_empty(void) {
 bool is_full(void) {
 	return cb.count == BUFFER_SIZE;
 }
+
 /*
  * This to write data to memory
  * This only writes 8 bits of data at a time
@@ -205,12 +210,10 @@ bool is_full(void) {
 //Added the if statement to check if it's the first element being added
 //If it is, we need to keep the tail value the same since we want the tail
 //to point to the 0th element in data
-
 //If it's not the first element being added
 //add element to the index in front of tail
-
-	//This was implemented because the tail value would never reach 8 because of the mod BUFFER_SIZE = 8
-	//Could change the mod value to be 9 and revert to previous enqueue function
+//This was implemented because the tail value would never reach 8 because of the mod BUFFER_SIZE = 8
+//Could change the mod value to be 9 and revert to previous enqueue function
 //	void enqueue(CircularBuffer *cb, uint8_t data) {
 //		if (!is_full(cb)) {
 //
@@ -229,7 +232,7 @@ bool is_full(void) {
 /*
  * This is to retrieve memory
  */
-	//Just set the head to 0 for the dequeue before incrementing it
+//Just set the head to 0 for the dequeue before incrementing it
 //		uint8_t dequeue(CircularBuffer *cb) {
 //			if (!is_empty(cb)) {
 //				uint8_t data = cb->data[cb->head];
@@ -241,11 +244,9 @@ bool is_full(void) {
 //			}
 //			return 0;
 //		}
-
 void whichMemoryBank() {
 
 }
-
 
 //	bool is_empty(CircularBuffer *cb) {
 //		return cb->count == 0;
@@ -277,8 +278,11 @@ void whichMemoryBank() {
  */
 int main(void) {
 	/* USER CODE BEGIN 1 */
-	uint8_t spiRxBuffer[9];
-	uint8_t spiTxBuffer[9];
+//	uint8_t spiRxBuffer[9];
+//	uint8_t spiTxBuffer[9];
+	uint8_t spiRxBuffer[100] = { 0 };
+	char spiTxBuffer[100] = { 0 };
+	char uart_buffer[100];
 	/* USER CODE END 1 */
 
 	/* MCU Configuration--------------------------------------------------------*/
@@ -310,109 +314,193 @@ int main(void) {
 	MX_USART3_UART_Init();
 	/* USER CODE BEGIN 2 */
 
-	//write enable using WREN Command
-	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
-	HAL_SPI_Transmit(&hspi1, (uint8_t*)&WREN_WriteEnable, 1, 100);
-	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
-
-	//Write disable using WRDI Command
-	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
-	HAL_SPI_Transmit(&hspi1, (uint8_t*)&WRDI_WriteDisable, 1, 100);
-	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
-
-
 	// look at pin initialization below MX_GPIO
 	// ****** Also look at main.h file to see macro defines ******
-
 	// Get blue led running, shows that board is running
 	// Look at main.h to see GPLED1_Port and pin
 	// this is the same as: GPIOE, GPIO_PIN_2, GPIO_PIN_SET
-//	HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_SET);
+
+	// send something  to UART
+	strcpy((char*) uart_buffer, "Testing SPI\r\n");
+	PRINT_STRING_UART(uart_buffer);
+	// Read STATREG1
+////	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_RESET);
+//	PULL_ALL_LOW();
+//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_STATREG1, 1, 100);
+//	HAL_SPI_Receive(&hspi1, (uint8_t*) spiRxBuffer, 1, 100);
+//	PULL_ALL_HIGH();
+//	//	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_SET);
+
+//	// Read Status Register
+	PULL_ALL_LOW();
+	READ_STATUS_REGISTER(spiRxBuffer);
+	PULL_ALL_HIGH();
+
+//	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_RESET);
+//	READ_STATUS_REGISTER(spiRxBuffer);
+////	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_SET);
+//	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_SET);
 
 
-	strcpy((char*) spiTxBuffer, "He\r\n");
-	HAL_UART_Transmit(&huart1, spiTxBuffer, strlen(spiTxBuffer), 100);
+	strcpy((char*) uart_buffer, "Before WREN\r\n");
+//	HAL_UART_Transmit(&huart1, (uint8_t*) uart_buffer, strlen(uart_buffer), 100);
+	PRINT_STRING_UART(uart_buffer);
 
-	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_GPIO_Port, GPIO_PIN_SET);
-
-
-	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_GPIO_Port, GPIO_PIN_RESET);
-	HAL_SPI_Transmit(&hspi1, FLASH_STATREG1, 1, 100);
-	HAL_SPI_Receive(&hspi1, spiRxBuffer, 1, 100);
-	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_GPIO_Port, GPIO_PIN_SET);
-
-	HAL_UART_Transmit(&hspi1, &spiRxBuffer[0], 1, 100);
-//	HAL_SPI_Transmit(&hspi1, CLSR_ClearStatusReg, 1, 100);
-//	HAL_SPI_Transmit(&hspi1, (FLASH_WREN), 1, 100);
-
-//	strcpy(spiTxBuffer, spiRxBuffer);
-//	HAL_UART_Transmit(&huart1, &spiRxBuffer[0], 1, 100);
-//	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_GPIO_Port, GPIO_PIN_RESET);
-
-
-//			HAL_Delay(500);
-			HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_SET);
-			HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED2_Pin, GPIO_PIN_SET);
-			HAL_Delay(500);
-
-
-
-
-	HAL_Delay(500);
-			HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED2_Pin, GPIO_PIN_RESET);
-			HAL_Delay(500);
-	for (int i = 0; i < 8; i++) {
-
-//		uint8_t bit = (spiRxBuffer[i] >> i) & 0x01;
-//		uint8_t tx_byte = bit + '0';
-//		HAL_UART_Transmit(&huart1, &tx_byte, 1, 100);
-
-//			HAL_UART_Transmit(&huart1, &spiRxBuffer[i], 1, 100);
-		if (spiRxBuffer[i] == 1) {
-//			HAL_Delay(250);
-			HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_SET);
-		}
-		else if (spiRxBuffer[i] == 0){
-			HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED2_Pin, GPIO_PIN_SET);
-
-		}
-		else {
-			HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_SET);
-			HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED2_Pin, GPIO_PIN_SET);
-//			HAL_Delay(500);
-
-		}
-
-		HAL_Delay(500);
-		HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED2_Pin, GPIO_PIN_RESET);
-		HAL_Delay(500);
-
-
+	for (int i = 7; i >= 0; i--) {
+		uint8_t bit = ((spiRxBuffer[0] >> i) & 1) + '0';
+//		HAL_UART_Transmit(&huart1, &bit, 1, 100);
+		PRINT_STRING_UART(&bit);
 	}
 
+//	// Enable WREN
+////	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_RESET);
+//	PULL_ALL_LOW();
+//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WREN, 1, 100);
+//	PULL_ALL_HIGH();
+//	//	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_SET);
+
+	// Enable WREN
+	PULL_ALL_LOW();
+	ENABLE_WREN();
+	PULL_ALL_HIGH();
+
+
+
+
+//	// Read STATREG1
+////	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_RESET);
+//	PULL_ALL_LOW();
+//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_STATREG1, 1, 100);
+//	HAL_SPI_Receive(&hspi1, (uint8_t*) spiRxBuffer, 1, 100);
+//	PULL_ALL_HIGH();
+//	//	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_SET);
+
+	// Read Status Register
+	PULL_ALL_LOW();
+	READ_STATUS_REGISTER(spiRxBuffer);
+	PULL_ALL_HIGH();
+
+
+	strcpy((char*) uart_buffer, "After WREN\r\n");
+//	HAL_UART_Transmit(&huart1, (uint8_t*) uart_buffer, strlen(uart_buffer), 100);
+	PRINT_STRING_UART(uart_buffer);
+	for (int i = 7; i >= 0; i--) {
+		uint8_t bit = ((spiRxBuffer[0] >> i) & 1) + '0';
+//		HAL_UART_Transmit(&huart1, &bit, 1, 100);
+		PRINT_STRING_UART(&bit);
+	}
+	WRITE_NEW_LINE();
+	WRITE_NEW_LINE();
+
+	// erases block of memory
+	uint8_t addr[3] = { 0x0f, 0xff, 0x00 };
+
+	//	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_RESET);
+	PULL_ALL_LOW();
+	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_ER32, 1, 100);
+	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
+	PULL_ALL_HIGH();
+	//	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_SET);
+
+	uint8_t wip = 1;
+	while (wip) {
+		// Reads Status Register
+//		HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin,
+//				GPIO_PIN_RESET);
+
+		PULL_ALL_LOW();
+		HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_STATREG1, 1, 100);
+		HAL_SPI_Receive(&hspi1, (uint8_t*) spiRxBuffer, 1, 100);
+		PULL_ALL_HIGH();
+		//		HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_SET);
+
+		wip = spiRxBuffer[0] & 1;
+		uint8_t txBit = wip + '0';
+
+//		HAL_UART_Transmit(&huart1, &txBit, 1, 100);
+//		WRITE_NEW_LINE();
+		PRINT_STRING_UART(&txBit);
+	}
+
+	WRITE_NEW_LINE();
+//	// Enable WREN
+//	PULL_ALL_LOW();
+//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WREN, 1, 100);
+//	PULL_ALL_HIGH();
+
+	PULL_ALL_LOW();
+	ENABLE_WREN();
+	PULL_ALL_HIGH();
+	// Write Data
+	strcpy((char*) spiTxBuffer, "My name is Ali, I am Testing stuff. I am with Saksham. Hello\r\n");
+
+	PULL_ALL_LOW();
+	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WRITE, 1, 100);
+	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
+	HAL_SPI_Transmit(&hspi1, (uint8_t*) spiTxBuffer, 100, 100);
+	PULL_ALL_HIGH();
+
+	wip = 1;
+	while (wip) {
+		PULL_ALL_LOW();
+		HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_STATREG1, 1, 100);
+		HAL_SPI_Receive(&hspi1, (uint8_t*) spiRxBuffer, 1, 100);
+		PULL_ALL_HIGH();
+		//		HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_SET);
+
+		wip = spiRxBuffer[0] & 1;
+		uint8_t txBit = wip + '0';
+
+//		HAL_UART_Transmit(&huart1, &wip, 1, 100);
+//		WRITE_NEW_LINE();
+		PRINT_STRING_UART(&txBit);
+	}
+
+	// Read Data Back
+	PULL_ALL_LOW();
+	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_READ, 1, 100);
+	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
+	HAL_SPI_Receive(&hspi1, (uint8_t*) spiRxBuffer, sizeof(spiRxBuffer), 100);
+	PULL_ALL_HIGH();
+
+//	// Print to Uart
+//	HAL_UART_Transmit(&huart1, (uint8_t*) spiRxBuffer,
+//			strlen((char*) spiRxBuffer), 100);
+//	WRITE_NEW_LINE();
+	PRINT_STRING_UART(spiRxBuffer);
+
+
+	PULL_ALL_LOW();
+	ENABLE_WRDI();
+	READ_STATUS_REGISTER(spiRxBuffer);
+	PULL_ALL_HIGH();
+
+	strcpy((char*)uart_buffer, "After WRDI");
+	PRINT_STRING_UART(uart_buffer);
+	for (int i = 7; i >= 0; i--) {
+		uint8_t bit = ((spiRxBuffer[0] >> i) & 1) + '0';
+//		HAL_UART_Transmit(&huart1, &bit, 1, 100);
+
+		PRINT_STRING_UART(&bit);
+	}
+
+
+
+
+	// Turn off LED
+	HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_RESET);
 
 	// Pull Chip Select High so we can use UART safely
 //	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_SET);
 //	HAL_GPIO_WritePin(FLASH_NCS_A1_GPIO_Port, FLASH_NCS_A1_Pin, GPIO_PIN_SET);
 //	HAL_GPIO_WritePin(FLASH_NCS_A1_GPIO_Port, FLASH_NCS_A1_Pin, GPIO_PIN_SET);
 
-//	// Test UART
-//	char testBuffer[] = "Hello World!";
-//	HAL_UART_Transmit(&huart4, (uint8_t*) testBuffer,
-//			strlen((char*) testBuffer), 100);
-
 	// To Access FLASH Module 0 (of 7), there are 3 Chip selects, A0, A1, A2
 	// that repesent Chip Selects for decoders
 	// A0 is the LSB
 	// By default, these Chip selects are pulled high,
 	// to access module 0, we need 000, so A0, A1, and A2 is all pulled high
-
-	// Pull Chip Select Low so we can access status register
-//  HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_SET);
-//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &RDSR1_ReadStatusReg1, 1, 100);
-//	HAL_SPI_Receive(&hspi1, (uint8_t*) spiRxBuffer, 1, 100);
 
 	/* USER CODE END 2 */
 
@@ -619,11 +707,11 @@ static void MX_SPI1_Init(void) {
 	hspi1.Instance = SPI1;
 	hspi1.Init.Mode = SPI_MODE_MASTER;
 	hspi1.Init.Direction = SPI_DIRECTION_2LINES;
-	hspi1.Init.DataSize = SPI_DATASIZE_4BIT;
+	hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
 	hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
 	hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
 	hspi1.Init.NSS = SPI_NSS_SOFT;
-	hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+	hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
 	hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
 	hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
 	hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -911,7 +999,7 @@ static void MX_GPIO_Init(void) {
 
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(GPIOG,
-			FLASH_NCS_A2_Pin | FLASH_NCS_A1_Pin | MPI_RX_NEN_Pin | MPI_TX_EN_Pin,
+	FLASH_NCS_A2_Pin | FLASH_NCS_A1_Pin | MPI_RX_NEN_Pin | MPI_TX_EN_Pin,
 			GPIO_PIN_RESET);
 
 	/*Configure GPIO pin Output Level */
@@ -920,7 +1008,7 @@ static void MX_GPIO_Init(void) {
 
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(GPIOD,
-			ENCODER_EN_Pin | ENCODER_I_Pin | ENCODER_B_Pin | ENCODER_A_Pin,
+	ENCODER_EN_Pin | ENCODER_I_Pin | ENCODER_B_Pin | ENCODER_A_Pin,
 			GPIO_PIN_RESET);
 
 	/*Configure GPIO pins : GPLED1_Pin GPLED2_Pin GPLED3_Pin FLASH_CS_A0_Pin
@@ -985,13 +1073,80 @@ void init_DecoderInputs(void) {
 	A1.Pin = FLASH_NCS_A1_Pin;
 	A2.Pin = FLASH_NCS_A2_Pin;
 
-	// They are all initially starting off at 0
-	// This would initially access Memory Module 0, out of 7
+	// They are all initially starting off at 7
+	// This would initially access Memory Module 7, out of 7
 	A0.State = INACTIVE_STATE;
 	A1.State = INACTIVE_STATE;
 	A2.State = INACTIVE_STATE;
 }
 
+/*
+ * @param expects a char pointer
+ * @return Nothing, just prints the string to UART
+ */
+void PRINT_STRING_UART(void *string) {
+	char *buff = (char*)string;
+	HAL_UART_Transmit(&huart1, (uint8_t*) buff, strlen((char*) buff), 100);
+	WRITE_NEW_LINE();
+	memset(string, 0, sizeof(string));
+}
+
+/*
+ * Pulls all Chip Selects Low
+ * Essentially, accessing Memory bank 0, (000)
+ */
+void PULL_ALL_LOW() {
+//	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_RESET);
+
+    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET);
+//	HAL_GPIO_WritePin(FLASH_NCS_A1_GPIO_Port, FLASH_NCS_A1_Pin, GPIO_PIN_RESET);
+//	HAL_GPIO_WritePin(FLASH_NCS_A2_GPIO_Port, FLASH_NCS_A2_Pin, GPIO_PIN_RESET);
+}
+
+/*
+ * Pull all Chip Select High
+ * This is the Default state of the chip selects
+ * Essentially, accessing Memory Bank 7, (111)
+ */
+void PULL_ALL_HIGH() {
+//	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_SET);
+
+    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_SET);
+
+	//	HAL_GPIO_WritePin(FLASH_NCS_A1_GPIO_Port, FLASH_NCS_A1_Pin, GPIO_PIN_SET);
+//	HAL_GPIO_WritePin(FLASH_NCS_A2_GPIO_Port, FLASH_NCS_A2_Pin, GPIO_PIN_SET);
+}
+
+/*
+ * Write's new Line to UART
+ */
+void WRITE_NEW_LINE() {
+	char buf[] = "\r\n";
+	HAL_UART_Transmit(&huart1, (uint8_t*) buf, strlen(buf), 100);
+}
+/*
+ * @param Takes any type of array/pointer, always converts to uint8_t pointer
+ * @return Nothing, Reads Status Register, stores value in param
+ */
+void READ_STATUS_REGISTER(void *rxBuf) {
+	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_STATREG1, 1, 100);
+	HAL_SPI_Receive(&hspi1, (uint8_t*) rxBuf, 1, 100);
+
+}
+/*
+ * Just Transmit WREN Command
+ */
+void ENABLE_WREN() {
+	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WREN, 1, 100);
+}
+
+/*
+ * Just Transmit WRDI Command
+ */
+void ENABLE_WRDI(){
+	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WRDI, 1, 100);
+
+}
 //static void init_DecoderInputs(DecoderInput * LSB, DecoderInput * MiddleBit, DecoderInput * MSB) {
 ////		LSB->ACTIVE_STATE, MiddleBit->ACTIVE_STATE, MSB->ACTIVE_STATE = 0;
 ////		LSB->INACTIVE_STATE, MiddleBit->INACTIVE_STATE, MSB->INACTIVE_STATE = 1;
