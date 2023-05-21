@@ -324,57 +324,26 @@ int main(void) {
 	// send something  to UART
 	strcpy((char*) uart_buffer, "Testing SPI\r\n");
 	PRINT_STRING_UART(uart_buffer);
-	// Read STATREG1
-////	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_RESET);
-//	PULL_ALL_LOW();
-//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_STATREG1, 1, 100);
-//	HAL_SPI_Receive(&hspi1, (uint8_t*) spiRxBuffer, 1, 100);
-//	PULL_ALL_HIGH();
-//	//	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_SET);
 
-//	// Read Status Register
+	// Read Status Register
 	PULL_ALL_LOW();
 	READ_STATUS_REGISTER(spiRxBuffer);
 	PULL_ALL_HIGH();
 
-//	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_RESET);
-//	READ_STATUS_REGISTER(spiRxBuffer);
-////	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_SET);
-//	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_SET);
-
-
 	strcpy((char*) uart_buffer, "Before WREN\r\n");
-//	HAL_UART_Transmit(&huart1, (uint8_t*) uart_buffer, strlen(uart_buffer), 100);
 	PRINT_STRING_UART(uart_buffer);
 
+	// Prints out Each bit of the Status Register
 	for (int i = 7; i >= 0; i--) {
 		uint8_t bit = ((spiRxBuffer[0] >> i) & 1) + '0';
-//		HAL_UART_Transmit(&huart1, &bit, 1, 100);
 		PRINT_STRING_UART(&bit);
 	}
 
-//	// Enable WREN
-////	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_RESET);
-//	PULL_ALL_LOW();
-//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WREN, 1, 100);
-//	PULL_ALL_HIGH();
-//	//	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_SET);
 
 	// Enable WREN
 	PULL_ALL_LOW();
 	ENABLE_WREN();
 	PULL_ALL_HIGH();
-
-
-
-
-//	// Read STATREG1
-////	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_RESET);
-//	PULL_ALL_LOW();
-//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_STATREG1, 1, 100);
-//	HAL_SPI_Receive(&hspi1, (uint8_t*) spiRxBuffer, 1, 100);
-//	PULL_ALL_HIGH();
-//	//	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_SET);
 
 	// Read Status Register
 	PULL_ALL_LOW();
@@ -383,11 +352,9 @@ int main(void) {
 
 
 	strcpy((char*) uart_buffer, "After WREN\r\n");
-//	HAL_UART_Transmit(&huart1, (uint8_t*) uart_buffer, strlen(uart_buffer), 100);
 	PRINT_STRING_UART(uart_buffer);
 	for (int i = 7; i >= 0; i--) {
 		uint8_t bit = ((spiRxBuffer[0] >> i) & 1) + '0';
-//		HAL_UART_Transmit(&huart1, &bit, 1, 100);
 		PRINT_STRING_UART(&bit);
 	}
 	WRITE_NEW_LINE();
@@ -396,42 +363,35 @@ int main(void) {
 	// erases block of memory
 	uint8_t addr[3] = { 0x0f, 0xff, 0x00 };
 
-	//	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_RESET);
 	PULL_ALL_LOW();
 	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_ER32, 1, 100);
 	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
 	PULL_ALL_HIGH();
-	//	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_SET);
 
 	uint8_t wip = 1;
 	while (wip) {
 		// Reads Status Register
-//		HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin,
-//				GPIO_PIN_RESET);
 
 		PULL_ALL_LOW();
 		HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_STATREG1, 1, 100);
 		HAL_SPI_Receive(&hspi1, (uint8_t*) spiRxBuffer, 1, 100);
 		PULL_ALL_HIGH();
-		//		HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_SET);
 
 		wip = spiRxBuffer[0] & 1;
 		uint8_t txBit = wip + '0';
 
-//		HAL_UART_Transmit(&huart1, &txBit, 1, 100);
-//		WRITE_NEW_LINE();
 		PRINT_STRING_UART(&txBit);
 	}
 
 	WRITE_NEW_LINE();
-//	// Enable WREN
-//	PULL_ALL_LOW();
-//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WREN, 1, 100);
-//	PULL_ALL_HIGH();
 
+
+	// Enable WREN
 	PULL_ALL_LOW();
 	ENABLE_WREN();
 	PULL_ALL_HIGH();
+
+
 	// Write Data
 	strcpy((char*) spiTxBuffer, "My name is Ali, I am Testing stuff. I am with Saksham. Hello\r\n");
 
@@ -447,13 +407,10 @@ int main(void) {
 		HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_STATREG1, 1, 100);
 		HAL_SPI_Receive(&hspi1, (uint8_t*) spiRxBuffer, 1, 100);
 		PULL_ALL_HIGH();
-		//		HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_SET);
 
 		wip = spiRxBuffer[0] & 1;
 		uint8_t txBit = wip + '0';
 
-//		HAL_UART_Transmit(&huart1, &wip, 1, 100);
-//		WRITE_NEW_LINE();
 		PRINT_STRING_UART(&txBit);
 	}
 
@@ -464,10 +421,8 @@ int main(void) {
 	HAL_SPI_Receive(&hspi1, (uint8_t*) spiRxBuffer, sizeof(spiRxBuffer), 100);
 	PULL_ALL_HIGH();
 
-//	// Print to Uart
-//	HAL_UART_Transmit(&huart1, (uint8_t*) spiRxBuffer,
-//			strlen((char*) spiRxBuffer), 100);
-//	WRITE_NEW_LINE();
+	// Print to Uart
+
 	PRINT_STRING_UART(spiRxBuffer);
 
 
@@ -480,8 +435,6 @@ int main(void) {
 	PRINT_STRING_UART(uart_buffer);
 	for (int i = 7; i >= 0; i--) {
 		uint8_t bit = ((spiRxBuffer[0] >> i) & 1) + '0';
-//		HAL_UART_Transmit(&huart1, &bit, 1, 100);
-
 		PRINT_STRING_UART(&bit);
 	}
 
