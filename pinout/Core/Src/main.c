@@ -85,9 +85,9 @@ UART_HandleTypeDef huart3;
 const uint8_t INACTIVE_STATE = 1;
 const uint8_t ACTIVE_STATE = 0;
 
-static DecoderInput A0;
-static DecoderInput A1;
-static DecoderInput A2;
+//static DecoderInput A0;
+//static DecoderInput A1;
+//static DecoderInput A2;
 
 static CircularBuffer cb;
 
@@ -126,6 +126,8 @@ const uint8_t FLASH_ER64 = 0xd8;
 const uint8_t FLASH_ERCP = 0xC7;
 const uint8_t FLASH_STATREG1 = 0X05;
 
+uint8_t memory_bank_counter = 0;
+
 /*
  * The instruction
  * 03h (ExtAdd=0) is followed by a 3-byte address (A23-A0) or
@@ -161,16 +163,17 @@ static void MX_USART1_UART_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_USART3_UART_Init(void);
 /* USER CODE BEGIN PFP */
-static void init_DecoderInputs(void);
+//static void INIT_DECODER_INPUTS(void);
 static void init_buffer(void);
 
 void PRINT_STRING_UART(void*);
 void PULL_ALL_LOW();
 void PULL_ALL_HIGH();
-void WRITE_NEW_LINE();
+void PRINT_NEW_LINE();
 void READ_STATUS_REGISTER(void*);
 void ENABLE_WREN();
 void ENABLE_WRDI();
+void SET_DECODER_INPUTS();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -244,10 +247,21 @@ bool is_full(void) {
 //			}
 //			return 0;
 //		}
-void whichMemoryBank() {
 
-}
-
+/*
+ * 	There are 7 memory banks on board this chip,
+ * 	every time it reaches the end of the memory bank,
+ * 	it will need to be incremented, done by Allocate function
+ */
+//void WHICH_MEMORY_BANK() {
+//
+//	uint8_t mem_bank = (memory_bank_counter % 8);
+//	A0.State = mem_bank & 0x1; // LSB
+//	A1.State = mem_bank & 0x2; // Middle Bit
+//	A2.State = mem_bank & 0x4; // MSB
+//
+//
+//}
 //	bool is_empty(CircularBuffer *cb) {
 //		return cb->count == 0;
 //	}
@@ -280,9 +294,12 @@ int main(void) {
 	/* USER CODE BEGIN 1 */
 //	uint8_t spiRxBuffer[9];
 //	uint8_t spiTxBuffer[9];
-	uint8_t spiRxBuffer[100] = { 0 };
+	char spiRxBuffer[100] = { 0 };
 	char spiTxBuffer[100] = { 0 };
 	char uart_buffer[100];
+	uint8_t addr[3];
+	uint8_t wip;
+//	INIT_DECODER_INPUTS();
 	/* USER CODE END 1 */
 
 	/* MCU Configuration--------------------------------------------------------*/
@@ -321,14 +338,24 @@ int main(void) {
 	// this is the same as: GPIOE, GPIO_PIN_2, GPIO_PIN_SET
 	HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_SET);
 
+//	SET_DECODER_INPUTS();
+	PULL_ALL_LOW();
+	HAL_SPI_Transmit(&hspi1, (uint8_t*)&CLSR_ClearStatusReg, 1, 100);
+	PULL_ALL_HIGH();
+
+	READ_STATUS_REGISTER(spiRxBuffer);
+	for (int i = 7; i >= 0; i--) {
+		uint8_t bit = ((spiRxBuffer[0] >> i) & 1) + '0';
+		PRINT_STRING_UART(&bit);
+	}
+
+
+	SET_DECODER_INPUTS();
 	// send something  to UART
 	strcpy((char*) uart_buffer, "Testing SPI\r\n");
 	PRINT_STRING_UART(uart_buffer);
 
-	// Read Status Register
-	PULL_ALL_LOW();
 	READ_STATUS_REGISTER(spiRxBuffer);
-	PULL_ALL_HIGH();
 
 	strcpy((char*) uart_buffer, "Before WREN\r\n");
 	PRINT_STRING_UART(uart_buffer);
@@ -339,17 +366,9 @@ int main(void) {
 		PRINT_STRING_UART(&bit);
 	}
 
-
-	// Enable WREN
-	PULL_ALL_LOW();
 	ENABLE_WREN();
-	PULL_ALL_HIGH();
 
-	// Read Status Register
-	PULL_ALL_LOW();
 	READ_STATUS_REGISTER(spiRxBuffer);
-	PULL_ALL_HIGH();
-
 
 	strcpy((char*) uart_buffer, "After WREN\r\n");
 	PRINT_STRING_UART(uart_buffer);
@@ -357,57 +376,47 @@ int main(void) {
 		uint8_t bit = ((spiRxBuffer[0] >> i) & 1) + '0';
 		PRINT_STRING_UART(&bit);
 	}
-	WRITE_NEW_LINE();
-	WRITE_NEW_LINE();
+	PRINT_NEW_LINE();
+	PRINT_NEW_LINE();
 
 	// erases block of memory
-	uint8_t addr[3] = { 0x0f, 0xff, 0x00 };
+	addr[0] = 0x0f;
+	addr[1] = 0xff;
+	addr[2] = 0x00;
 
-	PULL_ALL_LOW();
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_ER32, 1, 100);
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
-	PULL_ALL_HIGH();
-
-	uint8_t wip = 1;
-	while (wip) {
-		// Reads Status Register
-
-		PULL_ALL_LOW();
-		HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_STATREG1, 1, 100);
-		HAL_SPI_Receive(&hspi1, (uint8_t*) spiRxBuffer, 1, 100);
-		PULL_ALL_HIGH();
-
-		wip = spiRxBuffer[0] & 1;
-		uint8_t txBit = wip + '0';
-
-		PRINT_STRING_UART(&txBit);
-	}
-
-	WRITE_NEW_LINE();
-
-
-	// Enable WREN
-	PULL_ALL_LOW();
-	ENABLE_WREN();
-	PULL_ALL_HIGH();
-
+//	SET_DECODER_INPUTS();
+//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_ER32, 1, 100);
+//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
+//	PULL_ALL_HIGH();
+//
+//	wip = 1;
+//	while (wip) {
+//		// Reads Status Register
+//
+//		READ_STATUS_REGISTER(spiRxBuffer);
+//		wip = spiRxBuffer[0] & 1;
+//		uint8_t txBit = wip + '0';
+//
+//		PRINT_STRING_UART(&txBit);
+//	}
+//
+//	PRINT_NEW_LINE();
 
 	// Write Data
-	strcpy((char*) spiTxBuffer, "My name is Ali, I am Testing stuff. I am with Saksham. Hello\r\n");
-
-	PULL_ALL_LOW();
+	ENABLE_WREN();
+	strcpy((char*) spiTxBuffer,
+			"Muhammad Ali and Saksham Puri\r\n");
+	uint8_t buflen = strlen((char*)spiTxBuffer);
+	PRINT_STRING_UART(spiTxBuffer);
+	SET_DECODER_INPUTS();
 	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WRITE, 1, 100);
 	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) spiTxBuffer, 100, 100);
+	HAL_SPI_Transmit(&hspi1, (uint8_t*) &spiTxBuffer, 100, 100);
 	PULL_ALL_HIGH();
 
 	wip = 1;
 	while (wip) {
-		PULL_ALL_LOW();
-		HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_STATREG1, 1, 100);
-		HAL_SPI_Receive(&hspi1, (uint8_t*) spiRxBuffer, 1, 100);
-		PULL_ALL_HIGH();
-
+		READ_STATUS_REGISTER(spiRxBuffer);
 		wip = spiRxBuffer[0] & 1;
 		uint8_t txBit = wip + '0';
 
@@ -415,21 +424,77 @@ int main(void) {
 	}
 
 	// Read Data Back
-	PULL_ALL_LOW();
+//	PULL_ALL_LOW();
+	SET_DECODER_INPUTS();
 	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_READ, 1, 100);
 	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
-	HAL_SPI_Receive(&hspi1, (uint8_t*) spiRxBuffer, sizeof(spiRxBuffer), 100);
+	HAL_SPI_Receive(&hspi1, (uint8_t*) spiRxBuffer, 100, 100);
 	PULL_ALL_HIGH();
 
 	// Print to Uart
 
 	PRINT_STRING_UART(spiRxBuffer);
+//	memset(spiRxBuffer, 0, sizeof(spiRxBuffer)/sizeof(uint8_t));
+	memset(spiTxBuffer, 0, strlen((char*)spiTxBuffer));
+//	memset(spiRxBuffer, 0, strlen((char*) spiRxBuffer));
 
+//	// erases block of memory
+////		addr = { 0x0f, 0xff, 0x00 };
+//
+//		SET_DECODER_INPUTS();
+//		HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_ER32, 1, 100);
+//		HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
+//		PULL_ALL_HIGH();
+//
+//		wip = 1;
+//		while (wip) {
+//			// Reads Status Register
+//
+//			READ_STATUS_REGISTER(spiRxBuffer);
+//			wip = spiRxBuffer[0] & 1;
+//			uint8_t txBit = wip + '0';
+//
+//			PRINT_STRING_UART(&txBit);
+//		}
+//
+//		PRINT_NEW_LINE();
+//
+//
+//
+//
+//
+//	// Write Data
+//	ENABLE_WREN();
+//	strcpy((char*) spiTxBuffer, "My name is Bob, I am Testing stuff. I am with Saksham. Hello\r\n");
+//
+//	SET_DECODER_INPUTS();
+//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WRITE, 1, 100);
+//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
+//	HAL_SPI_Transmit(&hspi1, (uint8_t*) spiTxBuffer, 100, 100);
+//	PULL_ALL_HIGH();
+//
+//	wip = 1;
+//	while (wip) {
+//		READ_STATUS_REGISTER(spiRxBuffer);
+//		wip = spiRxBuffer[0] & 1;
+//		uint8_t txBit = wip + '0';
+//
+//		PRINT_STRING_UART(&txBit);
+//	}
+//
+//	// Read Data Back
+//		PULL_ALL_LOW();
+//		HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_READ, 1, 100);
+//		HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
+//		HAL_SPI_Receive(&hspi1, (uint8_t*) spiRxBuffer, sizeof(spiRxBuffer), 100);
+//		PULL_ALL_HIGH();
+//
+//		// Print to Uart
+//
+//		PRINT_STRING_UART(spiRxBuffer);
 
-	PULL_ALL_LOW();
 	ENABLE_WRDI();
 	READ_STATUS_REGISTER(spiRxBuffer);
-	PULL_ALL_HIGH();
 
 	strcpy((char*)uart_buffer, "After WRDI");
 	PRINT_STRING_UART(uart_buffer);
@@ -438,22 +503,17 @@ int main(void) {
 		PRINT_STRING_UART(&bit);
 	}
 
-
-
+//	ENABLE_WREN();
+//	READ_STATUS_REGISTER(spiRxBuffer);
+//	strcpy((char*)uart_buffer, "After WREN 2");
+//	PRINT_STRING_UART(uart_buffer);
+//	for (int i = 7; i >= 0; i--) {
+//		uint8_t bit = ((spiRxBuffer[0] >> i) & 1) + '0';
+//		PRINT_STRING_UART(&bit);
+//	}
 
 	// Turn off LED
 	HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_RESET);
-
-	// Pull Chip Select High so we can use UART safely
-//	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_SET);
-//	HAL_GPIO_WritePin(FLASH_NCS_A1_GPIO_Port, FLASH_NCS_A1_Pin, GPIO_PIN_SET);
-//	HAL_GPIO_WritePin(FLASH_NCS_A1_GPIO_Port, FLASH_NCS_A1_Pin, GPIO_PIN_SET);
-
-	// To Access FLASH Module 0 (of 7), there are 3 Chip selects, A0, A1, A2
-	// that repesent Chip Selects for decoders
-	// A0 is the LSB
-	// By default, these Chip selects are pulled high,
-	// to access module 0, we need 000, so A0, A1, and A2 is all pulled high
 
 	/* USER CODE END 2 */
 
@@ -1012,25 +1072,18 @@ static void MX_GPIO_Init(void) {
 }
 
 /* USER CODE BEGIN 4 */
-void init_DecoderInputs(void) {
-	// Same as setting PIN_GPIO_SET
-//		A0.INACTIVE_STATE, A1.INACTIVE_STATE, A2.INACTIVE_STATE = INACTIVE_STATE;
-	// Same as setting PIN_GPIO_RESET
-//		A0.ACTIVE_STATE, A1.ACTIVE_STATE, A2.ACTIVE_STATE = 0;
 
-	A0.Port = FLASH_CS_A0_GPIO_Port;
-	A1.Port = FLASH_NCS_A1_GPIO_Port;
-	A2.Port = FLASH_NCS_A2_GPIO_Port;
+void SET_DECODER_INPUTS() {
+	// same as memory_bank_counter % 8
+	uint8_t mem_bank = (memory_bank_counter & 0x7);
+	uint8_t lsb = mem_bank & 0x1;
+	uint8_t middle_bit = mem_bank & 0x2;
+	uint8_t msb = mem_bank & 0x4;
 
-	A0.Pin = FLASH_CS_A0_Pin;
-	A1.Pin = FLASH_NCS_A1_Pin;
-	A2.Pin = FLASH_NCS_A2_Pin;
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET); // LSB
+//	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_1, GPIO_PIN_RESET); // Middle Input
+//	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_0, GPIO_PIN_RESET); // MSB
 
-	// They are all initially starting off at 7
-	// This would initially access Memory Module 7, out of 7
-	A0.State = INACTIVE_STATE;
-	A1.State = INACTIVE_STATE;
-	A2.State = INACTIVE_STATE;
 }
 
 /*
@@ -1038,10 +1091,10 @@ void init_DecoderInputs(void) {
  * @return Nothing, just prints the string to UART
  */
 void PRINT_STRING_UART(void *string) {
-	char *buff = (char*)string;
+	char *buff = (char*) string;
 	HAL_UART_Transmit(&huart1, (uint8_t*) buff, strlen((char*) buff), 100);
-	WRITE_NEW_LINE();
-	memset(string, 0, sizeof(string));
+	PRINT_NEW_LINE();
+	memset(string, 0, strlen((char*) string));
 }
 
 /*
@@ -1050,8 +1103,12 @@ void PRINT_STRING_UART(void *string) {
  */
 void PULL_ALL_LOW() {
 //	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_RESET);
-
-    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET);
+	// Below is A0
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET);
+	// A1
+	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_1, GPIO_PIN_RESET);
+	// A2
+	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_0, GPIO_PIN_RESET);
 //	HAL_GPIO_WritePin(FLASH_NCS_A1_GPIO_Port, FLASH_NCS_A1_Pin, GPIO_PIN_RESET);
 //	HAL_GPIO_WritePin(FLASH_NCS_A2_GPIO_Port, FLASH_NCS_A2_Pin, GPIO_PIN_RESET);
 }
@@ -1062,41 +1119,53 @@ void PULL_ALL_LOW() {
  * Essentially, accessing Memory Bank 7, (111)
  */
 void PULL_ALL_HIGH() {
-//	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_SET);
-
-    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_SET);
-
-	//	HAL_GPIO_WritePin(FLASH_NCS_A1_GPIO_Port, FLASH_NCS_A1_Pin, GPIO_PIN_SET);
-//	HAL_GPIO_WritePin(FLASH_NCS_A2_GPIO_Port, FLASH_NCS_A2_Pin, GPIO_PIN_SET);
+	// Below is A0
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_SET);
+	// A1
+//	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_1, GPIO_PIN_SET);
+//	// A2
+//	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_0, GPIO_PIN_SET);
 }
 
 /*
  * Write's new Line to UART
  */
-void WRITE_NEW_LINE() {
+void PRINT_NEW_LINE() {
 	char buf[] = "\r\n";
 	HAL_UART_Transmit(&huart1, (uint8_t*) buf, strlen(buf), 100);
 }
 /*
  * @param Takes any type of array/pointer, always converts to uint8_t pointer
  * @return Nothing, Reads Status Register, stores value in param
+ * Sets Decoder Inputs BeforeHand
+ * Pull All Decoder Inputs High After
+ *
  */
 void READ_STATUS_REGISTER(void *rxBuf) {
+	SET_DECODER_INPUTS();
 	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_STATREG1, 1, 100);
 	HAL_SPI_Receive(&hspi1, (uint8_t*) rxBuf, 1, 100);
-
+	PULL_ALL_HIGH();
 }
 /*
  * Just Transmit WREN Command
+ * Sets Decoder Inputs beforehand
+ * Pull all Decoder Inputs High After
  */
 void ENABLE_WREN() {
+	SET_DECODER_INPUTS();
 	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WREN, 1, 100);
+	PULL_ALL_HIGH();
 }
 
 /*
  * Just Transmit WRDI Command
+ * As noted  in Section 9.3.9 of the Manual,
+ * ALL Chip Selects must be pulled high in order for this command
+ * to go through
  */
-void ENABLE_WRDI(){
+void ENABLE_WRDI() {
+	PULL_ALL_HIGH();
 	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WRDI, 1, 100);
 
 }
