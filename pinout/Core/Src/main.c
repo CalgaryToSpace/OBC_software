@@ -125,6 +125,7 @@ const uint8_t FLASH_ER32 = 0x52;
 const uint8_t FLASH_ER64 = 0xd8;
 const uint8_t FLASH_ERCP = 0xC7;
 const uint8_t FLASH_STATREG1 = 0X05;
+const uint8_t FLASH_SECTOR_ERASE = 0xD8;
 
 uint8_t memory_bank_counter = 0;
 
@@ -164,16 +165,16 @@ static void MX_USART2_UART_Init(void);
 static void MX_USART3_UART_Init(void);
 /* USER CODE BEGIN PFP */
 //static void INIT_DECODER_INPUTS(void);
-static void init_buffer(void);
+//static void init_buffer(void);
 
 void PRINT_STRING_UART(void*);
 void PULL_ALL_LOW();
-void PULL_ALL_HIGH();
+void SET_CS();
 void PRINT_NEW_LINE();
 void READ_STATUS_REGISTER(void*);
 void ENABLE_WREN();
 void ENABLE_WRDI();
-void SET_DECODER_INPUTS();
+void PULL_CS();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -247,7 +248,6 @@ bool is_full(void) {
 //			}
 //			return 0;
 //		}
-
 /*
  * 	There are 7 memory banks on board this chip,
  * 	every time it reaches the end of the memory bank,
@@ -296,8 +296,8 @@ int main(void) {
 //	uint8_t spiTxBuffer[9];
 	char spiRxBuffer[100] = { 0 };
 	char spiTxBuffer[100] = { 0 };
-	char uart_buffer[100];
-	uint8_t addr[3];
+//	char uart_buffer[100];
+	uint8_t addr[3] = { 0 };
 	uint8_t wip;
 //	INIT_DECODER_INPUTS();
 	/* USER CODE END 1 */
@@ -331,186 +331,53 @@ int main(void) {
 	MX_USART3_UART_Init();
 	/* USER CODE BEGIN 2 */
 
-	// look at pin initialization below MX_GPIO
-	// ****** Also look at main.h file to see macro defines ******
-	// Get blue led running, shows that board is running
-	// Look at main.h to see GPLED1_Port and pin
-	// this is the same as: GPIOE, GPIO_PIN_2, GPIO_PIN_SET
 	HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_SET);
 
-//	SET_DECODER_INPUTS();
-	PULL_ALL_LOW();
-	HAL_SPI_Transmit(&hspi1, (uint8_t*)&CLSR_ClearStatusReg, 1, 100);
-	PULL_ALL_HIGH();
-
-	READ_STATUS_REGISTER(spiRxBuffer);
-	for (int i = 7; i >= 0; i--) {
-		uint8_t bit = ((spiRxBuffer[0] >> i) & 1) + '0';
-		PRINT_STRING_UART(&bit);
-	}
-
-
-	SET_DECODER_INPUTS();
-	// send something  to UART
-	strcpy((char*) uart_buffer, "Testing SPI\r\n");
-	PRINT_STRING_UART(uart_buffer);
-
-	READ_STATUS_REGISTER(spiRxBuffer);
-
-	strcpy((char*) uart_buffer, "Before WREN\r\n");
-	PRINT_STRING_UART(uart_buffer);
-
-	// Prints out Each bit of the Status Register
-	for (int i = 7; i >= 0; i--) {
-		uint8_t bit = ((spiRxBuffer[0] >> i) & 1) + '0';
-		PRINT_STRING_UART(&bit);
-	}
-
 	ENABLE_WREN();
 
 	READ_STATUS_REGISTER(spiRxBuffer);
 
-	strcpy((char*) uart_buffer, "After WREN\r\n");
-	PRINT_STRING_UART(uart_buffer);
-	for (int i = 7; i >= 0; i--) {
-		uint8_t bit = ((spiRxBuffer[0] >> i) & 1) + '0';
-		PRINT_STRING_UART(&bit);
-	}
-	PRINT_NEW_LINE();
-	PRINT_NEW_LINE();
-
-	// erases block of memory
-	addr[0] = 0x0f;
-	addr[1] = 0xff;
-	addr[2] = 0x00;
-
-//	SET_DECODER_INPUTS();
-//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_ER32, 1, 100);
-//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
-//	PULL_ALL_HIGH();
-//
-//	wip = 1;
-//	while (wip) {
-//		// Reads Status Register
-//
-//		READ_STATUS_REGISTER(spiRxBuffer);
-//		wip = spiRxBuffer[0] & 1;
-//		uint8_t txBit = wip + '0';
-//
-//		PRINT_STRING_UART(&txBit);
-//	}
-//
-//	PRINT_NEW_LINE();
-
-	// Write Data
-	ENABLE_WREN();
-	strcpy((char*) spiTxBuffer,
-			"Muhammad Ali and Saksham Puri\r\n");
-	uint8_t buflen = strlen((char*)spiTxBuffer);
-	PRINT_STRING_UART(spiTxBuffer);
-	SET_DECODER_INPUTS();
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WRITE, 1, 100);
+	// Clear 1 sector starting from 0x0
+	// Note how I am sending 3 bytes from addr,
+	// This is because the Sector Erase requires a 3 byte address
+	PULL_CS();
+	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_SECTOR_ERASE, 1, 100);
 	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) &spiTxBuffer, 100, 100);
-	PULL_ALL_HIGH();
+	SET_CS();
 
 	wip = 1;
 	while (wip) {
 		READ_STATUS_REGISTER(spiRxBuffer);
-		wip = spiRxBuffer[0] & 1;
-		uint8_t txBit = wip + '0';
 
-		PRINT_STRING_UART(&txBit);
+		wip = spiRxBuffer[0] & 1;
 	}
 
-	// Read Data Back
-//	PULL_ALL_LOW();
-	SET_DECODER_INPUTS();
+	// Write data
+	ENABLE_WREN();
+
+	strcpy((char*) spiTxBuffer, "TESTING SPI, Cool things, hah, im 22");
+
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET);
+	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WRITE, 1, 100);
+	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
+	HAL_SPI_Transmit(&hspi1, (uint8_t*) &spiTxBuffer, 100, 100);
+	SET_CS();
+
+	wip = 1;
+	while (wip) {
+		READ_STATUS_REGISTER(spiRxBuffer);
+
+		wip = spiRxBuffer[0] & 1;
+	}
+
+	// Read
+	PULL_CS();
 	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_READ, 1, 100);
 	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
 	HAL_SPI_Receive(&hspi1, (uint8_t*) spiRxBuffer, 100, 100);
-	PULL_ALL_HIGH();
-
-	// Print to Uart
+	SET_CS();
 
 	PRINT_STRING_UART(spiRxBuffer);
-//	memset(spiRxBuffer, 0, sizeof(spiRxBuffer)/sizeof(uint8_t));
-	memset(spiTxBuffer, 0, strlen((char*)spiTxBuffer));
-//	memset(spiRxBuffer, 0, strlen((char*) spiRxBuffer));
-
-//	// erases block of memory
-////		addr = { 0x0f, 0xff, 0x00 };
-//
-//		SET_DECODER_INPUTS();
-//		HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_ER32, 1, 100);
-//		HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
-//		PULL_ALL_HIGH();
-//
-//		wip = 1;
-//		while (wip) {
-//			// Reads Status Register
-//
-//			READ_STATUS_REGISTER(spiRxBuffer);
-//			wip = spiRxBuffer[0] & 1;
-//			uint8_t txBit = wip + '0';
-//
-//			PRINT_STRING_UART(&txBit);
-//		}
-//
-//		PRINT_NEW_LINE();
-//
-//
-//
-//
-//
-//	// Write Data
-//	ENABLE_WREN();
-//	strcpy((char*) spiTxBuffer, "My name is Bob, I am Testing stuff. I am with Saksham. Hello\r\n");
-//
-//	SET_DECODER_INPUTS();
-//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WRITE, 1, 100);
-//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
-//	HAL_SPI_Transmit(&hspi1, (uint8_t*) spiTxBuffer, 100, 100);
-//	PULL_ALL_HIGH();
-//
-//	wip = 1;
-//	while (wip) {
-//		READ_STATUS_REGISTER(spiRxBuffer);
-//		wip = spiRxBuffer[0] & 1;
-//		uint8_t txBit = wip + '0';
-//
-//		PRINT_STRING_UART(&txBit);
-//	}
-//
-//	// Read Data Back
-//		PULL_ALL_LOW();
-//		HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_READ, 1, 100);
-//		HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
-//		HAL_SPI_Receive(&hspi1, (uint8_t*) spiRxBuffer, sizeof(spiRxBuffer), 100);
-//		PULL_ALL_HIGH();
-//
-//		// Print to Uart
-//
-//		PRINT_STRING_UART(spiRxBuffer);
-
-	ENABLE_WRDI();
-	READ_STATUS_REGISTER(spiRxBuffer);
-
-	strcpy((char*)uart_buffer, "After WRDI");
-	PRINT_STRING_UART(uart_buffer);
-	for (int i = 7; i >= 0; i--) {
-		uint8_t bit = ((spiRxBuffer[0] >> i) & 1) + '0';
-		PRINT_STRING_UART(&bit);
-	}
-
-//	ENABLE_WREN();
-//	READ_STATUS_REGISTER(spiRxBuffer);
-//	strcpy((char*)uart_buffer, "After WREN 2");
-//	PRINT_STRING_UART(uart_buffer);
-//	for (int i = 7; i >= 0; i--) {
-//		uint8_t bit = ((spiRxBuffer[0] >> i) & 1) + '0';
-//		PRINT_STRING_UART(&bit);
-//	}
 
 	// Turn off LED
 	HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_RESET);
@@ -724,7 +591,7 @@ static void MX_SPI1_Init(void) {
 	hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
 	hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
 	hspi1.Init.NSS = SPI_NSS_SOFT;
-	hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
+	hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
 	hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
 	hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
 	hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -1073,16 +940,17 @@ static void MX_GPIO_Init(void) {
 
 /* USER CODE BEGIN 4 */
 
-void SET_DECODER_INPUTS() {
-	// same as memory_bank_counter % 8
-	uint8_t mem_bank = (memory_bank_counter & 0x7);
-	uint8_t lsb = mem_bank & 0x1;
-	uint8_t middle_bit = mem_bank & 0x2;
-	uint8_t msb = mem_bank & 0x4;
-
+void PULL_CS() {
+//	// same as memory_bank_counter % 8
+//	uint8_t mem_bank = (memory_bank_counter & 0x7);
+//	uint8_t lsb = mem_bank & 0x1;
+//	uint8_t middle_bit = mem_bank & 0x2;
+//	uint8_t msb = mem_bank & 0x4;
+//
+//	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET); // LSB
+////	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_1, GPIO_PIN_RESET); // Middle Input
+////	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_0, GPIO_PIN_RESET); // MSB
 	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET); // LSB
-//	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_1, GPIO_PIN_RESET); // Middle Input
-//	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_0, GPIO_PIN_RESET); // MSB
 
 }
 
@@ -1091,8 +959,8 @@ void SET_DECODER_INPUTS() {
  * @return Nothing, just prints the string to UART
  */
 void PRINT_STRING_UART(void *string) {
-	char *buff = (char*) string;
-	HAL_UART_Transmit(&huart1, (uint8_t*) buff, strlen((char*) buff), 100);
+//	char *buff = (char*) string;
+	HAL_UART_Transmit(&huart1, (uint8_t*) string, strlen((char*) string), 100);
 	PRINT_NEW_LINE();
 	memset(string, 0, strlen((char*) string));
 }
@@ -1114,17 +982,19 @@ void PULL_ALL_LOW() {
 }
 
 /*
- * Pull all Chip Select High
- * This is the Default state of the chip selects
- * Essentially, accessing Memory Bank 7, (111)
+ * Pull Chip Select High
+ *
+ * This is the default state of the CS
  */
-void PULL_ALL_HIGH() {
-	// Below is A0
+void SET_CS() {
+//	// Below is A0
+//	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_SET);
+//	// A1
+////	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_1, GPIO_PIN_SET);
+//////	// A2
+////	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_0, GPIO_PIN_SET);
+
 	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_SET);
-	// A1
-//	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_1, GPIO_PIN_SET);
-//	// A2
-//	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_0, GPIO_PIN_SET);
 }
 
 /*
@@ -1142,10 +1012,10 @@ void PRINT_NEW_LINE() {
  *
  */
 void READ_STATUS_REGISTER(void *rxBuf) {
-	SET_DECODER_INPUTS();
+	PULL_CS();
 	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_STATREG1, 1, 100);
 	HAL_SPI_Receive(&hspi1, (uint8_t*) rxBuf, 1, 100);
-	PULL_ALL_HIGH();
+	SET_CS();
 }
 /*
  * Just Transmit WREN Command
@@ -1153,9 +1023,9 @@ void READ_STATUS_REGISTER(void *rxBuf) {
  * Pull all Decoder Inputs High After
  */
 void ENABLE_WREN() {
-	SET_DECODER_INPUTS();
+	PULL_CS();
 	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WREN, 1, 100);
-	PULL_ALL_HIGH();
+	SET_CS();
 }
 
 /*
@@ -1165,10 +1035,11 @@ void ENABLE_WREN() {
  * to go through
  */
 void ENABLE_WRDI() {
-	PULL_ALL_HIGH();
+	SET_CS();
 	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WRDI, 1, 100);
 
 }
+
 //static void init_DecoderInputs(DecoderInput * LSB, DecoderInput * MiddleBit, DecoderInput * MSB) {
 ////		LSB->ACTIVE_STATE, MiddleBit->ACTIVE_STATE, MSB->ACTIVE_STATE = 0;
 ////		LSB->INACTIVE_STATE, MiddleBit->INACTIVE_STATE, MSB->INACTIVE_STATE = 1;
@@ -1186,12 +1057,12 @@ void ENABLE_WRDI() {
 //}
 //
 
-void init_buffer(void) {
-//			cb.size = BUFFER_SIZE;
-	cb.head = 0;
-	cb.tail = 0;
-	cb.count = 0;
-}
+//void init_buffer(void) {
+////			cb.size = BUFFER_SIZE;
+//	cb.head = 0;
+//	cb.tail = 0;
+//	cb.count = 0;
+//}
 
 /* USER CODE END 4 */
 
