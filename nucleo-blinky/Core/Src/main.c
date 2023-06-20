@@ -434,6 +434,13 @@ void StartBlinkRed(void *argument)
 //	  HAL_Delay(1000);
 
     osDelay(500); // os delay allows us to run other tasks while we delay
+    osThreadId_t PrintUARTTask;
+    const osThreadAttr_t PrintUARTTask_attributes = {
+      .name = "PrintUARTTask",
+      .stack_size = 128 * 4,
+      .priority = (osPriority_t) osPriorityNormal,
+    };
+
   }
 
   // In case we accidentally exit from loop somehow
