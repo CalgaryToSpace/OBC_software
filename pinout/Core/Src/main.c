@@ -27,13 +27,6 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-typedef struct DecoderInput {
-	uint64_t Port;
-	uint16_t Pin;
-	uint8_t State;
-
-} DecoderInput;
-
 typedef struct CircularBuffer {
 //	uint64_t size;
 	uint8_t data[128];
@@ -79,16 +72,6 @@ UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
 
-// Equal to GPIO_PIN_SET, for this architecture
-// 1 is the inactive state
-// 0 is the active state
-const uint8_t INACTIVE_STATE = 1;
-const uint8_t ACTIVE_STATE = 0;
-
-//static DecoderInput A0;
-//static DecoderInput A1;
-//static DecoderInput A2;
-
 static CircularBuffer cb;
 
 /***************************************
@@ -99,24 +82,9 @@ static CircularBuffer cb;
 /* The following are defined in the S25... Manual
  * Section 7.6.1, 9.3
  */
-//const uint8_t WRR_WriteRegister = 0x01;
 const uint8_t CLSR_ClearStatusReg = 0x30;
-//
-//const uint8_t RDSR1_ReadStatusReg1 = 0x05;
-//const uint8_t RDSR2_ReadStatusReg2 = 0x07;
-//const uint8_t RDCR_ReadConfigReg = 0x35;
-//const uint8_t BRRD_ReadBankReg = 0x16;
-//
-//const uint8_t BRWR_WriteBankReg = 0x17;
-//const uint8_t BRAC_BankRegAccess = 0xB9;
-////const uint8_t WriteReg = 0x01;
-//const uint8_t WREN_WriteEnable = 0x06;
-//const uint8_t WRDI_WriteDisable = 0x04;
-//
-//const uint8_t ECCRD_ECCRead = 0x18;
-//
 
-const uint8_t FLASH_READ = 0x03;
+const uint8_t FLASH_READ = 0x03; // Section in Data sheet: 9.4.1
 const uint8_t FLASH_WRITE = 0x02;
 const uint8_t FLASH_WREN = 0x06;
 const uint8_t FLASH_WRDI = 0x04;
@@ -988,6 +956,9 @@ void ERASE_MEM(void * addrBuf) {
 	@param Buffer that contains atleast 1 address
 	Must send 3 byte address to Module
 */
+// TODO:
+// Add valid Params
+//
 void READ(void* addrBuf) {
 
 }
