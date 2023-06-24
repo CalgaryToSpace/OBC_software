@@ -175,6 +175,7 @@ void READ_STATUS_REGISTER(void*);
 void ENABLE_WREN();
 void ENABLE_WRDI();
 void PULL_CS();
+void MEM_CLEAR(void *);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -333,6 +334,8 @@ int main(void) {
 
 	HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_SET);
 
+	MEM_CLEAR(addr);
+
 	ENABLE_WREN();
 
 	READ_STATUS_REGISTER(spiRxBuffer);
@@ -355,7 +358,7 @@ int main(void) {
 	// Write data
 	ENABLE_WREN();
 
-	strcpy((char*) spiTxBuffer, "TESTING SPI, Cool things, hah, im 22");
+	strcpy((char*) spiTxBuffer, "Toshi is my new friend!");
 
 	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET);
 	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WRITE, 1, 100);
@@ -1038,6 +1041,22 @@ void ENABLE_WRDI() {
 	SET_CS();
 	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WRDI, 1, 100);
 
+}
+
+void MEM_CLEAR(void * addr) {
+	ENABLE_WREN();
+
+	PULL_CS();
+	HAL_SPI_Transmit(&hspi1, (uint8_t*)&FLASH_SECTOR_ERASE, 1, 100);
+	HAL_SPI_Transmit(&hspi1, (uint8_t*)&addr, 3, 100);
+	SET_CS();
+
+	uint8_t wip = 1;
+	while (wip) {
+		uint8_t buf[100];
+		READ_STATUS_REGISTER(buf);
+		wip = 1 & buf[0];
+	}
 }
 
 //static void init_DecoderInputs(DecoderInput * LSB, DecoderInput * MiddleBit, DecoderInput * MSB) {
