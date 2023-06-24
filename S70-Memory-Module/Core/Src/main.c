@@ -27,6 +27,13 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+typedef struct DecoderInput {
+	uint64_t Port;
+	uint16_t Pin;
+	uint8_t State;
+
+} DecoderInput;
+
 typedef struct CircularBuffer {
 //	uint64_t size;
 	uint8_t data[128];
@@ -72,6 +79,16 @@ UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
 
+// Equal to GPIO_PIN_SET, for this architecture
+// 1 is the inactive state
+// 0 is the active state
+const uint8_t INACTIVE_STATE = 1;
+const uint8_t ACTIVE_STATE = 0;
+
+//static DecoderInput A0;
+//static DecoderInput A1;
+//static DecoderInput A2;
+
 static CircularBuffer cb;
 
 /***************************************
@@ -82,9 +99,24 @@ static CircularBuffer cb;
 /* The following are defined in the S25... Manual
  * Section 7.6.1, 9.3
  */
+//const uint8_t WRR_WriteRegister = 0x01;
 const uint8_t CLSR_ClearStatusReg = 0x30;
+//
+//const uint8_t RDSR1_ReadStatusReg1 = 0x05;
+//const uint8_t RDSR2_ReadStatusReg2 = 0x07;
+//const uint8_t RDCR_ReadConfigReg = 0x35;
+//const uint8_t BRRD_ReadBankReg = 0x16;
+//
+//const uint8_t BRWR_WriteBankReg = 0x17;
+//const uint8_t BRAC_BankRegAccess = 0xB9;
+////const uint8_t WriteReg = 0x01;
+//const uint8_t WREN_WriteEnable = 0x06;
+//const uint8_t WRDI_WriteDisable = 0x04;
+//
+//const uint8_t ECCRD_ECCRead = 0x18;
+//
 
-const uint8_t FLASH_READ = 0x03; // Section in Data sheet: 9.4.1
+const uint8_t FLASH_READ = 0x03;
 const uint8_t FLASH_WRITE = 0x02;
 const uint8_t FLASH_WREN = 0x06;
 const uint8_t FLASH_WRDI = 0x04;
@@ -134,6 +166,7 @@ static void MX_USART3_UART_Init(void);
 /* USER CODE BEGIN PFP */
 //static void INIT_DECODER_INPUTS(void);
 //static void init_buffer(void);
+
 void PRINT_STRING_UART(void*);
 void PULL_ALL_LOW();
 void SET_CS();
@@ -142,11 +175,6 @@ void READ_STATUS_REGISTER(void*);
 void ENABLE_WREN();
 void ENABLE_WRDI();
 void PULL_CS();
-void ERASE_MEM(void *);
-void WRITE(void*);
-void READ(void*);
-uint64_t roundUpToNearestMultipleOf4(uint64_t number);
-
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -270,7 +298,6 @@ int main(void) {
 	char spiTxBuffer[100] = { 0 };
 //	char uart_buffer[100];
 	uint8_t addr[3] = { 0 };
-	uint32_t lastSectAddr[3] = {0x0003FFFF};
 	uint8_t wip;
 //	INIT_DECODER_INPUTS();
 	/* USER CODE END 1 */
@@ -313,27 +340,9 @@ int main(void) {
 	// Clear 1 sector starting from 0x0
 	// Note how I am sending 3 bytes from addr,
 	// This is because the Sector Erase requires a 3 byte address
-//	PULL_CS();
-//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_SECTOR_ERASE, 1, 100);
-//	HAL_SPI_Transmit(&hspi1, (uint8_t*) addr, 3, 100);
-//	SET_CS();
-	ERASE_MEM(addr);
-	// wip = 1;
-	// while (wip) {
-	// 	READ_STATUS_REGISTER(spiRxBuffer);
-
-	// 	wip = spiRxBuffer[0] & 1;
-	// }
-
-	// Write data
-	ENABLE_WREN();
-
-	strcpy((char*) spiTxBuffer, "I am a genius!");
-
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET);
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WRITE, 1, 100);
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) addr, 3, 100);
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) spiTxBuffer, 100, 100);
+	PULL_CS();
+	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_SECTOR_ERASE, 1, 100);
+	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
 	SET_CS();
 
 	wip = 1;
@@ -343,12 +352,28 @@ int main(void) {
 		wip = spiRxBuffer[0] & 1;
 	}
 
-	ERASE_MEM(lastSectAddr);
+	// Write data
+	ENABLE_WREN();
+
+	strcpy((char*) spiTxBuffer, "TESTING SPI, Cool things, hah, im 22");
+
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET);
+	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WRITE, 1, 100);
+	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
+	HAL_SPI_Transmit(&hspi1, (uint8_t*) &spiTxBuffer, 100, 100);
+	SET_CS();
+
+	wip = 1;
+	while (wip) {
+		READ_STATUS_REGISTER(spiRxBuffer);
+
+		wip = spiRxBuffer[0] & 1;
+	}
 
 	// Read
 	PULL_CS();
 	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_READ, 1, 100);
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) addr, 3, 100);
+	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
 	HAL_SPI_Receive(&hspi1, (uint8_t*) spiRxBuffer, 100, 100);
 	SET_CS();
 
@@ -914,113 +939,6 @@ static void MX_GPIO_Init(void) {
 }
 
 /* USER CODE BEGIN 4 */
-
-uint64_t roundUpToNearestMultipleOf4(uint64_t number) {
-	uint8_t remainder = number & 0x03;
-	uint64_t result;
-
-    if (remainder > 0) result = number + (4 - remainder);
-    else result = number;
-
-    return result;
-}
-
-/*
-	Clear from Memory
-	@param Buffer that contains atleast 1 address
-	If you want to erase starting from only 1 address,
-	just pass a uint8_t pointer for that address
-*/
-void ERASE_MEM(void * addrBuf) {
-	ENABLE_WREN();
-
-
-	PULL_CS();
-	HAL_SPI_Transmit(&hspi1, (uint8_t *) &FLASH_SECTOR_ERASE, 1, 100);
-	// Must send 3 byte address to Module
-	HAL_SPI_Transmit(&hspi1, (uint8_t *) addrBuf, 3, 100);
-	SET_CS();
-	
-	uint8_t wip = 1;
-	char spiRxBuffer[5];
-	while (wip) {
-		READ_STATUS_REGISTER(spiRxBuffer);
-
-		wip = spiRxBuffer[0] & 1;
-	}
-
-}
-
-/*
-	Read from Memory
-	@param Buffer that contains atleast 1 address
-	Must send 3 byte address to Module
-*/
-// TODO:
-// Add valid Params
-//
-void READ(void* addrBuf) {
-
-}
-
-/*
-	Func1(void * info) {
-		buf1[1024];
-		memcpy(info, buf1);
-		write_to_mem(buf1);
-	}
-
-	
-
-
-*/ 
-
-/**
- * Write to Memory
- */
-void WRITE(void* packet) {
-	char writeBuffer[100] = {0};
-	char readBuffer[100] = {0};
-
-	uint8_t buffer_head = 0x0;
-	uint8_t buffer_tail = 0x0;
-
-	uint8_t new_buffer_head;
-	uint8_t new_buffer_tail;
-
-	uint8_t max_bank_size = 0xffff;
-	uint8_t remaining_space = max_bank_size - (buffer_head-1);
-	uint8_t packet_size = sizeof((uint8_t*)packet);
-
-	if ((buffer_head % 256) == 0){
-		ERASE_MEM(buffer_head);
-	}
-	if (packet_size < remaining_space) {
-		new_buffer_head = packet_size + (buffer_head + 1);
-	}
-	uint8_t address[3] = {buffer_head};
-
-	ENABLE_WREN();
-
-	strcpy((char*) writeBuffer, packet);
-
-	PULL_CS();
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WRITE, 1, 100);
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) address, 3, 100);
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) writeBuffer, 100, 100);
-	SET_CS();
-
-	uint8_t wip = 1;
-	while (wip) {
-		READ_STATUS_REGISTER(readBuffer);
-
-		wip = readBuffer[0] & 1;
-	}
-	ENABLE_WRDI();
-
-	// buffer_head = new_buffer_head;
-	
-}
 
 void PULL_CS() {
 //	// same as memory_bank_counter % 8
