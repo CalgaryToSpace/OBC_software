@@ -185,7 +185,7 @@ void ENABLE_WRDI();
 void PULL_CS();
 void MEM_CLEAR(void *);
 //void basicFunction(char *, char *, uint8_t *);
-void basicFunction(basicInfo);
+void basicFunction(basicInfo * );
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -339,7 +339,7 @@ int main(void) {
 	memset(bi.spiRxBuffer, 0, sizeof(bi.spiRxBuffer));
 	memset(bi.spiTxBuffer, 0, sizeof(bi.spiTxBuffer));
 
-	basicFunction(bi);
+	basicFunction(&bi);
 //		char spiRxBuffer[100] = { 0 };
 //		char spiTxBuffer[100] = { 0 };
 //		uint8_t addr[3] = { 0 };
@@ -1071,7 +1071,7 @@ void MEM_CLEAR(void * addr) {
 	}
 }
 
-void basicFunction(basicInfo bi) {
+void basicFunction(basicInfo * bi) {
 //	char spiRxBuffer[100] = { 0 };
 //	char spiTxBuffer[100] = { 0 };
 //	uint8_t addr[3] = { 0 };
@@ -1088,13 +1088,13 @@ void basicFunction(basicInfo bi) {
 
 		ENABLE_WREN();
 
-		READ_STATUS_REGISTER(bi.spiRxBuffer);
+		READ_STATUS_REGISTER(bi->spiRxBuffer);
 
 		wip = 1;
 		while (wip) {
-			READ_STATUS_REGISTER(bi.spiRxBuffer);
+			READ_STATUS_REGISTER(bi->spiRxBuffer);
 
-			wip = bi.spiRxBuffer[0] & 1;
+			wip = bi->spiRxBuffer[0] & 1;
 		}
 
 			// Clear 1 sector starting from 0x0
@@ -1102,14 +1102,14 @@ void basicFunction(basicInfo bi) {
 			// This is because the Sector Erase requires a 3 byte address
 			PULL_CS();
 			HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_SECTOR_ERASE, 1, 100);
-			HAL_SPI_Transmit(&hspi1, (uint8_t*) &bi.addr, 3, 100);
+			HAL_SPI_Transmit(&hspi1, (uint8_t*) &bi->addr, 3, 100);
 			SET_CS();
 
 			wip = 1;
 			while (wip) {
-				READ_STATUS_REGISTER(bi.spiRxBuffer);
+				READ_STATUS_REGISTER(bi->spiRxBuffer);
 
-				wip = bi.spiRxBuffer[0] & 1;
+				wip = bi->spiRxBuffer[0] & 1;
 			}
 
 
@@ -1120,29 +1120,29 @@ void basicFunction(basicInfo bi) {
 
 //		strcpy((char*) spiTxBuffer, "lel, bruv");
 		char * str = someRandomFunc();
-		strcpy((char *) bi.spiTxBuffer, str);
+		strcpy((char *) bi->spiTxBuffer, str);
 
 		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET);
 		HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WRITE, 1, 100);
-		HAL_SPI_Transmit(&hspi1, (uint8_t*) &bi.addr, 3, 100);
-		HAL_SPI_Transmit(&hspi1, (uint8_t*) &bi.spiTxBuffer, 100, 100);
+		HAL_SPI_Transmit(&hspi1, (uint8_t*) &bi->addr, 3, 100);
+		HAL_SPI_Transmit(&hspi1, (uint8_t*) &bi->spiTxBuffer, 100, 100);
 		SET_CS();
 
 		wip = 1;
 		while (wip) {
-			READ_STATUS_REGISTER(bi.spiRxBuffer);
+			READ_STATUS_REGISTER(bi->spiRxBuffer);
 
-			wip = bi.spiRxBuffer[0] & 1;
+			wip = bi->spiRxBuffer[0] & 1;
 		}
 //		memset(spiRxBuffer, 0, strlen((char*) spiRxBuffer));
 		// Read
 		PULL_CS();
 		HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_READ, 1, 100);
-		HAL_SPI_Transmit(&hspi1, (uint8_t*) &bi.addr, 3, 100);
-		HAL_SPI_Receive(&hspi1, (uint8_t*) bi.spiRxBuffer, 100, 100);
+		HAL_SPI_Transmit(&hspi1, (uint8_t*) &bi->addr, 3, 100);
+		HAL_SPI_Receive(&hspi1, (uint8_t*) bi->spiRxBuffer, 100, 100);
 		SET_CS();
 
-		PRINT_STRING_UART(bi.spiRxBuffer);
+		PRINT_STRING_UART(bi->spiRxBuffer);
 
 		// Turn off LED
 		HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_RESET);

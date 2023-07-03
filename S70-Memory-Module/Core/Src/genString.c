@@ -8,5 +8,5 @@
 #include <genString.h>
 
 char * someRandomFunc(){
-	return "Yo, is this working????";
+	return "Please work, inshallah this will work ~!!!@#!@#@!##@$#";
 }
