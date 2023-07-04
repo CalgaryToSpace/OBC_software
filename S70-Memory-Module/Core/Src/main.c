@@ -24,6 +24,8 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
+
+#include <PacketEnum.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -177,6 +179,7 @@ void ENABLE_WREN();
 void ENABLE_WRDI();
 void PULL_CS();
 void MEM_CLEAR(void *);
+void TEST_WRITE_PACKET(void *, void *, packet_type);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -287,20 +290,19 @@ bool is_full(void) {
 //		return 0;
 //	}
 
-
-typedef enum {A, B, C} packet_type;
-
 typedef struct telemetry {
 	packet_type type;
 	int secondsSinceBoot;
 	double temperature;
-} tel __attribute__ ((aligned));
+} tel;
 
-struct MRI_Data {
+typedef struct MPI_Data {
 	packet_type type;
 	char data[100];
 	int time_collected;
-};
+} MPI;
+
+void *enumFunctions[] = {CREATE_PACKET_0, CREATE_PACKET_1, CREATE_PACKET_2};
 
 /* USER CODE END 0 */
 
@@ -315,20 +317,22 @@ int main(void) {
 	char spiTxBuffer[100] = {0};
 	char statusRegBuffer[9] = {0};
 
+	TEST_WRITE_PACKET()
+
 	char testBuffer[100] = {0};
 	char testBuffer2[100] = {0};
 
 	memset(testBuffer, 0x0, 100);
 	memset(testBuffer2, 0x0, 100);
 
-	uint8_t addr[3] = { 0 };
+	uint8_t addr[3] = {0};
 	uint8_t wip;
 
 	tel t;
 
 	t.secondsSinceBoot = 12;
 	t.temperature = 3.2;
-	t.type = B;
+	t.type = PowerSystems;
 
 	uint8_t typeSize = sizeof(t.type);
 	uint8_t secondsSize = sizeof(t.secondsSinceBoot);
@@ -1134,6 +1138,80 @@ void MEM_CLEAR(void * addr) {
 	}
 }
 
+//This function would take the data from OS, and decode it to store it into struct
+void DECODE_PACKET_0(void * buffer) {
+
+}
+
+//Function to create a packet from given buffer, and then return a buffer with hex values
+void CREATE_PACKET_0(void * buffer) {
+	char testBuffer[100] = {0};
+	char testBuffer2[100] = {0};
+
+	memset(testBuffer, 0x0, 100);
+	memset(testBuffer2, 0x0, 100);
+
+	DECODE_PACKET_0(buffer);
+
+	tel t;
+
+	t.secondsSinceBoot = 12;
+	t.temperature = 3.2;
+	t.type = PowerSystems;
+
+	uint8_t typeSize = sizeof(t.type);
+	uint8_t secondsSize = sizeof(t.secondsSinceBoot);
+
+	memcpy(testBuffer, &t, sizeof(t));
+
+	size_t i = 0;
+	uint8_t del_size = 0;
+
+	//Storing it in HEX, Doubles use Big-Endian Values
+	while (i < sizeof(t) + 3) {
+		if (i == 0) { // if i == 0, add starting character
+			sprintf(testBuffer2 + (i * 2), "%02X", '}'); //7D
+			del_size++;
+		}
+		else if (i < typeSize + 1) { // If i < 2, accessing i == 1, buffer indices 0
+			sprintf(testBuffer2 + (i * 2), "%02X", testBuffer[i-del_size]);
+		}
+		else if (i == typeSize + 1) { // If i == 2, add a delimiter
+			sprintf(testBuffer2 + (i * 2), "%02X", '!'); //21
+			del_size++;
+		}
+		else if (i < secondsSize + typeSize + 2) { // If i < 7, accessing i == 3, 4, 5, 6, buffer indices 1, 2, 3, 4
+			sprintf(testBuffer2 + (i * 2), "%02X", testBuffer[i-del_size]);
+		}
+		else if (i == secondsSize + typeSize + 2) { // i == 7, add a delimiter
+			sprintf(testBuffer2 + (i * 2), "%02X", '!');
+			del_size++;
+		}
+		else { // If i > 7, accessing i == 8, 9, ..., 15, buffer indices 5, 6, ... ,12
+			sprintf(testBuffer2 + (i * 2), "%02X", testBuffer[i-del_size]);
+		}
+		i++;
+	}
+}
+
+void CREATE_PACKET_1() {
+
+}
+
+void CREATE_PACKET_2() {
+
+}
+
+//Recieve a type of data, and write it into module
+void TEST_WRITE_PACKET(void * addr, void * buffer, packet_type type) {
+	packet_type (*operation)(void *);
+	function = enumFunctions[type];
+	function(buffer);
+}
+
+void TEST_READ_PACKET(void * buffer, ) {
+
+}
 //static void init_DecoderInputs(DecoderInput * LSB, DecoderInput * MiddleBit, DecoderInput * MSB) {
 ////		LSB->ACTIVE_STATE, MiddleBit->ACTIVE_STATE, MSB->ACTIVE_STATE = 0;
 ////		LSB->INACTIVE_STATE, MiddleBit->INACTIVE_STATE, MSB->INACTIVE_STATE = 1;
