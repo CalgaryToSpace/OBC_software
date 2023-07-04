@@ -23,6 +23,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdbool.h>
 #include <string.h>
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -285,6 +286,22 @@ bool is_full(void) {
 //		}
 //		return 0;
 //	}
+
+
+typedef enum {A, B, C} packet_type;
+
+typedef struct telemetry {
+	packet_type type;
+	int secondsSinceBoot;
+	double temperature;
+} tel __attribute__ ((aligned));
+
+struct MRI_Data {
+	packet_type type;
+	char data[100];
+	int time_collected;
+};
+
 /* USER CODE END 0 */
 
 /**
@@ -293,14 +310,69 @@ bool is_full(void) {
  */
 int main(void) {
 	/* USER CODE BEGIN 1 */
-//	uint8_t spiRxBuffer[9];
-//	uint8_t spiTxBuffer[9];
-	char spiRxBuffer[100] = { 0 };
-	char spiTxBuffer[100] = { 0 };
-//	char uart_buffer[100];
+
+	char spiRxBuffer[100] = {0};
+	char spiTxBuffer[100] = {0};
+	char statusRegBuffer[9] = {0};
+
+	char testBuffer[100] = {0};
+	char testBuffer2[100] = {0};
+
+	memset(testBuffer, 0x0, 100);
+	memset(testBuffer2, 0x0, 100);
+
 	uint8_t addr[3] = { 0 };
 	uint8_t wip;
-//	INIT_DECODER_INPUTS();
+
+	tel t;
+
+	t.secondsSinceBoot = 12;
+	t.temperature = 3.2;
+	t.type = B;
+
+	uint8_t typeSize = sizeof(t.type);
+	uint8_t secondsSize = sizeof(t.secondsSinceBoot);
+
+	memcpy(testBuffer, &t, sizeof(t));
+
+	size_t i = 0;
+	uint8_t del_size = 0;
+
+	//7D 01 21 0C0C0C0C 21 FLOAT
+	// 0  1  2  3 4 5 6  7 8
+
+	while (i < sizeof(t) + 3) {
+		if (i == 0) { // if i == 0, add starting character
+			sprintf(testBuffer2 + (i * 2), "%02X", '}'); //7D
+			del_size++;
+		}
+		else if (i < typeSize + 1) { // If i < 2, accessing i == 1, buffer indices 0
+			sprintf(testBuffer2 + (i * 2), "%02X", testBuffer[i-del_size]);
+		}
+		else if (i == typeSize + 1) { // If i == 2, add a delimiter
+			sprintf(testBuffer2 + (i * 2), "%02X", '!'); //21
+			del_size++;
+		}
+		else if (i < secondsSize + typeSize + 2) { // If i < 7, accessing i == 3, 4, 5, 6, buffer indices 1, 2, 3, 4
+			sprintf(testBuffer2 + (i * 2), "%02X", testBuffer[i-del_size]);
+		}
+		else if (i == secondsSize + typeSize + 2) { // i == 7, add a delimiter
+			sprintf(testBuffer2 + (i * 2), "%02X", '!');
+			del_size++;
+		}
+		else { // If i > 7, accessing i == 8, 9, ..., 15, buffer indices 5, 6, ... ,12
+			sprintf(testBuffer2 + (i * 2), "%02X", testBuffer[i-del_size]);
+		}
+		i++;
+	}
+
+//
+//	for (size_t i = 0; i < sizeof(tel); i++) {
+//		sprintf(&testBuffer2[i * 2], "%02X", testBuffer[i]);
+//	}
+//
+//	PRINT_STRING_UART(testBuffer2);
+
 	/* USER CODE END 1 */
 
 	/* MCU Configuration--------------------------------------------------------*/
@@ -332,17 +404,20 @@ int main(void) {
 	MX_USART3_UART_Init();
 	/* USER CODE BEGIN 2 */
 
+	//Turn on LED1 to indicate program starting
 	HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_SET);
 
+	//Clear Memory before using memory
 	MEM_CLEAR(addr);
 
-	ENABLE_WREN();
-
+	//Read the Status Register and store it in the corresponding buffer
 	READ_STATUS_REGISTER(spiRxBuffer);
 
 	// Clear 1 sector starting from 0x0
 	// Note how I am sending 3 bytes from addr,
 	// This is because the Sector Erase requires a 3 byte address
+
+	ENABLE_WREN();
 	PULL_CS();
 	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_SECTOR_ERASE, 1, 100);
 	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
@@ -358,8 +433,8 @@ int main(void) {
 	// Write data
 	ENABLE_WREN();
 
-	strcpy((char*) spiTxBuffer, "Toshi is my new friend!");
-
+//	strcpy((char*) spiTxBuffer, "jhbgtyty 654646");
+	strcpy((char*) spiTxBuffer, testBuffer2);
 	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET);
 	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WRITE, 1, 100);
 	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
@@ -965,7 +1040,7 @@ void PRINT_STRING_UART(void *string) {
 //	char *buff = (char*) string;
 	HAL_UART_Transmit(&huart1, (uint8_t*) string, strlen((char*) string), 100);
 	PRINT_NEW_LINE();
-	memset(string, 0, strlen((char*) string));
+//	memset(string, 0, strlen((char*) string));
 }
 
 /*
