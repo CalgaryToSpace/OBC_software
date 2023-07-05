@@ -1,6 +1,6 @@
 ################################################################################
 # Automatically-generated file. Do not edit!
-# Toolchain: GNU Tools for STM32 (9-2020-q2-update)
+# Toolchain: GNU Tools for STM32 (10.3-2021.10)
 ################################################################################
 
 -include ../makefile.init
@@ -43,14 +43,14 @@ BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ART
 EXECUTABLES += \
 TestingTime.elf \
 
+MAP_FILES += \
+TestingTime.map \
+
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
 TestingTime.list \
-
-OBJCOPY_BIN += \
-TestingTime.bin \
 
 
 # All Target
@@ -60,8 +60,8 @@ all: main-build
 main-build: TestingTime.elf secondary-outputs
 
 # Tool invocations
-TestingTime.elf: $(OBJS) $(USER_OBJS) C:\Users\asjad\STM32CubeIDE\workspace_1.7.0\TestingTime\STM32L4R5ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "TestingTime.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\asjad\STM32CubeIDE\workspace_1.7.0\TestingTime\STM32L4R5ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="TestingTime.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+TestingTime.elf TestingTime.map: $(OBJS) $(USER_OBJS) C:\Users\asjad\Documents\@CUBESAT\clone\OBC_software\Tools\CameraTest\STM32L4R5ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "TestingTime.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\asjad\Documents\@CUBESAT\clone\OBC_software\Tools\CameraTest\STM32L4R5ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="TestingTime.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -75,17 +75,12 @@ TestingTime.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-TestingTime.bin: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "TestingTime.bin"
-	@echo 'Finished building: $@'
-	@echo ' '
-
 # Other Targets
 clean:
-	-$(RM) TestingTime.bin TestingTime.elf TestingTime.list default.size.stdout
+	-$(RM) TestingTime.elf TestingTime.list TestingTime.map default.size.stdout
 	-@echo ' '
 
-secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_BIN)
+secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
 
 fail-specified-linker-script-missing:
 	@echo 'Error: Cannot find the specified linker script. Check the linker settings in the build configuration.'

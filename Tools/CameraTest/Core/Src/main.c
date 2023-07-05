@@ -18,12 +18,12 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include <string.h>
-#include <stdbool.h>
+
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdlib.h>
+#include <stdbool.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -41,7 +41,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-UART_HandleTypeDef hlpuart1;
+ UART_HandleTypeDef hlpuart1;
 UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart3;
 
@@ -64,7 +64,9 @@ static void MX_USART1_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint8_t dataRec[65];
+uint8_t dataRec[300];
+// File pointer init
+FILE *fptr;
 
 /* USER CODE END 0 */
 
@@ -140,8 +142,9 @@ int main(void)
   			  SentencesNum += 1;
   			  //if SentencesNum becomes = to 100, write group to mem, and subtract 100 from totalSentences and make SentencesNum =0
   			  if(SentencesNum == 100){
-//  				  HAL_UART_Transmit(&hlpuart1, (uint8_t*)sentence, 64, HAL_MAX_DELAY);
+  				  HAL_UART_Transmit(&hlpuart1, (uint8_t*)group, ((SentencesNum)*67), HAL_MAX_DELAY);
   				  //memWrite(CAMERA_DATA, group, ((sentencesNum)*67));
+
   				  totalSentences -= 100;
   				  SentencesNum = 0;
   				  // re initialize group to empty it
@@ -239,19 +242,24 @@ int main(void)
 
     }
 
+    // tester function to write groups of data to a file
+    void fileWrite(char group[][]){
+
+    }
+
 
 
 
 
 
 uint8_t noFT[3] = {3,1,8};
-const char *m = "m";
+const char *m = "t";
 
 //HAL_UART_Transmit(&hlpuart1, (uint8_t*)m, 1, HAL_MAX_DELAY);
 
 //HAL_UART_Receive(&hlpuart1, (uint8_t*)dataRec, 64, HAL_MAX_DELAY);
 //HAL_UART_Receive_DMA(&hlpuart1, dataRec, 65);
-Capture_Image(true, 'm');
+//Capture_Image(true, 'm');
 
 
 
@@ -272,7 +280,9 @@ Capture_Image(true, 'm');
 
 
 
-	  HAL_UART_Transmit(&hlpuart1, (uint8_t*)dataRec, 4, HAL_MAX_DELAY);
+	  HAL_UART_Transmit(&hlpuart1, (uint8_t*)m, 1, HAL_MAX_DELAY);
+	  HAL_UART_Receive(&hlpuart1, (uint8_t*)dataRec, 202, HAL_MAX_DELAY);
+
   }
   /* USER CODE END 3 */
 }
@@ -292,6 +302,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
@@ -310,6 +321,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+
   /** Initializes the CPU, AHB and APB buses clocks
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
@@ -341,7 +353,7 @@ static void MX_LPUART1_UART_Init(void)
 
   /* USER CODE END LPUART1_Init 1 */
   hlpuart1.Instance = LPUART1;
-  hlpuart1.Init.BaudRate = 230400;
+  hlpuart1.Init.BaudRate = 115200;
   hlpuart1.Init.WordLength = UART_WORDLENGTH_8B;
   hlpuart1.Init.StopBits = UART_STOPBITS_1;
   hlpuart1.Init.Parity = UART_PARITY_NONE;
@@ -598,4 +610,3 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
-

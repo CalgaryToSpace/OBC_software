@@ -1,0 +1,10 @@
+19:13:19 **** Incremental Build of configuration Debug for project FileTesting ****
+make -j8 all 
+arm-none-eabi-size   FileTesting.elf 
+   text	   data	    bss	    dec	    hex	filename
+  16244	     20	   1860	  18124	   46cc	FileTesting.elf
+Finished building: default.size.stdout
+ 
+
+19:13:20 Build Finished. 0 errors, 0 warnings. (took 331ms)
+

@@ -1,0 +1,51 @@
+19:13:18 **** Incremental Build of configuration Debug for project TestingTime ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L4R5xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c:69:1: error: unknown type name 'FILE'
+   69 | FILE *fptr;
+      | ^~~~
+../Core/Src/main.c:27:1: note: 'FILE' is defined in header '<stdio.h>'; did you forget to '#include <stdio.h>'?
+   26 | #include <stdbool.h>
+  +++ |+#include <stdio.h>
+   27 | /* USER CODE END Includes */
+../Core/Src/main.c: In function 'receiveImage':
+../Core/Src/main.c:131:9: warning: implicit declaration of function 'strncpy' [-Wimplicit-function-declaration]
+  131 |         strncpy(&hexTotal[2], &sentence[4], 4);
+      |         ^~~~~~~
+../Core/Src/main.c:131:9: warning: incompatible implicit declaration of built-in function 'strncpy'
+../Core/Src/main.c:27:1: note: include '<string.h>' or provide a declaration of 'strncpy'
+   26 | #include <stdbool.h>
+  +++ |+#include <string.h>
+   27 | /* USER CODE END Includes */
+../Core/Src/main.c:141:8: warning: implicit declaration of function 'strcpy' [-Wimplicit-function-declaration]
+  141 |        strcpy(group[SentencesNum],sentence);
+      |        ^~~~~~
+../Core/Src/main.c:141:8: warning: incompatible implicit declaration of built-in function 'strcpy'
+../Core/Src/main.c:141:8: note: include '<string.h>' or provide a declaration of 'strcpy'
+../Core/Src/main.c:151:14: warning: unused variable 'group' [-Wunused-variable]
+  151 |         char group[100][64];
+      |              ^~~~~
+../Core/Src/main.c:167:10: warning: incompatible implicit declaration of built-in function 'strcpy'
+  167 |          strcpy(group[i],sentence);
+      |          ^~~~~~
+../Core/Src/main.c:167:10: note: include '<string.h>' or provide a declaration of 'strcpy'
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:246:25: error: array type has incomplete element type 'char[]'
+  246 |     void fileWrite(char group[][]){
+      |                         ^~~~~
+../Core/Src/main.c:246:25: note: declaration of 'group' as multidimensional array must have bounds for all dimensions except the first
+../Core/Src/main.c:255:9: warning: unused variable 'noFT' [-Wunused-variable]
+  255 | uint8_t noFT[3] = {3,1,8};
+      |         ^~~~
+At top level:
+../Core/Src/main.c:246:10: warning: 'fileWrite' defined but not used [-Wunused-function]
+  246 |     void fileWrite(char group[][]){
+      |          ^~~~~~~~~
+../Core/Src/main.c:191:25: warning: 'Capture_Image' defined but not used [-Wunused-function]
+  191 |     enum Capture_Status Capture_Image(bool flash, char lighting){
+      |                         ^~~~~~~~~~~~~
+make: *** [Core/Src/subdir.mk:34: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+
+19:13:18 Build Failed. 3 errors, 9 warnings. (took 425ms)
+

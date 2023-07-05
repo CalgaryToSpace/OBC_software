@@ -1,2 +1,2 @@
-threads.c:22:6:StartTest1	16	static
-threads.c:44:6:StartTest2	16	static
+../Core/Src/threads.c:22:6:StartTest1	16	static
+../Core/Src/threads.c:44:6:StartTest2	16	static
