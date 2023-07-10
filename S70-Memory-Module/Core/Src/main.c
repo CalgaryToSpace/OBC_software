@@ -17,7 +17,6 @@
  */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -25,7 +24,10 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <PacketEnum.h>
+#include "PacketEnum.h"
+#include "MemoryUtilities.h"
+#include "PacketRead.h"
+#include "PacketWrite.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -119,17 +121,6 @@ const uint8_t CLSR_ClearStatusReg = 0x30;
 //const uint8_t ECCRD_ECCRead = 0x18;
 //
 
-const uint8_t FLASH_READ = 0x03;
-const uint8_t FLASH_WRITE = 0x02;
-const uint8_t FLASH_WREN = 0x06;
-const uint8_t FLASH_WRDI = 0x04;
-const uint8_t FLASH_ER4 = 0x20;
-const uint8_t FLASH_ER32 = 0x52;
-const uint8_t FLASH_ER64 = 0xd8;
-const uint8_t FLASH_ERCP = 0xC7;
-const uint8_t FLASH_STATREG1 = 0X05;
-const uint8_t FLASH_SECTOR_ERASE = 0xD8;
-
 uint8_t memory_bank_counter = 0;
 
 /*
@@ -172,13 +163,13 @@ static void MX_USART3_UART_Init(void);
 
 void PRINT_STRING_UART(void*);
 void PULL_ALL_LOW();
-void SET_CS();
 void PRINT_NEW_LINE();
-void READ_STATUS_REGISTER(void*);
 void ENABLE_WREN();
 void ENABLE_WRDI();
-void PULL_CS();
-void MEM_CLEAR(void *);
+void DECODE_PACKET_0(void *);
+void CREATE_PACKET_0(void *);
+void CREATE_PACKET_1();
+void CREATE_PACKET_2();
 void TEST_WRITE_PACKET(void *, void *, packet_type);
 /* USER CODE END PFP */
 
@@ -290,18 +281,6 @@ bool is_full(void) {
 //		return 0;
 //	}
 
-typedef struct telemetry {
-	packet_type type;
-	int secondsSinceBoot;
-	double temperature;
-} tel;
-
-typedef struct MPI_Data {
-	packet_type type;
-	char data[100];
-	int time_collected;
-} MPI;
-
 void *enumFunctions[] = {CREATE_PACKET_0, CREATE_PACKET_1, CREATE_PACKET_2};
 
 /* USER CODE END 0 */
@@ -315,67 +294,58 @@ int main(void) {
 
 	char spiRxBuffer[100] = {0};
 	char spiTxBuffer[100] = {0};
-	char statusRegBuffer[9] = {0};
-
-	TEST_WRITE_PACKET()
-
-	char testBuffer[100] = {0};
-	char testBuffer2[100] = {0};
-
-	memset(testBuffer, 0x0, 100);
-	memset(testBuffer2, 0x0, 100);
-
+//	char statusRegBuffer[9] = {0};
+//
+//	char testBuffer[100] = {0};
+//	char testBuffer2[100] = {0};
+//
+//	memset(testBuffer, 0x0, 100);
+//	memset(testBuffer2, 0x0, 100);
+//
 	uint8_t addr[3] = {0};
-	uint8_t wip;
-
-	tel t;
-
-	t.secondsSinceBoot = 12;
-	t.temperature = 3.2;
-	t.type = PowerSystems;
-
-	uint8_t typeSize = sizeof(t.type);
-	uint8_t secondsSize = sizeof(t.secondsSinceBoot);
-
-	memcpy(testBuffer, &t, sizeof(t));
-
-	size_t i = 0;
-	uint8_t del_size = 0;
-
-	//7D 01 21 0C0C0C0C 21 FLOAT
-	// 0  1  2  3 4 5 6  7 8
-
-	while (i < sizeof(t) + 3) {
-		if (i == 0) { // if i == 0, add starting character
-			sprintf(testBuffer2 + (i * 2), "%02X", '}'); //7D
-			del_size++;
-		}
-		else if (i < typeSize + 1) { // If i < 2, accessing i == 1, buffer indices 0
-			sprintf(testBuffer2 + (i * 2), "%02X", testBuffer[i-del_size]);
-		}
-		else if (i == typeSize + 1) { // If i == 2, add a delimiter
-			sprintf(testBuffer2 + (i * 2), "%02X", '!'); //21
-			del_size++;
-		}
-		else if (i < secondsSize + typeSize + 2) { // If i < 7, accessing i == 3, 4, 5, 6, buffer indices 1, 2, 3, 4
-			sprintf(testBuffer2 + (i * 2), "%02X", testBuffer[i-del_size]);
-		}
-		else if (i == secondsSize + typeSize + 2) { // i == 7, add a delimiter
-			sprintf(testBuffer2 + (i * 2), "%02X", '!');
-			del_size++;
-		}
-		else { // If i > 7, accessing i == 8, 9, ..., 15, buffer indices 5, 6, ... ,12
-			sprintf(testBuffer2 + (i * 2), "%02X", testBuffer[i-del_size]);
-		}
-		i++;
-	}
-
+//	uint8_t wip;
 //
-//	for (size_t i = 0; i < sizeof(tel); i++) {
-//		sprintf(&testBuffer2[i * 2], "%02X", testBuffer[i]);
+//	tel t;
+//
+//	t.secondsSinceBoot = 12;
+//	t.temperature = 3.2;
+//	t.type = PowerSystems;
+//
+//	uint8_t typeSize = sizeof(t.type);
+//	uint8_t secondsSize = sizeof(t.secondsSinceBoot);
+//
+//	memcpy(testBuffer, &t, sizeof(t));
+//
+//	size_t i = 0;
+//	uint8_t del_size = 0;
+//
+//	//7D 01 21 0C0C0C0C 21 FLOAT
+//	// 0  1  2  3 4 5 6  7 8
+//
+//	while (i < sizeof(t) + 3) {
+//		if (i == 0) { // if i == 0, add starting character
+//			sprintf(testBuffer2 + (i * 2), "%02X", '}'); //7D
+//			del_size++;
+//		}
+//		else if (i < typeSize + 1) { // If i < 2, accessing i == 1, buffer indices 0
+//			sprintf(testBuffer2 + (i * 2), "%02X", testBuffer[i-del_size]);
+//		}
+//		else if (i == typeSize + 1) { // If i == 2, add a delimiter
+//			sprintf(testBuffer2 + (i * 2), "%02X", '!'); //21
+//			del_size++;
+//		}
+//		else if (i < secondsSize + typeSize + 2) { // If i < 7, accessing i == 3, 4, 5, 6, buffer indices 1, 2, 3, 4
+//			sprintf(testBuffer2 + (i * 2), "%02X", testBuffer[i-del_size]);
+//		}
+//		else if (i == secondsSize + typeSize + 2) { // i == 7, add a delimiter
+//			sprintf(testBuffer2 + (i * 2), "%02X", '!');
+//			del_size++;
+//		}
+//		else { // If i > 7, accessing i == 8, 9, ..., 15, buffer indices 5, 6, ... ,12
+//			sprintf(testBuffer2 + (i * 2), "%02X", testBuffer[i-del_size]);
+//		}
+//		i++;
 //	}
-//
-//	PRINT_STRING_UART(testBuffer2);
 
 	/* USER CODE END 1 */
 
@@ -411,58 +381,77 @@ int main(void) {
 	//Turn on LED1 to indicate program starting
 	HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_SET);
 
-	//Clear Memory before using memory
-	MEM_CLEAR(addr);
+	MEM_CLEAR(hspi1, addr);
+	strcpy((char*) spiTxBuffer, "Testing Modularity!");
 
-	//Read the Status Register and store it in the corresponding buffer
-	READ_STATUS_REGISTER(spiRxBuffer);
-
-	// Clear 1 sector starting from 0x0
-	// Note how I am sending 3 bytes from addr,
-	// This is because the Sector Erase requires a 3 byte address
-
-	ENABLE_WREN();
-	PULL_CS();
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_SECTOR_ERASE, 1, 100);
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
-	SET_CS();
-
-	wip = 1;
-	while (wip) {
-		READ_STATUS_REGISTER(spiRxBuffer);
-
-		wip = spiRxBuffer[0] & 1;
+	if (WRITE(hspi1, spiTxBuffer) == 0) {
+		PRINT_STRING_UART("Written successfully");
+	} else {
+		PRINT_STRING_UART("Error Occurred during writing");
 	}
 
-	// Write data
-	ENABLE_WREN();
-
-//	strcpy((char*) spiTxBuffer, "jhbgtyty 654646");
-	strcpy((char*) spiTxBuffer, testBuffer2);
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET);
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WRITE, 1, 100);
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) &spiTxBuffer, 100, 100);
-	SET_CS();
-
-	wip = 1;
-	while (wip) {
-		READ_STATUS_REGISTER(spiRxBuffer);
-
-		wip = spiRxBuffer[0] & 1;
+	if (READ(hspi1, spiRxBuffer) == 0) {
+		PRINT_STRING_UART("Data Read Successfully");
+		PRINT_STRING_UART(spiRxBuffer);
+	} else {
+		PRINT_STRING_UART("Error Occurred during Reading");
 	}
-
-	// Read
-	PULL_CS();
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_READ, 1, 100);
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
-	HAL_SPI_Receive(&hspi1, (uint8_t*) spiRxBuffer, 100, 100);
-	SET_CS();
-
-	PRINT_STRING_UART(spiRxBuffer);
 
 	// Turn off LED
 	HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_RESET);
+
+//
+//	//Clear Memory before using memory
+//	MEM_CLEAR(hspi1, addr);
+//
+//	//Read the Status Register and store it in the corresponding buffer
+//	READ_STATUS_REGISTER(hspi1, spiRxBuffer);
+//
+//	// Clear 1 sector starting from 0x0
+//	// Note how I am sending 3 bytes from addr,
+//	// This is because the Sector Erase requires a 3 byte address
+//
+//	ENABLE_WREN(hspi1);
+//	PULL_CS();
+//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_SECTOR_ERASE, 1, 100);
+//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
+//	SET_CS();
+//
+//	wip = 1;
+//	while (wip) {
+//		READ_STATUS_REGISTER(hspi1, spiRxBuffer);
+//
+//		wip = spiRxBuffer[0] & 1;
+//	}
+//
+//	// Write data
+//	ENABLE_WREN(hspi1);
+//
+////	strcpy((char*) spiTxBuffer, "jhbgtyty 654646");
+//	strcpy((char*) spiTxBuffer, testBuffer2);
+//	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET);
+//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WRITE, 1, 100);
+//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
+//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &spiTxBuffer, 100, 100);
+//	SET_CS();
+//
+//	wip = 1;
+//	while (wip) {
+//		READ_STATUS_REGISTER(hspi1, spiRxBuffer);
+//
+//		wip = spiRxBuffer[0] & 1;
+//	}
+//
+//	// Read
+//	PULL_CS();
+//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_READ, 1, 100);
+//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
+//	HAL_SPI_Receive(&hspi1, (uint8_t*) spiRxBuffer, 100, 100);
+//	SET_CS();
+//
+//	PRINT_STRING_UART(spiRxBuffer);
+//
+
 
 	/* USER CODE END 2 */
 
@@ -1022,20 +1011,6 @@ static void MX_GPIO_Init(void) {
 
 /* USER CODE BEGIN 4 */
 
-void PULL_CS() {
-//	// same as memory_bank_counter % 8
-//	uint8_t mem_bank = (memory_bank_counter & 0x7);
-//	uint8_t lsb = mem_bank & 0x1;
-//	uint8_t middle_bit = mem_bank & 0x2;
-//	uint8_t msb = mem_bank & 0x4;
-//
-//	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET); // LSB
-////	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_1, GPIO_PIN_RESET); // Middle Input
-////	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_0, GPIO_PIN_RESET); // MSB
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET); // LSB
-
-}
-
 /*
  * @param expects a char pointer
  * @return Nothing, just prints the string to UART
@@ -1064,78 +1039,11 @@ void PULL_ALL_LOW() {
 }
 
 /*
- * Pull Chip Select High
- *
- * This is the default state of the CS
- */
-void SET_CS() {
-//	// Below is A0
-//	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_SET);
-//	// A1
-////	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_1, GPIO_PIN_SET);
-//////	// A2
-////	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_0, GPIO_PIN_SET);
-
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_SET);
-}
-
-/*
  * Write's new Line to UART
  */
 void PRINT_NEW_LINE() {
 	char buf[] = "\r\n";
 	HAL_UART_Transmit(&huart1, (uint8_t*) buf, strlen(buf), 100);
-}
-/*
- * @param Takes any type of array/pointer, always converts to uint8_t pointer
- * @return Nothing, Reads Status Register, stores value in param
- * Sets Decoder Inputs BeforeHand
- * Pull All Decoder Inputs High After
- *
- */
-void READ_STATUS_REGISTER(void *rxBuf) {
-	PULL_CS();
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_STATREG1, 1, 100);
-	HAL_SPI_Receive(&hspi1, (uint8_t*) rxBuf, 1, 100);
-	SET_CS();
-}
-/*
- * Just Transmit WREN Command
- * Sets Decoder Inputs beforehand
- * Pull all Decoder Inputs High After
- */
-void ENABLE_WREN() {
-	PULL_CS();
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WREN, 1, 100);
-	SET_CS();
-}
-
-/*
- * Just Transmit WRDI Command
- * As noted  in Section 9.3.9 of the Manual,
- * ALL Chip Selects must be pulled high in order for this command
- * to go through
- */
-void ENABLE_WRDI() {
-	SET_CS();
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WRDI, 1, 100);
-
-}
-
-void MEM_CLEAR(void * addr) {
-	ENABLE_WREN();
-
-	PULL_CS();
-	HAL_SPI_Transmit(&hspi1, (uint8_t*)&FLASH_SECTOR_ERASE, 1, 100);
-	HAL_SPI_Transmit(&hspi1, (uint8_t*)&addr, 3, 100);
-	SET_CS();
-
-	uint8_t wip = 1;
-	while (wip) {
-		uint8_t buf[100];
-		READ_STATUS_REGISTER(buf);
-		wip = 1 & buf[0];
-	}
 }
 
 //This function would take the data from OS, and decode it to store it into struct
@@ -1204,14 +1112,16 @@ void CREATE_PACKET_2() {
 
 //Recieve a type of data, and write it into module
 void TEST_WRITE_PACKET(void * addr, void * buffer, packet_type type) {
-	packet_type (*operation)(void *);
+	packet_type (*function)(void *);
 	function = enumFunctions[type];
 	function(buffer);
 }
 
-void TEST_READ_PACKET(void * buffer, ) {
+void TEST_READ_PACKET(void * buffer) {
 
 }
+
+
 //static void init_DecoderInputs(DecoderInput * LSB, DecoderInput * MiddleBit, DecoderInput * MSB) {
 ////		LSB->ACTIVE_STATE, MiddleBit->ACTIVE_STATE, MSB->ACTIVE_STATE = 0;
 ////		LSB->INACTIVE_STATE, MiddleBit->INACTIVE_STATE, MSB->INACTIVE_STATE = 1;
