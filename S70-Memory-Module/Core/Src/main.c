@@ -55,7 +55,6 @@ typedef struct basicInfo {
 	uint8_t addr[3];
 } basicInfo;
 
-
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -174,18 +173,15 @@ static void MX_USART3_UART_Init(void);
 /* USER CODE BEGIN PFP */
 //static void INIT_DECODER_INPUTS(void);
 //static void init_buffer(void);
-
 void PRINT_STRING_UART(void*);
-void PULL_ALL_LOW();
 void SET_CS();
 void PRINT_NEW_LINE();
 void READ_STATUS_REGISTER(void*);
 void ENABLE_WREN();
 void ENABLE_WRDI();
 void PULL_CS();
-void MEM_CLEAR(void *);
-//void basicFunction(char *, char *, uint8_t *);
-void basicFunction(basicInfo * );
+void MEM_CLEAR(uint8_t*);
+void basicFunction(basicInfo*);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -956,17 +952,7 @@ static void MX_GPIO_Init(void) {
 /* USER CODE BEGIN 4 */
 
 void PULL_CS() {
-//	// same as memory_bank_counter % 8
-//	uint8_t mem_bank = (memory_bank_counter & 0x7);
-//	uint8_t lsb = mem_bank & 0x1;
-//	uint8_t middle_bit = mem_bank & 0x2;
-//	uint8_t msb = mem_bank & 0x4;
-//
-//	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET); // LSB
-////	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_1, GPIO_PIN_RESET); // Middle Input
-////	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_0, GPIO_PIN_RESET); // MSB
 	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET); // LSB
-
 }
 
 /*
@@ -981,33 +967,11 @@ void PRINT_STRING_UART(void *string) {
 }
 
 /*
- * Pulls all Chip Selects Low
- * Essentially, accessing Memory bank 0, (000)
- */
-void PULL_ALL_LOW() {
-//	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_RESET);
-	// Below is A0
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET);
-	// A1
-	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_1, GPIO_PIN_RESET);
-	// A2
-	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_0, GPIO_PIN_RESET);
-//	HAL_GPIO_WritePin(FLASH_NCS_A1_GPIO_Port, FLASH_NCS_A1_Pin, GPIO_PIN_RESET);
-//	HAL_GPIO_WritePin(FLASH_NCS_A2_GPIO_Port, FLASH_NCS_A2_Pin, GPIO_PIN_RESET);
-}
-
-/*
  * Pull Chip Select High
  *
  * This is the default state of the CS
  */
 void SET_CS() {
-//	// Below is A0
-//	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_SET);
-//	// A1
-////	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_1, GPIO_PIN_SET);
-//////	// A2
-////	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_0, GPIO_PIN_SET);
 
 	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_SET);
 }
@@ -1055,12 +1019,17 @@ void ENABLE_WRDI() {
 
 }
 
-void MEM_CLEAR(void * addr) {
+
+/*
+ * Clears Memory at the addresses specified in the addr array
+ */
+void MEM_CLEAR(uint8_t *addr) {
+	uint8_t **ptr = &addr;
 	ENABLE_WREN();
 
 	PULL_CS();
-	HAL_SPI_Transmit(&hspi1, (uint8_t*)&FLASH_SECTOR_ERASE, 1, 100);
-	HAL_SPI_Transmit(&hspi1, (uint8_t*)&addr, 3, 100);
+	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_SECTOR_ERASE, 1, 100);
+	HAL_SPI_Transmit(&hspi1, *ptr, 3, 100);
 	SET_CS();
 
 	uint8_t wip = 1;
@@ -1071,82 +1040,54 @@ void MEM_CLEAR(void * addr) {
 	}
 }
 
-void basicFunction(basicInfo * bi) {
-//	char spiRxBuffer[100] = { 0 };
-//	char spiTxBuffer[100] = { 0 };
-//	uint8_t addr[3] = { 0 };
-//	char * spiRxBuffer = bi->spiRxBuffer;
-//	char  * spiTxBuffer = bi->spiTxBuffer;
-//	uint8_t  * addr = bi->addr;
-//		char * spiRxBuffer = bi.spiRxBuffer;
-//		char  * spiTxBuffer = bi.spiTxBuffer;
-//		uint8_t  * addr = bi.addr;
+void basicFunction(basicInfo *bi) {
+
 	uint8_t wip = 0;
 	HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_SET);
 
-//		MEM_CLEAR(addr);
+	MEM_CLEAR(bi->addr);
 
-		ENABLE_WREN();
+	ENABLE_WREN();
 
+	READ_STATUS_REGISTER(bi->spiRxBuffer);
+
+	wip = 1;
+	while (wip) {
 		READ_STATUS_REGISTER(bi->spiRxBuffer);
 
-		wip = 1;
-		while (wip) {
-			READ_STATUS_REGISTER(bi->spiRxBuffer);
+		wip = bi->spiRxBuffer[0] & 1;
+	}
 
-			wip = bi->spiRxBuffer[0] & 1;
-		}
+	// Write data
+	ENABLE_WREN();
 
-			// Clear 1 sector starting from 0x0
-			// Note how I am sending 3 bytes from addr,
-			// This is because the Sector Erase requires a 3 byte address
-			PULL_CS();
-			HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_SECTOR_ERASE, 1, 100);
-			HAL_SPI_Transmit(&hspi1, (uint8_t*) &bi->addr, 3, 100);
-			SET_CS();
+	char *str = someRandomFunc();
+	strcpy((char*) bi->spiTxBuffer, str);
 
-			wip = 1;
-			while (wip) {
-				READ_STATUS_REGISTER(bi->spiRxBuffer);
+	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET);
+	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WRITE, 1, 100);
+	HAL_SPI_Transmit(&hspi1, (uint8_t*) &bi->addr, 3, 100);
+	HAL_SPI_Transmit(&hspi1, (uint8_t*) &bi->spiTxBuffer, 100, 100);
+	SET_CS();
 
-				wip = bi->spiRxBuffer[0] & 1;
-			}
+	wip = 1;
+	while (wip) {
+		READ_STATUS_REGISTER(bi->spiRxBuffer);
 
+		wip = bi->spiRxBuffer[0] & 1;
+	}
 
+	// Read
+	PULL_CS();
+	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_READ, 1, 100);
+	HAL_SPI_Transmit(&hspi1, (uint8_t*) &bi->addr, 3, 100);
+	HAL_SPI_Receive(&hspi1, (uint8_t*) bi->spiRxBuffer, 100, 100);
+	SET_CS();
 
+	PRINT_STRING_UART(bi->spiRxBuffer);
 
-		// Write data
-		ENABLE_WREN();
-
-//		strcpy((char*) spiTxBuffer, "lel, bruv");
-		char * str = someRandomFunc();
-		strcpy((char *) bi->spiTxBuffer, str);
-
-		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET);
-		HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WRITE, 1, 100);
-		HAL_SPI_Transmit(&hspi1, (uint8_t*) &bi->addr, 3, 100);
-		HAL_SPI_Transmit(&hspi1, (uint8_t*) &bi->spiTxBuffer, 100, 100);
-		SET_CS();
-
-		wip = 1;
-		while (wip) {
-			READ_STATUS_REGISTER(bi->spiRxBuffer);
-
-			wip = bi->spiRxBuffer[0] & 1;
-		}
-//		memset(spiRxBuffer, 0, strlen((char*) spiRxBuffer));
-		// Read
-		PULL_CS();
-		HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_READ, 1, 100);
-		HAL_SPI_Transmit(&hspi1, (uint8_t*) &bi->addr, 3, 100);
-		HAL_SPI_Receive(&hspi1, (uint8_t*) bi->spiRxBuffer, 100, 100);
-		SET_CS();
-
-		PRINT_STRING_UART(bi->spiRxBuffer);
-
-		// Turn off LED
-		HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_RESET);
-
+	// Turn off LED
+	HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_RESET);
 
 }
 
