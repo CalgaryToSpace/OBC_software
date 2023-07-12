@@ -95,9 +95,9 @@ static const uint8_t FLASH_SECTOR_ERASE = 0xD8;
 
 void PULL_CS();
 void SET_CS();
-void READ_STATUS_REGISTER(SPI_HandleTypeDef, void *);
-void ENABLE_WREN(SPI_HandleTypeDef);
-void ENABLE_WRDI(SPI_HandleTypeDef);
-void MEM_CLEAR(SPI_HandleTypeDef, void *);
+void READ_STATUS_REGISTER(SPI_HandleTypeDef *, uint8_t *);
+void ENABLE_WREN(SPI_HandleTypeDef *);
+void ENABLE_WRDI(SPI_HandleTypeDef *);
+void MEM_CLEAR(SPI_HandleTypeDef *, uint8_t *);
 
 #endif /* INC_MEMORYUTILITIES_H_ */

@@ -10,6 +10,6 @@
 
 #include "MemoryUtilities.h"
 
-uint8_t READ(SPI_HandleTypeDef hspi1, void * spiRxBuffer);
+uint8_t READ(SPI_HandleTypeDef *hspi1, uint8_t * spiRxBuffer);
 
 #endif /* INC_PACKETREAD_H_ */

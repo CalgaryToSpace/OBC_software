@@ -24,25 +24,31 @@
  * @return - 0 if written successfully
  * 			 1 if an error occurred during writing to memory
  */
-uint8_t WRITE(SPI_HandleTypeDef hspi1, void * packetBuffer) {
+uint8_t WRITE(SPI_HandleTypeDef *hspi1, uint8_t * packetBuffer) {
+	//TEMPORARY ADDRESS VARIABLE TO REPLACE CIRCULAR BUFFER
+	uint8_t addr[3] = {0};
+
+	//Clear the address where writing will be done
+	MEM_CLEAR(hspi1, addr);
+
 	// Buffers for transmitting data, and receiving status register data
-	char spiTxBuffer[100] = {0};
-	char statusRegBuffer[100] = {0};
+	uint8_t spiTxBuffer[100] = {0};
+	uint8_t statusRegBuffer[100] = {0};
 
 	//Enable WREN Command, so that we can write to the memory module
 	ENABLE_WREN(hspi1);
 
-	//Copy the passed buffer data to a char buffer
-	strcpy((char*) spiTxBuffer, packetBuffer);
+	READ_STATUS_REGISTER(hspi1, statusRegBuffer);
 
-	//TEMPORARY ADDRESS VARIABLE TO REPLACE CIRCULAR BUFFER
-	uint8_t addr[3] = {0};
+	//Copy the passed buffer data to a char buffer
+	strcpy((char*) spiTxBuffer, (char*) packetBuffer);
 
 	//Transmit the Data to the Memory Module
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET);
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WRITE, 1, 100);
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) &spiTxBuffer, 100, 100);
+	PULL_CS();
+
+	HAL_SPI_Transmit(hspi1, (uint8_t*) &FLASH_WRITE, 1, 100);
+	HAL_SPI_Transmit(hspi1, (uint8_t*) &addr, 3, 100);
+	HAL_SPI_Transmit(hspi1, (uint8_t*) &spiTxBuffer, 100, 100);
 	SET_CS();
 
 	//Stay in the While loop until writing isn't done

@@ -10,6 +10,6 @@
 
 #include "MemoryUtilities.h"
 
-uint8_t WRITE(SPI_HandleTypeDef hspi1, void * packetBuffer);
+uint8_t WRITE(SPI_HandleTypeDef *hspi1, uint8_t * packetBuffer);
 
 #endif /* INC_PACKETWRITE_H_ */

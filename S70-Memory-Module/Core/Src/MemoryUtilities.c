@@ -6,7 +6,7 @@
  */
 
 #include "MemoryUtilities.h"
-
+#include "DebugUtilities.h"
 /*
  * Chip Select set to LOW
  */
@@ -47,10 +47,10 @@ void SET_CS() {
  * Pull All Decoder Inputs High After
  *
  */
-void READ_STATUS_REGISTER(SPI_HandleTypeDef hspi1, void *rxBuf) {
+void READ_STATUS_REGISTER(SPI_HandleTypeDef *hspi1, uint8_t *rxBuf) {
 	PULL_CS();
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_STATREG1, 1, 100);
-	HAL_SPI_Receive(&hspi1, (uint8_t*) rxBuf, 1, 100);
+	HAL_SPI_Transmit(hspi1, (uint8_t*) &FLASH_STATREG1, 1, 100);
+	HAL_SPI_Receive(hspi1, (uint8_t*) rxBuf, 1, 100);
 	SET_CS();
 }
 
@@ -59,9 +59,9 @@ void READ_STATUS_REGISTER(SPI_HandleTypeDef hspi1, void *rxBuf) {
  * Sets Decoder Inputs beforehand
  * Pull all Decoder Inputs High After
  */
-void ENABLE_WREN(SPI_HandleTypeDef hspi1) {
+void ENABLE_WREN(SPI_HandleTypeDef *hspi1) {
 	PULL_CS();
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WREN, 1, 100);
+	HAL_SPI_Transmit(hspi1, (uint8_t*) &FLASH_WREN, 1, 100);
 	SET_CS();
 }
 
@@ -71,9 +71,9 @@ void ENABLE_WREN(SPI_HandleTypeDef hspi1) {
  * ALL Chip Selects must be pulled high in order for this command
  * to go through
  */
-void ENABLE_WRDI(SPI_HandleTypeDef hspi1) {
+void ENABLE_WRDI(SPI_HandleTypeDef *hspi1) {
 	SET_CS();
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WRDI, 1, 100);
+	HAL_SPI_Transmit(hspi1, (uint8_t*) &FLASH_WRDI, 1, 100);
 }
 
 /*
@@ -81,17 +81,19 @@ void ENABLE_WRDI(SPI_HandleTypeDef hspi1) {
  * The function takes an address and clears the memory in that address
  * We wait until the clearing is done and then end the function
  */
-void MEM_CLEAR(SPI_HandleTypeDef hspi1, void * addr) {
+void MEM_CLEAR(SPI_HandleTypeDef *hspi1, uint8_t * addr) {
 	ENABLE_WREN(hspi1);
 
+	uint8_t **ptr = &addr;
+
 	PULL_CS();
-	HAL_SPI_Transmit(&hspi1, (uint8_t*)&FLASH_SECTOR_ERASE, 1, 100);
-	HAL_SPI_Transmit(&hspi1, (uint8_t*)&addr, 3, 100);
+	HAL_SPI_Transmit(hspi1, (uint8_t*)&FLASH_SECTOR_ERASE, 1, 100);
+	HAL_SPI_Transmit(hspi1, (uint8_t*)*ptr, 3, 100);
 	SET_CS();
 
 	uint8_t wip = 1;
 	while (wip) {
-		uint8_t buf[100];
+		uint8_t buf[10];
 		READ_STATUS_REGISTER(hspi1, buf);
 		wip = 1 & buf[0];
 	}

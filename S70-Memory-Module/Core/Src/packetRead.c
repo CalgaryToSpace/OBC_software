@@ -22,17 +22,21 @@
  * @return - 0 if read successfully
  * 			 1 if an error occurred during writing to memory
  */
-uint8_t READ(SPI_HandleTypeDef hspi1, void * spiRxBuffer) {
+uint8_t READ(SPI_HandleTypeDef *hspi1, uint8_t * spiRxBuffer) {
 
 	//TEMPORARY ADDRESS VARIABLE TO REPLACE CIRCULAR BUFFER
 	uint8_t addr[3] = {0};
 
+	char buffer[100] = {0};
+
 	//Set Chip select to LOW and read from the address and store data in given buffer
 	PULL_CS();
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_READ, 1, 100);
-	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
-	HAL_SPI_Receive(&hspi1, (uint8_t*) spiRxBuffer, 100, 100);
+	HAL_SPI_Transmit(hspi1, (uint8_t*) &FLASH_READ, 1, 100);
+	HAL_SPI_Transmit(hspi1, (uint8_t*) &addr, 3, 100);
+	HAL_SPI_Receive(hspi1, (uint8_t*) spiRxBuffer, 100, 100);
 	SET_CS();
+
+	strcpy((char*) buffer, spiRxBuffer);
 
 	return 0;
 }

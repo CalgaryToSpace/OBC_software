@@ -26,6 +26,7 @@
 
 #include "PacketEnum.h"
 #include "MemoryUtilities.h"
+#include "DebugUtilities.h"
 #include "PacketRead.h"
 #include "PacketWrite.h"
 /* USER CODE END Includes */
@@ -78,7 +79,7 @@ SPI_HandleTypeDef hspi1;
 TIM_HandleTypeDef htim15;
 
 UART_HandleTypeDef huart4;
-UART_HandleTypeDef huart1;
+//UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
 
@@ -154,7 +155,7 @@ static void MX_I2C3_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_TIM15_Init(void);
 static void MX_UART4_Init(void);
-static void MX_USART1_UART_Init(void);
+//static void MX_USART1_UART_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_USART3_UART_Init(void);
 /* USER CODE BEGIN PFP */
@@ -373,7 +374,7 @@ int main(void) {
 	MX_SPI1_Init();
 	MX_TIM15_Init();
 	MX_UART4_Init();
-	MX_USART1_UART_Init();
+//	MX_USART1_UART_Init();
 	MX_USART2_UART_Init();
 	MX_USART3_UART_Init();
 	/* USER CODE BEGIN 2 */
@@ -381,16 +382,21 @@ int main(void) {
 	//Turn on LED1 to indicate program starting
 	HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_SET);
 
-	MEM_CLEAR(hspi1, addr);
-	strcpy((char*) spiTxBuffer, "Testing Modularity!");
+	//Copying the data to write in spiTxBuffer
+	strcpy((char*) spiTxBuffer, "Why do we need to call MEM_CLEAR twice");
 
-	if (WRITE(hspi1, spiTxBuffer) == 0) {
+	//Clear the address where writing will be done
+	MEM_CLEAR(&hspi1, addr);
+
+	//Calling the WRITE function and making sure it's successful
+	if (WRITE(&hspi1, (uint8_t*) spiTxBuffer) == 0) {
 		PRINT_STRING_UART("Written successfully");
 	} else {
 		PRINT_STRING_UART("Error Occurred during writing");
 	}
 
-	if (READ(hspi1, spiRxBuffer) == 0) {
+	//Calling the READ function and making sure it's successful
+	if (READ(&hspi1, (uint8_t*) spiRxBuffer) == 0) {
 		PRINT_STRING_UART("Data Read Successfully");
 		PRINT_STRING_UART(spiRxBuffer);
 	} else {
@@ -411,7 +417,7 @@ int main(void) {
 //	// Note how I am sending 3 bytes from addr,
 //	// This is because the Sector Erase requires a 3 byte address
 //
-//	ENABLE_WREN(hspi1);
+//	ENABLE_WREN(&hspi1);
 //	PULL_CS();
 //	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_SECTOR_ERASE, 1, 100);
 //	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
@@ -419,16 +425,16 @@ int main(void) {
 //
 //	wip = 1;
 //	while (wip) {
-//		READ_STATUS_REGISTER(hspi1, spiRxBuffer);
+//		READ_STATUS_REGISTER(&hspi1, spiRxBuffer);
 //
 //		wip = spiRxBuffer[0] & 1;
 //	}
 //
 //	// Write data
-//	ENABLE_WREN(hspi1);
+//	ENABLE_WREN(&hspi1);
 //
-////	strcpy((char*) spiTxBuffer, "jhbgtyty 654646");
-//	strcpy((char*) spiTxBuffer, testBuffer2);
+//	strcpy((char*) spiTxBuffer, "Does it work now??");
+////	strcpy((char*) spiTxBuffer, testBuffer2);
 //	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET);
 //	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WRITE, 1, 100);
 //	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
@@ -437,10 +443,20 @@ int main(void) {
 //
 //	wip = 1;
 //	while (wip) {
-//		READ_STATUS_REGISTER(hspi1, spiRxBuffer);
+//		READ_STATUS_REGISTER(&hspi1, (uint8_t*)spiRxBuffer);
 //
 //		wip = spiRxBuffer[0] & 1;
 //	}
+//
+//	if (READ(&hspi1, (uint8_t*) spiRxBuffer) == 0) {
+//		PRINT_STRING_UART("Data Read Successfully");
+//		PRINT_STRING_UART(spiRxBuffer);
+//	} else {
+//		PRINT_STRING_UART("Error Occurred during Reading");
+//	}
+//
+//	// Turn off LED
+//	HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_RESET);
 //
 //	// Read
 //	PULL_CS();
@@ -791,45 +807,45 @@ static void MX_UART4_Init(void) {
  * @param None
  * @retval None
  */
-static void MX_USART1_UART_Init(void) {
-
-	/* USER CODE BEGIN USART1_Init 0 */
-
-	/* USER CODE END USART1_Init 0 */
-
-	/* USER CODE BEGIN USART1_Init 1 */
-
-	/* USER CODE END USART1_Init 1 */
-	huart1.Instance = USART1;
-	huart1.Init.BaudRate = 115200;
-	huart1.Init.WordLength = UART_WORDLENGTH_8B;
-	huart1.Init.StopBits = UART_STOPBITS_1;
-	huart1.Init.Parity = UART_PARITY_NONE;
-	huart1.Init.Mode = UART_MODE_TX_RX;
-	huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-	huart1.Init.OverSampling = UART_OVERSAMPLING_16;
-	huart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-	huart1.Init.ClockPrescaler = UART_PRESCALER_DIV1;
-	huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-	if (HAL_UART_Init(&huart1) != HAL_OK) {
-		Error_Handler();
-	}
-	if (HAL_UARTEx_SetTxFifoThreshold(&huart1, UART_TXFIFO_THRESHOLD_1_8)
-			!= HAL_OK) {
-		Error_Handler();
-	}
-	if (HAL_UARTEx_SetRxFifoThreshold(&huart1, UART_RXFIFO_THRESHOLD_1_8)
-			!= HAL_OK) {
-		Error_Handler();
-	}
-	if (HAL_UARTEx_DisableFifoMode(&huart1) != HAL_OK) {
-		Error_Handler();
-	}
-	/* USER CODE BEGIN USART1_Init 2 */
-
-	/* USER CODE END USART1_Init 2 */
-
-}
+//static void MX_USART1_UART_Init(void) {
+//
+//	/* USER CODE BEGIN USART1_Init 0 */
+//
+//	/* USER CODE END USART1_Init 0 */
+//
+//	/* USER CODE BEGIN USART1_Init 1 */
+//
+//	/* USER CODE END USART1_Init 1 */
+//	huart1.Instance = USART1;
+//	huart1.Init.BaudRate = 115200;
+//	huart1.Init.WordLength = UART_WORDLENGTH_8B;
+//	huart1.Init.StopBits = UART_STOPBITS_1;
+//	huart1.Init.Parity = UART_PARITY_NONE;
+//	huart1.Init.Mode = UART_MODE_TX_RX;
+//	huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+//	huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+//	huart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+//	huart1.Init.ClockPrescaler = UART_PRESCALER_DIV1;
+//	huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+//	if (HAL_UART_Init(&huart1) != HAL_OK) {
+//		Error_Handler();
+//	}
+//	if (HAL_UARTEx_SetTxFifoThreshold(&huart1, UART_TXFIFO_THRESHOLD_1_8)
+//			!= HAL_OK) {
+//		Error_Handler();
+//	}
+//	if (HAL_UARTEx_SetRxFifoThreshold(&huart1, UART_RXFIFO_THRESHOLD_1_8)
+//			!= HAL_OK) {
+//		Error_Handler();
+//	}
+//	if (HAL_UARTEx_DisableFifoMode(&huart1) != HAL_OK) {
+//		Error_Handler();
+//	}
+//	/* USER CODE BEGIN USART1_Init 2 */
+//
+//	/* USER CODE END USART1_Init 2 */
+//
+//}
 
 /**
  * @brief USART2 Initialization Function
@@ -1015,12 +1031,6 @@ static void MX_GPIO_Init(void) {
  * @param expects a char pointer
  * @return Nothing, just prints the string to UART
  */
-void PRINT_STRING_UART(void *string) {
-//	char *buff = (char*) string;
-	HAL_UART_Transmit(&huart1, (uint8_t*) string, strlen((char*) string), 100);
-	PRINT_NEW_LINE();
-//	memset(string, 0, strlen((char*) string));
-}
 
 /*
  * Pulls all Chip Selects Low
@@ -1041,10 +1051,7 @@ void PULL_ALL_LOW() {
 /*
  * Write's new Line to UART
  */
-void PRINT_NEW_LINE() {
-	char buf[] = "\r\n";
-	HAL_UART_Transmit(&huart1, (uint8_t*) buf, strlen(buf), 100);
-}
+
 
 //This function would take the data from OS, and decode it to store it into struct
 void DECODE_PACKET_0(void * buffer) {
