@@ -7,6 +7,7 @@
 
 #include "MemoryUtilities.h"
 #include "DebugUtilities.h"
+
 /*
  * Chip Select set to LOW
  */
@@ -81,20 +82,23 @@ void ENABLE_WRDI(SPI_HandleTypeDef *hspi1) {
  * The function takes an address and clears the memory in that address
  * We wait until the clearing is done and then end the function
  */
-void MEM_CLEAR(SPI_HandleTypeDef *hspi1, uint8_t * addr) {
-	ENABLE_WREN(hspi1);
+void MEM_CLEAR(SPI_HandleTypeDef *ptr_hspi1, uint8_t * addr) {
+	ENABLE_WREN(ptr_hspi1);
+	uint8_t statusRegBuffer[50] = {0};
+
+	READ_STATUS_REGISTER(ptr_hspi1, statusRegBuffer);
 
 	uint8_t **ptr = &addr;
 
 	PULL_CS();
-	HAL_SPI_Transmit(hspi1, (uint8_t*)&FLASH_SECTOR_ERASE, 1, 100);
-	HAL_SPI_Transmit(hspi1, (uint8_t*)*ptr, 3, 100);
+	HAL_SPI_Transmit(ptr_hspi1, (uint8_t*)&FLASH_SECTOR_ERASE, 1, 100);
+	HAL_SPI_Transmit(ptr_hspi1, (uint8_t*)*ptr, 3, 100);
 	SET_CS();
 
+	//Stay in the While loop until writing isn't done
 	uint8_t wip = 1;
 	while (wip) {
-		uint8_t buf[10];
-		READ_STATUS_REGISTER(hspi1, buf);
-		wip = 1 & buf[0];
+		READ_STATUS_REGISTER(ptr_hspi1, statusRegBuffer);
+		wip = statusRegBuffer[0] & 1;
 	}
 }

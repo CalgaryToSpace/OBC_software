@@ -93,6 +93,12 @@ static const uint8_t FLASH_ERCP = 0xC7;
 static const uint8_t FLASH_STATREG1 = 0X05;
 static const uint8_t FLASH_SECTOR_ERASE = 0xD8;
 
+typedef struct CircularBuffer {
+	uint32_t head;
+	uint32_t tail;
+	uint16_t count;
+} CircularBuffer;
+
 void PULL_CS();
 void SET_CS();
 void READ_STATUS_REGISTER(SPI_HandleTypeDef *, uint8_t *);

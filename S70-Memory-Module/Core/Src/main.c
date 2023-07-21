@@ -27,8 +27,7 @@
 #include "PacketEnum.h"
 #include "MemoryUtilities.h"
 #include "DebugUtilities.h"
-#include "PacketRead.h"
-#include "PacketWrite.h"
+#include "packetReadWrite.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -39,20 +38,6 @@ typedef struct DecoderInput {
 	uint8_t State;
 
 } DecoderInput;
-
-typedef struct CircularBuffer {
-//	uint64_t size;
-	uint8_t data[128];
-	uint16_t head;
-	uint16_t tail;
-	uint16_t count;
-// add counter for which of 1 out 8 memory modules we are in
-// the buffersize should be changed to be the size of 1 module
-// every time it passes it, this variable gets updated by mod 8
-
-// receive stream of data, must turn into packet of some size (established soon)
-
-} CircularBuffer;
 
 /* USER CODE END PTD */
 
@@ -94,8 +79,6 @@ const uint8_t ACTIVE_STATE = 0;
 //static DecoderInput A0;
 //static DecoderInput A1;
 //static DecoderInput A2;
-
-static CircularBuffer cb;
 
 /***************************************
  * 	Look at Pages 75, 76, 77
@@ -196,12 +179,12 @@ void TEST_WRITE_PACKET(void *, void *, packet_type);
 //		cb->tail = 0;
 //		cb->count = 0;
 //	}
-bool is_empty(void) {
-	return cb.count == 0;
-}
-bool is_full(void) {
-	return cb.count == BUFFER_SIZE;
-}
+//bool is_empty(void) {
+//	return cb.count == 0;
+//}
+//bool is_full(void) {
+//	return cb.count == BUFFER_SIZE;
+//}
 
 /*
  * This to write data to memory
@@ -303,7 +286,7 @@ int main(void) {
 //	memset(testBuffer, 0x0, 100);
 //	memset(testBuffer2, 0x0, 100);
 //
-	uint8_t addr[3] = {0};
+//	uint8_t addr[3] = {0};
 //	uint8_t wip;
 //
 //	tel t;
@@ -382,11 +365,29 @@ int main(void) {
 	//Turn on LED1 to indicate program starting
 	HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_SET);
 
-	//Copying the data to write in spiTxBuffer
-	strcpy((char*) spiTxBuffer, "Why do we need to call MEM_CLEAR twice");
+	//Initialize the circular buffer with default values
+	INITIALIZE();
 
-	//Clear the address where writing will be done
-	MEM_CLEAR(&hspi1, addr);
+	//Copying the data to write in spiTxBuffer
+	strcpy((char*) spiTxBuffer, "First String has Symbols !@#");
+
+	//Calling the WRITE function and making sure it's successful
+	if (WRITE(&hspi1, (uint8_t*) spiTxBuffer) == 0) {
+		PRINT_STRING_UART("Written successfully");
+	} else {
+		PRINT_STRING_UART("Error Occurred during writing");
+	}
+
+	//Calling the READ function and making sure it's successful
+	if (READ(&hspi1, (uint8_t*) spiRxBuffer) == 0) {
+		PRINT_STRING_UART("Data Read Successfully");
+		PRINT_STRING_UART(spiRxBuffer);
+	} else {
+		PRINT_STRING_UART("Error Occurred during Reading");
+	}
+
+	//Copying the data to write in spiTxBuffer
+	strcpy((char*) spiTxBuffer, "Second String has Numbers 123");
 
 	//Calling the WRITE function and making sure it's successful
 	if (WRITE(&hspi1, (uint8_t*) spiTxBuffer) == 0) {
