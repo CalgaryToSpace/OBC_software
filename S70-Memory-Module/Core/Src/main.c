@@ -369,7 +369,7 @@ int main(void) {
 	INITIALIZE();
 
 	//Copying the data to write in spiTxBuffer
-	strcpy((char*) spiTxBuffer, "First String has Symbols !@#");
+	strcpy((char*) spiTxBuffer, "Minimum 16 Char");
 
 	//Calling the WRITE function and making sure it's successful
 	if (WRITE(&hspi1, (uint8_t*) spiTxBuffer) == 0) {
@@ -387,7 +387,25 @@ int main(void) {
 	}
 
 	//Copying the data to write in spiTxBuffer
-	strcpy((char*) spiTxBuffer, "Second String has Numbers 123");
+	strcpy((char*) spiTxBuffer, "Second One");
+
+	//Calling the WRITE function and making sure it's successful
+	if (WRITE(&hspi1, (uint8_t*) spiTxBuffer) == 0) {
+		PRINT_STRING_UART("Written successfully");
+	} else {
+		PRINT_STRING_UART("Error Occurred during writing");
+	}
+
+	//Calling the READ function and making sure it's successful
+	if (READ(&hspi1, (uint8_t*) spiRxBuffer) == 0) {
+		PRINT_STRING_UART("Data Read Successfully");
+		PRINT_STRING_UART(spiRxBuffer);
+	} else {
+		PRINT_STRING_UART("Error Occurred during Reading");
+	}
+
+	//Copying the data to write in spiTxBuffer
+	strcpy((char*) spiTxBuffer, "Third time is the charm");
 
 	//Calling the WRITE function and making sure it's successful
 	if (WRITE(&hspi1, (uint8_t*) spiTxBuffer) == 0) {

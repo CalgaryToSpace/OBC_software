@@ -12,13 +12,21 @@
 // Include string header library to use strcpy
 #include <string.h>
 
+// Variables---------------------------------------------------------
+// Circular buffer variable
 CircularBuffer cb;
+
+// Memory Clear Flag for WRITE function to know when to clear flag
+uint8_t clearFlag = 1;
+
+// Variable that keeps track of the number of bytes until next page
+uint16_t bytesUntilNextPage = 512;
 
 // Functions----------------------------------------------------------
 
 void INITIALIZE() {
-	cb.tail = 0;
-	cb.head = 0;
+	cb.tail = 0x000000;
+	cb.head = 0x000000;
 }
 
 /**
@@ -34,27 +42,42 @@ void INITIALIZE() {
  */
 uint8_t WRITE(SPI_HandleTypeDef *hspi1, uint8_t * packetBuffer) {
 	//TEMPORARY ADDRESS VARIABLE TO REPLACE CIRCULAR BUFFER
-	uint8_t addr[3] = {(cb.head >> 8) & 0xFF,(cb.head >> 4) & 0xFF, cb.head & 0xFF};
-
-	if (cb.head % 256 == 0) {
-		//Clear the address where writing will be done
-		MEM_CLEAR(hspi1, addr);
-		MEM_CLEAR(hspi1, addr);
-	}
+	uint8_t addr[3] = {(cb.head >> 16) & 0xFF,(cb.head >> 8) & 0xFF, cb.head & 0xFF};
+//	uint8_t addr[3] = {0x00, 0x00, 0x00};
 
 	// Buffers for transmitting data, and receiving status register data
-	uint8_t spiTxBuffer[100] = {0};
+	uint8_t spiTxBuffer[512] = {0};
+	uint8_t backupBuffer[511] = {0};
 	uint8_t statusRegBuffer[50] = {0};
 
-	//Enable WREN Command, so that we can write to the memory module
-	ENABLE_WREN(hspi1);
-
-	READ_STATUS_REGISTER(hspi1, statusRegBuffer);
-
+	// Variable to store the packet size
 	size_t packetSize = 0;
+
+	// Variable used to store data in the backup buffer
+	uint8_t backupIndex = 0;
+
+	// Calculate the packet size while adding data to buffer
 	while (packetBuffer[packetSize] != '\0' && packetSize < sizeof(spiTxBuffer)) {
-	    spiTxBuffer[packetSize] = packetBuffer[packetSize];
-	    packetSize++;
+		if (bytesUntilNextPage == 0) {
+			backupBuffer[backupIndex] = packetBuffer[packetSize];
+			backupIndex++;
+			packetSize++;
+		} else {
+			spiTxBuffer[packetSize] = packetBuffer[packetSize];
+			packetSize++;
+			bytesUntilNextPage--;
+		}
+	}
+
+	// Set packet size to data size being written this iteration
+	packetSize -= backupIndex;
+
+	// Clear the address where writing will be done when the clearFlag is 1
+	if (clearFlag == 1) {
+		clearFlag = 0;
+
+		MEM_CLEAR(hspi1, addr);
+		MEM_CLEAR(hspi1, addr);
 	}
 
 //	//Copy the passed buffer data to a char buffer
@@ -63,26 +86,46 @@ uint8_t WRITE(SPI_HandleTypeDef *hspi1, uint8_t * packetBuffer) {
 //	//Size of the packet
 //	uint8_t packetSize = sizeof(spiTxBuffer);
 
+	//Enable WREN Command, so that we can write to the memory module
+	ENABLE_WREN(hspi1);
+
+//	READ_STATUS_REGISTER(hspi1, statusRegBuffer);
+
 	//Transmit the Data to the Memory Module
 	PULL_CS();
-
 	HAL_SPI_Transmit(hspi1, (uint8_t*) &FLASH_WRITE, 1, 100);
 	HAL_SPI_Transmit(hspi1, (uint8_t*) &addr, 3, 100);
-	HAL_SPI_Transmit(hspi1, (uint8_t*) &spiTxBuffer, 100, 100);
+	HAL_SPI_Transmit(hspi1, (uint8_t*) &spiTxBuffer, packetSize, 100);
 	SET_CS();
 
 	//Update the circular buffer
 	cb.tail = cb.head;
-	cb.head += packetSize;
 
-	//Stay in the While loop until writing isn't done
+	//If going over a sector, set clearFlag to 1 for next time
+	if (cb.tail % 0x0003FFFF > (cb.head += packetSize) % 0x0003FFFF) {
+		clearFlag = 1;
+	}
+
+	// Stay in the While loop until writing isn't done
 	uint8_t wip = 1;
+	uint8_t err = 0;
 	while (wip) {
 		READ_STATUS_REGISTER(hspi1, statusRegBuffer);
 		wip = statusRegBuffer[0] & 1;
+		err = statusRegBuffer[0] & 3;
+
+		if (err == 1) {
+			err = 1;
+			break;
+		}
 	}
 
-	return 0;
+	// If not all data written to the memory yet
+	if (backupIndex > 0) {
+		WRITE(hspi1, backupBuffer);
+	}
+
+	return err;
 }
 
 // Functions----------------------------------------------------------
@@ -99,14 +142,15 @@ uint8_t WRITE(SPI_HandleTypeDef *hspi1, uint8_t * packetBuffer) {
  */
 uint8_t READ(SPI_HandleTypeDef *hspi1, uint8_t * spiRxBuffer) {
 
-	//TEMPORARY ADDRESS VARIABLE TO REPLACE CIRCULAR BUFFER
-	uint8_t addr[3] = {(cb.tail >> 8) & 0xFF,(cb.tail >> 4) & 0xFF, cb.tail & 0xFF};
+	// TEMPORARY ADDRESS VARIABLE TO REPLACE CIRCULAR BUFFER
+	uint8_t addr[3] = {(cb.tail >> 16) & 0xFF,(cb.tail >> 8) & 0xFF, cb.tail & 0xFF};
+//	uint8_t addr[3] = {0x00, 0x00, 0x00};
 
-	//Set Chip select to LOW and read from the address and store data in given buffer
+	// Set Chip select to LOW and read from the address and store data in given buffer
 	PULL_CS();
 	HAL_SPI_Transmit(hspi1, (uint8_t*) &FLASH_READ, 1, 100);
 	HAL_SPI_Transmit(hspi1, (uint8_t*) &addr, 3, 100);
-	HAL_SPI_Receive(hspi1, (uint8_t*) spiRxBuffer, 100, 100);
+	HAL_SPI_Receive(hspi1, (uint8_t*) spiRxBuffer, cb.head - cb.tail, 100);
 	SET_CS();
 
 	return 0;

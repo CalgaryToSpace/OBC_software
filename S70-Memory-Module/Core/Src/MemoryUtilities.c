@@ -62,8 +62,25 @@ void READ_STATUS_REGISTER(SPI_HandleTypeDef *hspi1, uint8_t *rxBuf) {
  */
 void ENABLE_WREN(SPI_HandleTypeDef *hspi1) {
 	PULL_CS();
-	HAL_SPI_Transmit(hspi1, (uint8_t*) &FLASH_WREN, 1, 100);
+	if (HAL_SPI_Transmit(hspi1, (uint8_t*) &FLASH_WREN, 1, HAL_MAX_DELAY) != HAL_OK) {
+		PRINT_STRING_UART("Timeout when enabling WREN");
+	}
 	SET_CS();
+
+	uint8_t statusRegBuffer[10] = {0};
+
+	uint8_t wip = 1;
+	while (wip) {
+		READ_STATUS_REGISTER(hspi1, statusRegBuffer);
+		wip = statusRegBuffer[0] & 1;
+	}
+
+//	//Stay in the While loop until writing isn't done
+//	uint8_t wel = 0;
+//	while (!wel) {
+//		READ_STATUS_REGISTER(hspi1, statusRegBuffer);
+//		wel = statusRegBuffer[0] & 2;
+//	}
 }
 
 /*
@@ -75,6 +92,14 @@ void ENABLE_WREN(SPI_HandleTypeDef *hspi1) {
 void ENABLE_WRDI(SPI_HandleTypeDef *hspi1) {
 	SET_CS();
 	HAL_SPI_Transmit(hspi1, (uint8_t*) &FLASH_WRDI, 1, 100);
+
+	uint8_t statusRegBuffer[50] = {0};
+	//Stay in the While loop until writing isn't done
+	uint8_t wel = 1;
+	while (wel) {
+		READ_STATUS_REGISTER(hspi1, statusRegBuffer);
+		wel = statusRegBuffer[0] & 2;
+	}
 }
 
 /*
@@ -84,9 +109,6 @@ void ENABLE_WRDI(SPI_HandleTypeDef *hspi1) {
  */
 void MEM_CLEAR(SPI_HandleTypeDef *ptr_hspi1, uint8_t * addr) {
 	ENABLE_WREN(ptr_hspi1);
-	uint8_t statusRegBuffer[50] = {0};
-
-	READ_STATUS_REGISTER(ptr_hspi1, statusRegBuffer);
 
 	uint8_t **ptr = &addr;
 
@@ -95,10 +117,17 @@ void MEM_CLEAR(SPI_HandleTypeDef *ptr_hspi1, uint8_t * addr) {
 	HAL_SPI_Transmit(ptr_hspi1, (uint8_t*)*ptr, 3, 100);
 	SET_CS();
 
+	uint8_t statusRegBuffer[50] = {0};
+
 	//Stay in the While loop until writing isn't done
 	uint8_t wip = 1;
+	uint8_t err = 0;
 	while (wip) {
 		READ_STATUS_REGISTER(ptr_hspi1, statusRegBuffer);
 		wip = statusRegBuffer[0] & 1;
+		err = statusRegBuffer[2] & 2;
+		if (err == 1) {
+			PRINT_STRING_UART("Error during Erasing");
+		}
 	}
 }
