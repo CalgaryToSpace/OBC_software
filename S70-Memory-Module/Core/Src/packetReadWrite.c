@@ -122,6 +122,7 @@ uint8_t WRITE(SPI_HandleTypeDef *hspi1, uint8_t * packetBuffer) {
 
 	// If not all data written to the memory yet
 	if (backupIndex > 0) {
+		bytesUntilNextPage = 512;
 		WRITE(hspi1, backupBuffer);
 	}
 

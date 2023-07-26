@@ -276,8 +276,8 @@ void *enumFunctions[] = {CREATE_PACKET_0, CREATE_PACKET_1, CREATE_PACKET_2};
 int main(void) {
 	/* USER CODE BEGIN 1 */
 
-	char spiRxBuffer[100] = {0};
-	char spiTxBuffer[100] = {0};
+	char spiRxBuffer[512] = {0};
+	char spiTxBuffer[512] = {0};
 //	char statusRegBuffer[9] = {0};
 //
 //	char testBuffer[100] = {0};
@@ -368,8 +368,10 @@ int main(void) {
 	//Initialize the circular buffer with default values
 	INITIALIZE();
 
-	//Copying the data to write in spiTxBuffer
-	strcpy((char*) spiTxBuffer, "Minimum 16 Char");
+	//Copying the data to write in spiTxBuffer - 250 chars
+	strcpy((char*) spiTxBuffer, "Minimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 Char"
+			"Minimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 Char"
+			"Minimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 Char1234567890");
 
 	//Calling the WRITE function and making sure it's successful
 	if (WRITE(&hspi1, (uint8_t*) spiTxBuffer) == 0) {
@@ -386,8 +388,13 @@ int main(void) {
 		PRINT_STRING_UART("Error Occurred during Reading");
 	}
 
-	//Copying the data to write in spiTxBuffer
-	strcpy((char*) spiTxBuffer, "Second One");
+	//Clear the buffer after reading
+	memset(spiRxBuffer, 0, strlen((char*) spiRxBuffer));
+
+	//Copying the data to write in spiTxBuffer - 250
+	strcpy((char*) spiTxBuffer, "Second OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond One"
+			"Second OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond One"
+			"Second OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond One");
 
 	//Calling the WRITE function and making sure it's successful
 	if (WRITE(&hspi1, (uint8_t*) spiTxBuffer) == 0) {
@@ -404,8 +411,11 @@ int main(void) {
 		PRINT_STRING_UART("Error Occurred during Reading");
 	}
 
+	//Clear the buffer after reading
+	memset(spiRxBuffer, 0, strlen((char*) spiRxBuffer));
+
 	//Copying the data to write in spiTxBuffer
-	strcpy((char*) spiTxBuffer, "Third time is the charm");
+	strcpy((char*) spiTxBuffer, "Third time i-s the charm");
 
 	//Calling the WRITE function and making sure it's successful
 	if (WRITE(&hspi1, (uint8_t*) spiTxBuffer) == 0) {
@@ -421,6 +431,9 @@ int main(void) {
 	} else {
 		PRINT_STRING_UART("Error Occurred during Reading");
 	}
+
+	//Clear the buffer after reading
+	memset(spiRxBuffer, 0, strlen((char*) spiRxBuffer));
 
 	// Turn off LED
 	HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_RESET);
