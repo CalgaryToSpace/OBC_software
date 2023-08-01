@@ -5,11 +5,20 @@
  *      Author: Saksham Puri
  */
 
+// Includes----------------------------------------------------------
+// Includes Memory Utilities and String header files
 #include "MemoryUtilities.h"
 #include "string.h"
 
+// Variables---------------------------------------------------------
+// huart1 to use the UART protocol for debugging purposes
 UART_HandleTypeDef huart1;
+
+//variable to check if above UART variable has been initialized or not
 uint8_t initialized = 0;
+
+// Functions----------------------------------------------------------
+
 /**
  * @brief USART1 Initialization Function
  * @param None
@@ -54,16 +63,21 @@ static void MX_USART1_UART_Init(void) {
 	/* USER CODE END USART1_Init 2 */
 }
 
+//Function to print a new line (\n) in UART
 void PRINT_NEW_LINE() {
 	char buf[] = "\r\n";
 	HAL_UART_Transmit(&huart1, (uint8_t*) buf, strlen(buf), 100);
 }
 
+//Function to print a given string to UART
 void PRINT_STRING_UART(void *string) {
+
+	//If UART variable not initialized, initialize the variable
 	if (initialized == 0) {
 		MX_USART1_UART_Init();
 		initialized = 1;
 	}
+
 //	char *buff = (char*) string;
 	HAL_UART_Transmit(&huart1, (uint8_t*) string, strlen((char*) string), 100);
 	PRINT_NEW_LINE();

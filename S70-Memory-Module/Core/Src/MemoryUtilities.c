@@ -5,6 +5,8 @@
  *      Author: Saksham Puri
  */
 
+// Includes----------------------------------------------------------
+// Include header libraries for commands, functions, and pin Names and debugging
 #include "MemoryUtilities.h"
 #include "DebugUtilities.h"
 
@@ -74,13 +76,6 @@ void ENABLE_WREN(SPI_HandleTypeDef *hspi1) {
 		READ_STATUS_REGISTER(hspi1, statusRegBuffer);
 		wip = statusRegBuffer[0] & 1;
 	}
-
-//	//Stay in the While loop until writing isn't done
-//	uint8_t wel = 0;
-//	while (!wel) {
-//		READ_STATUS_REGISTER(hspi1, statusRegBuffer);
-//		wel = statusRegBuffer[0] & 2;
-//	}
 }
 
 /*
