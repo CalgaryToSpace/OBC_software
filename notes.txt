@@ -1,0 +1,4 @@
+In order to run test from the command line, first build the files
+then you can run the following command from the root of the folder:
+
+build/test/Debug/ExampleTests.exe
