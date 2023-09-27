@@ -97,6 +97,15 @@ def start_mpi_simulator(ser, mode):
 
                     print('Frames sent!')
 
+            # Test TC HV_SET_FACEPLATE_VOLTAGE
+            elif rx[0] == 84 and rx[1] == 67 and rx[2] == 4:
+                print('Received HV_SET_FACEPLATE_VOLTAGE TC')
+                echo = rx[:]
+                echo.append(1)
+                ser.write(bytes(echo))
+                print('Setting Faceplate Voltage to: ' + str(rx[3]))
+                print('Sending success echo: ' + str(echo))
+
             # unknown TC!!!
             elif rx[0] == 84 and rx[1] == 67:  # if its a TC
                 print('Unknown TC... sending failed Echo')
