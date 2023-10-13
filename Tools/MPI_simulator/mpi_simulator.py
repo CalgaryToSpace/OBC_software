@@ -16,7 +16,8 @@ def load_sample_data(file):
         byte = sample_telemetry_data_bin.read(1)
 
     for frame_number in range(0, len(all_bytes_ls) // 160):
-        sample_telemetry_data_ls.append(all_bytes_ls[frame_number * 160:(frame_number + 1) * 160])
+        sample_telemetry_data_ls.append(
+            all_bytes_ls[frame_number * 160:(frame_number + 1) * 160])
 
     return sample_telemetry_data_ls
 
@@ -47,7 +48,8 @@ def listen(ser):
 
 def start_mpi_simulator(ser, mode):
     print('Loading test data')
-    test_data = load_sample_data('CalgaryToSpace_Satellite1_MPI_Telemery_Example_ICD_V1.1.bin')
+    test_data = load_sample_data(
+        'CalgaryToSpace_Satellite1_MPI_Telemery_Example_ICD_V1.1.bin')
     print('Test data loaded')
 
     print('Listening for incoming serial messages...')
@@ -69,7 +71,7 @@ def start_mpi_simulator(ser, mode):
             print("**********************************")
 
             # if TC for start sending data
-            if rx[0] == 3 and rx[1] == 1 and rx[2] == 4:
+            if rx[0] == 84 and rx[1] == 67 and rx[2] == 9:
                 if mode == 1:
                     print('Sending success echo')
                     echo = rx[:]
@@ -95,18 +97,15 @@ def start_mpi_simulator(ser, mode):
 
                     print('Frames sent!')
 
-<<<<<<< Updated upstream:Tools/MPI_simulator/mpi_simulator.py
-=======
             # Test TC HV_SET_FACEPLATE_VOLTAGE
             elif rx[0] == 84 and rx[1] == 67 and rx[2] == 4:
                 print('Received HV_SET_FACEPLATE_VOLTAGE TC')
                 echo = rx[:]
                 echo.append(1)
                 ser.write(bytes(echo))
-                #print('Setting Faceplate Voltage to: ' + str(rx[3]))
+                print('Setting Faceplate Voltage to: ' + str(rx[3]))
                 print('Sending success echo: ' + str(echo))
 
->>>>>>> Stashed changes:MPI_simulator/mpi_simulator.py
             # unknown TC!!!
             elif rx[0] == 84 and rx[1] == 67:  # if its a TC
                 print('Unknown TC... sending failed Echo')
@@ -118,8 +117,8 @@ def start_mpi_simulator(ser, mode):
 
 if __name__ == '__main__':
     try:
-        port = 'COM3'
-        ser = serial.Serial(port, 230400, timeout=1)
+        port = "COM5"
+        ser = serial.Serial(port=port, baudrate=230400, timeout=1)
         ser.flush()
         print('Serial port opened')
 
