@@ -23,6 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <string.h>
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -67,7 +68,7 @@ static void MX_DMA_Init(void);
 static void MX_LPUART1_UART_Init(void);
 static void MX_SPI1_Init(void);
 /* USER CODE BEGIN PFP */
-
+uint8_t sendTelecommand(uint8_t commandCode, uint8_t *parameters);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -118,11 +119,8 @@ int main(void)
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
 
-  //turn on frame transmitting TC
-  UART1_txBuffer[0] = 0x54;
-  UART1_txBuffer[1] = 0x43;
-  UART1_txBuffer[2] = 0x9;
-  HAL_UART_Transmit(&hlpuart1, (uint8_t *)UART1_txBuffer, strlen((char*)UART1_txBuffer), 100);
+  // Telecommands without parameters
+  sendTelecommand(4,NULL);
 
   HAL_UART_Receive_DMA(&hlpuart1, UART1_rxBuffer, 160);
 
@@ -383,6 +381,27 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+// Send telecommand without parameters
+// TODO: Add error check
+uint8_t sendTelecommand(uint8_t commandCode, uint8_t *parameters){
+
+	// Turn on frame transmitting TC
+	UART1_txBuffer[0] = 0x54;
+	UART1_txBuffer[1] = 0x43;
+	UART1_txBuffer[2] = commandCode;
+
+	// Command with no parameters detected: Transmit command
+	if(parameters != NULL){
+		UART1_txBuffer[3] = *parameters;
+	}
+
+	// Transmit Telecommand
+	HAL_UART_Transmit(&hlpuart1, (uint8_t *)UART1_txBuffer, strlen((char*)UART1_txBuffer), 100);
+
+	return 1;
+}
+
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *hlpuart1)
 {
 	//if its a data frame
@@ -486,6 +505,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *hlpuart1)
 
     HAL_UART_Receive_DMA(hlpuart1, UART1_rxBuffer, 100);
 }
+
+
 
 /* USER CODE END 4 */
 
