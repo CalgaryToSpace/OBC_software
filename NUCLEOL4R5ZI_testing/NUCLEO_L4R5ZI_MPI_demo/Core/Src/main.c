@@ -120,7 +120,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   // Telecommands without parameters
-  sendTelecommand(4,NULL);
+  uint8_t parameter = 20;
+  sendTelecommand(4,&parameter);
 
   HAL_UART_Receive_DMA(&hlpuart1, UART1_rxBuffer, 160);
 
