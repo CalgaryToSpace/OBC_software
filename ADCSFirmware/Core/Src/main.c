@@ -83,9 +83,6 @@ int main(void)
 
   /* USER CODE END Init */
 
-  // For most of its being, mankind did not know what things are made of, but could only guess. With the growth of worldken, we began to learn, and today we have a beholding of stuff and work that watching bears out, both in the workstead and in daily life.
-
-
   /* Configure the system clock */
   SystemClock_Config();
 
