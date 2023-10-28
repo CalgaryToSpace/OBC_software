@@ -2,7 +2,7 @@
  * adcs_types.h
  *
  *  Created on: Oct 28, 2023
- *      Author: Saksham Puri
+ *      Authors: Saksham Puri, Zachary Uy
  */
 
 #ifndef INC_ADCS_TYPES_H_
@@ -21,7 +21,7 @@
 #define ADCS_START_OF_MESSAGE 0x7F;
 #define ADCS_END_OF_MESSAGE 0xFF;
 
-// Telecommand IDs - Section 6.1.1 Table 9 of Firmware Manual
+// Common Telecommand IDs - Section 6.1.1 Table 9 of Firmware Manual
 #define TC_RESET 1; // must be followed by ADCS_MAGIC_NUMBER to confirm reset
 #define TC_RESET_LOG_POINTER 4;
 #define TC_ADVANCE_LOG_POINTER 5;
@@ -37,7 +37,7 @@
 #define TC_RESET_FILELIST_READ_PTR 118;
 #define TC_INIT_DOWNLOAD_BURST 119;
 
-// Telemetry Frame IDs - Section 6.1.2 Table 26 of Firmware Manual
+// Common Telemetry Frame IDs - Section 6.1.2 Table 26 of Firmware Manual
 #define TLF_IDENTIFICATION 128;
 #define TLF_BOOT_RUNNING_PROGRAM_STATUS 129;
 #define TLF_BOOT_INDEX_STATUS 130;
@@ -50,5 +50,23 @@
 #define TLF_INIT_UPLOAD_COMPLETE 244;
 #define TLF_UPLOAD_BLOCK_COMPLETE 245;
 #define TLF_BLOCK_CHECSUM 246;
+
+// CubeAcp Telecommand IDs - Section 5.3.1 Table 72
+#define DEPLOY_MAGNETOMETER_BOOM 7
+#define ADCS_RUN_MODE 10
+#define CLEAR_ERRORS 12
+#define SET_ATTITUDE_CONTROL_MODE 13
+#define SET_ATTITUDE_ESTIMATION_MODE 14
+#define TRIGGER_ADCS_LOOP 18
+#define TRIGGER_ADCS_LOOP_WITH_SIMULATED_SENSOR_DATA 19
+#define ASGP4_RUN_MODE 31
+#define ASGP4_TRIGGER 32
+#define SET_MODE_OF_MAGNETOMETER_OPERATION 56
+#define CONVERT_TO_JPG_FILE 57
+#define SAVE_IMAGE 80
+#define SET_MAGNETORQUER_OUTPUT 16
+#define SET_WHEEL_SPEED 17
+#define SAVE_CONFIG 63
+#define SAVE_ORBIT_PARAMS 64
 
 #endif /* INC_ADCS_TYPES_H_ */
