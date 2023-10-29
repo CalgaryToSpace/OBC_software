@@ -2,7 +2,7 @@
  * adcs_types.h
  *
  *  Created on: Oct 28, 2023
- *      Authors: Saksham Puri, Zachary Uy
+ *      Authors: Saksham Puri, Zachary Uy, Nadeem Moosa
  */
 
 #ifndef INC_ADCS_TYPES_H_
@@ -49,9 +49,12 @@
 #define TLF_FILE_INFO 243;
 #define TLF_INIT_UPLOAD_COMPLETE 244;
 #define TLF_UPLOAD_BLOCK_COMPLETE 245;
-#define TLF_BLOCK_CHECSUM 246;
+#define TLF_BLOCK_CHECKSUM 246;
+#define TLF_SATSTATE_SRAM_LATCHUP_COUNTERS 142;
+#define TLF_SATSTATE_EDAC_ERROR_COUNTERS 143;
+#define TLF_SATSTATE_COMM_STATUS 144;
 
-// CubeAcp Telecommand IDs - Section 5.3.1 Table 72
+// CubeACP Telecommand IDs - Section 5.3.1 Table 72 of Firmware Manual
 #define DEPLOY_MAGNETOMETER_BOOM 7
 #define ADCS_RUN_MODE 10
 #define CLEAR_ERRORS 12
