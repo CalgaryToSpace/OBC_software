@@ -362,22 +362,21 @@ uint8_t send_telecommand(uint8_t id, uint8_t* data, int data_length) {
 	// data bytes can be up to a maximum of 8 bytes; data_length ranges from 0 to 8
 
 	uint8_t buf[5 + data_length / 2];
-	buf[4 + data_length / 2] = ADCS_ESC_CHARACTER;
-	buf[3 + data_length / 2] = ADCS_START_MESSAGE;
 
-	buf[2 + data_length / 2] = id;
+	buf[0] = ADCS_ESC_CHARACTER;
+	buf[1] = ADCS_START_MESSAGE;
+	buf[2] = id;
 
-	for (int i = 1 + data_length/2; i > 1; i++) {
-		buf[i] = data[data_length/2 - i];
+	for (int i = 0; i < data_length/2; i++) {
+		buf[i + 3] = data[i];
 	}
 
-	buf[1] = ADCS_ESC_CHARACTER;
-	buf[0] = ADCS_END_MESSAGE;
+	buf[3 + data_length / 2] = ADCS_ESC_CHARACTER;
+	buf[4 + data_length / 2] = ADCS_END_MESSAGE;
 
-	HAL_UART_Transmit(&hlpuart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
+	HAL_UART_Transmit(&huart3, buf, strlen((char*)buf), HAL_MAX_DELAY);
 
-	//TODO: make this actually work
-	return 0XFF; // TODO: add functionality to get response from ADCS
+	return 0X00; // TODO: add functionality to get response from ADCS
 
 }
 
