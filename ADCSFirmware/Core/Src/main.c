@@ -21,6 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "adcs_types.h"
 
 /* USER CODE END Includes */
 
@@ -47,6 +48,8 @@ PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
 /* USER CODE BEGIN PV */
 
+uint8_t CRC8Table[256];
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -56,7 +59,9 @@ static void MX_LPUART1_UART_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 /* USER CODE BEGIN PFP */
-
+uint8_t send_telecommand(uint8_t id, uint8_t* data, int data_length);
+void COMMS_Crc8Init();
+uint8_t COMMS_Crc8Checksum(uint8_t* buffer, uint16_t len);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -348,6 +353,77 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+
+uint8_t send_telecommand(uint8_t id, uint8_t* data, int data_length) {
+	// Telemetry Request or Telecommand Format:
+	// ADCS_ESC_CHARACTER, ADCS_START_MESSAGE [uint8_t TLM/TC ID], ADCS_ESC_CHARACTER, ADCS_END_MESSAGE
+	// The defines in adcs_types.h already include the 7th bit of the ID to distinguish TLM and TC
+	// data bytes can be up to a maximum of 8 bytes; data_length ranges from 0 to 8
+
+	uint8_t buf[5 + data_length / 2];
+	buf[4 + data_length / 2] = ADCS_ESC_CHARACTER;
+	buf[3 + data_length / 2] = ADCS_START_MESSAGE;
+
+	buf[2 + data_length / 2] = id;
+
+	for (int i = 1 + data_length/2; i > 1; i++) {
+		buf[i] = data[data_length/2 - i];
+	}
+
+	buf[1] = ADCS_ESC_CHARACTER;
+	buf[0] = ADCS_END_MESSAGE;
+
+	HAL_UART_Transmit(&hlpuart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
+
+	//TODO: make this actually work
+	return 0XFF; // TODO: add functionality to get response from ADCS
+
+}
+
+
+
+// CRC initialisation
+// init lookup table for 8-bit crc calculation
+void COMMS_Crc8Init()
+	{
+	for (int i = 0; i < 256; i++)
+	{
+		val = i;
+		for (int j = 0; j < 8; j++)
+		{
+			if (val & 1)
+			val ^= CRC_POLY;
+			val >>= 1;
+		}
+		CRC8Table[i] = val;
+	}
+}
+
+
+
+/***************************************************************************//**
+* Calculates an 8-bit CRC value
+*
+* @param[in] buffer
+* the buffer containing data for which to calculate the crc value
+* @param[in] len
+* the number of bytes of valid data in the buffer
+******************************************************************************/
+uint8_t COMMS_Crc8Checksum(uint8_t* buffer, uint16_t len)
+{
+	if (len == 0) return 0xff;
+
+	uint16_t i;
+	uint8_t crc = 0;
+
+	for (i = 0; i < len; i++)
+		crc = CRC8Table[crc ^ buffer[i]];
+
+	return crc;
+}
+
+
 
 /* USER CODE END 4 */
 
