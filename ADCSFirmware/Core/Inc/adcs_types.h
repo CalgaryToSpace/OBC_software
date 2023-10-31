@@ -18,8 +18,11 @@
 //Identifiers of Start of Message and End of Message - Section 4.2 of Firmware Manual
 // 0x1F | 0x7F ....... | 0x1F 0xFF
 #define ADCS_ESC_CHARACTER 0X1F;
-#define ADCS_START_OF_MESSAGE 0x7F;
-#define ADCS_END_OF_MESSAGE 0xFF;
+#define ADCS_START_MESSAGE 0x7F;
+#define ADCS_END_MESSAGE 0xFF;
+
+// CRC defines
+#define CRC_POLY 0x91
 
 // Common Telecommand IDs - Section 6.1.1 Table 9 of Firmware Manual
 #define TC_RESET 1; // must be followed by ADCS_MAGIC_NUMBER to confirm reset
