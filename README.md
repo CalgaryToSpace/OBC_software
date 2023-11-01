@@ -14,3 +14,4 @@ The CubeADCS documentation is available on the CTS Google Drive.
 #### Contributors
 - Saksham Puri (https://github.com/Saksham-P)
 - Zach Uy (https://github.com/SCBee)
+- Nadeem Moosa (https://github.com/DeemDeem52)
