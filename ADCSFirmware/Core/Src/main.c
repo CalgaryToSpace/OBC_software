@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "adcs_types.h"
+#include <string.h>
 
 /* USER CODE END Includes */
 
@@ -76,6 +77,8 @@ uint8_t COMMS_Crc8Checksum(uint8_t* buffer, uint16_t len);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+
+
 
   /* USER CODE END 1 */
 
@@ -386,6 +389,7 @@ uint8_t send_telecommand(uint8_t id, uint8_t* data, int data_length) {
 // init lookup table for 8-bit crc calculation
 void COMMS_Crc8Init()
 	{
+	int val;
 	for (int i = 0; i < 256; i++)
 	{
 		val = i;
