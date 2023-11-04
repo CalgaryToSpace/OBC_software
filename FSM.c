@@ -26,15 +26,13 @@ typedef enum { //need to change telecommand to something usable
 } event; //issue need to figure out how to make it so multiple events can possibly lead to the same event
 
 typedef struct { //pre establishes the properties of a state function
-    void(*func)(void);
+    void(*func)(void); // pointer to the function
 } stateFunction;
 
 typedef struct {
     event arrow[EVENT_COUNT];
     state correspond[EVENT_COUNT];
 } transitions;
-
-
 
 void initFunc () {
     printf("Init\n");
@@ -60,31 +58,49 @@ state stubFunc(event action) {
     return st_state;
 }
 
-
 typedef struct {    //structure defining the properties of the state
     state current_st; //state being defined
     transitions matrix;
      void (*stateFunc)(void);
 } stateProperties; //if there are multiple states that can be transitioned into keep it such that 
 
+// This is a transition table that defines (for each state) what event leads to what state, and the state function
 static stateProperties transitionTable[STATE_COUNT] ={
-    {st_init, 
-        {{telecommand,sufficientBattery, telecommandDetumble, lowBattery, criticalError, detumbled}, 
-            {st_init, st_init, st_charging, st_init, st_init, st_init}}, initFunc},
-    {st_charging, 
-        {{telecommand,sufficientBattery, telecommandDetumble, lowBattery, criticalError, detumbled}, 
-            {st_charging, st_detumbling,st_charging,st_charging,st_charging,st_charging}}, chargingFunc},
-    {st_detumbling,
-         {{telecommand,sufficientBattery, telecommandDetumble, lowBattery, criticalError, detumbled}, 
-            {st_detumbling,st_detumbling,st_detumbling,st_charging,st_detumbling,st_safeMode}}, detumblingFunc},
-    {st_safeMode,
-         {{telecommand,sufficientBattery, telecommandDetumble, lowBattery, criticalError, detumbled},
-             {st_state,st_safeMode,st_safeMode,st_safeMode,st_safeMode,st_safeMode}}, safeModeFunc},
-    {st_state,
-         {{telecommand,sufficientBattery, telecommandDetumble, lowBattery, criticalError, detumbled}, 
-            {st_state,st_state,st_state,st_safeMode,st_safeMode,st_state}}, stateFunc},
-};
+    {st_init,
+        {
+            {telecommand,sufficientBattery, telecommandDetumble, lowBattery, criticalError, detumbled}, 
+            {st_init,    st_init,           st_charging,         st_init,    st_init,       st_init}
+        }, 
+    initFunc},
 
+    {st_charging,
+        {
+            {telecommand, sufficientBattery, telecommandDetumble, lowBattery,  criticalError, detumbled}, 
+            {st_charging, st_detumbling,     st_charging,         st_charging, st_charging,   st_charging}
+        }, 
+    chargingFunc},
+            
+    {st_detumbling,
+        {
+            {telecommand,   sufficientBattery, telecommandDetumble, lowBattery,  criticalError, detumbled}, 
+            {st_detumbling, st_detumbling,     st_detumbling,       st_charging, st_detumbling, st_safeMode}
+        }, 
+    detumblingFunc},
+
+    {st_safeMode,
+        {
+            {telecommand, sufficientBattery, telecommandDetumble, lowBattery,  criticalError, detumbled},
+            {st_state,    st_safeMode,       st_safeMode,         st_safeMode, st_safeMode,   st_safeMode}
+        }, 
+    safeModeFunc},
+
+    {st_state,
+        {
+            {telecommand, sufficientBattery, telecommandDetumble, lowBattery,  criticalError, detumbled}, 
+            {st_state,    st_state,          st_state,            st_safeMode, st_safeMode,   st_state}
+        }, 
+    stateFunc},
+};
 
 /*
 event transition[STATE_COUNT] = {st_init,
@@ -114,7 +130,6 @@ event parser (){ //temporary method to convert input into event
         //need to add error handling
     }
 }
-
 
 void StateMachine_RunIteration(stateMachine_t *stateMachine, event trigger){  
     //changes the actual state
