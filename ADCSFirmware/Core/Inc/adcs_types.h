@@ -75,4 +75,11 @@
 #define TC_SAVE_CONFIG 63
 #define TC_SAVE_ORBIT_PARAMS 64
 
+// Telecommand Error Flags - Section 5.2.2 Figure 6 of Firmware Manual
+#define TC_ERROR_NONE 0
+#define TC_ERROR_INVALID_ID 1
+#define TC_ERROR_WRONG_LENGTH 2
+#define TC_ERROR_INVALID_PARAMS 3
+#define TC_ERROR_CRC 4
+
 #endif /* INC_ADCS_TYPES_H_ */

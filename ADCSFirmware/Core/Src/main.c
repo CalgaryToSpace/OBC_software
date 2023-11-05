@@ -357,7 +357,6 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
-
 uint8_t send_telecommand(uint8_t id, uint8_t* data, int data_length) {
 	// Telemetry Request or Telecommand Format:
 	// ADCS_ESC_CHARACTER, ADCS_START_MESSAGE [uint8_t TLM/TC ID], ADCS_ESC_CHARACTER, ADCS_END_MESSAGE
@@ -380,6 +379,10 @@ uint8_t send_telecommand(uint8_t id, uint8_t* data, int data_length) {
 	HAL_UART_Transmit(&huart3, buf, strlen((char*)buf), HAL_MAX_DELAY);
 
 	return 0X00; // TODO: add functionality to get response from ADCS
+
+  // The reply will contain two data bytes, the last one being the TC Error flag.
+  // The receipt of the acklowledge will indicate that another telecommand may be sent. 
+  // Sending another telecommand before the acknowledge will corrupt the telecommand buffer.
 
 }
 
