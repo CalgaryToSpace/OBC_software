@@ -82,16 +82,17 @@ void Error_Handler(void);
 #define MPI_TX_EN_Pin GPIO_PIN_5
 #define MPI_TX_EN_GPIO_Port GPIOG
 
-static const uint8_t FLASH_READ = 0x03;
-static const uint8_t FLASH_WRITE = 0x02;
-static const uint8_t FLASH_WREN = 0x06;
-static const uint8_t FLASH_WRDI = 0x04;
+//Addresses gotten from S25FL512S Datasheet
+//(https://drive.google.com/drive/folders/1BChqVnutp1Wtl-kCByhXuXNezaatGcF3)
+static const uint8_t FLASH_STATREG1 = 0X05; 	//Section 9.3.1 Page 81
+static const uint8_t FLASH_WREN = 0x06; 		//Section 9.3.8 Page 86
+static const uint8_t FLASH_WRDI = 0x04; 		//Section 9.3.9 Page 86
+static const uint8_t FLASH_READ = 0x03; 		//Section 9.4.1 Page 91
+static const uint8_t FLASH_WRITE = 0x02; 		//Section 9.5.2 Page 107
+static const uint8_t FLASH_SECTOR_ERASE = 0xD8; //Section 9.6.1 Page 109
+static const uint8_t FLASH_ERCP = 0xC7; 		//Section 9.6.2 Page 110
 static const uint8_t FLASH_ER4 = 0x20;
 static const uint8_t FLASH_ER32 = 0x52;
-static const uint8_t FLASH_ER64 = 0xd8;
-static const uint8_t FLASH_ERCP = 0xC7;
-static const uint8_t FLASH_STATREG1 = 0X05;
-static const uint8_t FLASH_SECTOR_ERASE = 0xD8;
 
 typedef struct CircularBuffer {
 	uint32_t head;

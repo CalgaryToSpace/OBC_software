@@ -64,13 +64,16 @@ void READ_STATUS_REGISTER(SPI_HandleTypeDef *hspi1, uint8_t *rxBuf) {
  */
 void ENABLE_WREN(SPI_HandleTypeDef *hspi1) {
 	PULL_CS();
+
+	//Checking if command transmission went OK
 	if (HAL_SPI_Transmit(hspi1, (uint8_t*) &FLASH_WREN, 1, HAL_MAX_DELAY) != HAL_OK) {
 		PRINT_STRING_UART("Timeout when enabling WREN");
 	}
+
 	SET_CS();
 
-	uint8_t statusRegBuffer[10] = {0};
-
+	//Checking Status register to double check if WREN Latch is enabled
+	uint8_t statusRegBuffer[1] = {0};
 	uint8_t wip = 1;
 	while (wip) {
 		READ_STATUS_REGISTER(hspi1, statusRegBuffer);

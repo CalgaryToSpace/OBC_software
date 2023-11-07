@@ -54,15 +54,20 @@ uint8_t WRITE(SPI_HandleTypeDef *hspi1, uint8_t * packetBuffer) {
 	size_t packetSize = 0;
 
 	// Variable used to store data in the backup buffer
+	// (In case packet overflows to next page)
 	uint8_t backupIndex = 0;
 
 	// Calculate the packet size while adding data to buffer as well as keep track of page overflow
 	while (packetBuffer[packetSize] != '\0' && packetSize < sizeof(spiTxBuffer)) {
+
+		//If current page is filled, start filling up backup buffer
 		if (bytesUntilNextPage == 0) {
 			backupBuffer[backupIndex] = packetBuffer[packetSize];
 			backupIndex++;
 			packetSize++;
 		} else {
+
+			//Else fill the normal data buffer
 			spiTxBuffer[packetSize] = packetBuffer[packetSize];
 			packetSize++;
 			bytesUntilNextPage--;
@@ -76,6 +81,7 @@ uint8_t WRITE(SPI_HandleTypeDef *hspi1, uint8_t * packetBuffer) {
 	if (clearFlag == 1) {
 		clearFlag = 0;
 
+		//Calling it twice because of a unknown bug (will fix in rev1.2)
 		MEM_CLEAR(hspi1, addr);
 		MEM_CLEAR(hspi1, addr);
 	}
@@ -120,7 +126,7 @@ uint8_t WRITE(SPI_HandleTypeDef *hspi1, uint8_t * packetBuffer) {
 
 	// If not all data written to the memory yet
 	if (backupIndex > 0) {
-		WRITE(hspi1, backupBuffer);
+		uint8_t tempVal = WRITE(hspi1, backupBuffer);
 	}
 
 	//return err value
@@ -136,7 +142,7 @@ uint8_t WRITE(SPI_HandleTypeDef *hspi1, uint8_t * packetBuffer) {
  * 			void * spiRxBuffer is the buffer data is going to be put into after reading
  *
  * @return - 0 if read successfully
- * 			 1 if an error occurred during writing to memory
+ * 			 1 if an error occurred during reading from memory
  */
 uint8_t READ(SPI_HandleTypeDef *hspi1, uint8_t * spiRxBuffer) {
 	uint8_t addr[3] = {(cb.tail >> 16) & 0xFF,(cb.tail >> 8) & 0xFF, cb.tail & 0xFF};
