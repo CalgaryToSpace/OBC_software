@@ -121,7 +121,8 @@ int main(void)
 
   // This function sends commands to the MPI
   uint8_t parameter = NULL;
-  sendTelecommand(4,&parameter);
+  uint8_t command_code = 4;
+  sendTelecommand(command_code,&parameter);
 
   HAL_UART_Receive_DMA(&hlpuart1, UART1_rxBuffer, 160);
 
