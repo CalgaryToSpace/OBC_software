@@ -383,9 +383,28 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
+void set_mpi_transceiver_state(mpi_transceiver_state_t new_state) {
+	// Note: Can only send or receive at once
+
+	if (new_state == MPI_TRANSCEIVER_STATE_MISO) {
+		HAL_GPIO_WritePin(MPI_RX_NEN_GPIO_Port, MPI_RX_NEN_Pin, GPIO_PIN_RESET); // RESET to activate MISO
+		HAL_GPIO_WritePin(MPI_TX_EN_GPIO_Port, MPI_TX_EN_Pin, GPIO_PIN_RESET); // SET to activate MOSI
+	}
+	else if (new_state == MPI_TRANSCEIVER_STATE_MOSI) {
+		HAL_GPIO_WritePin(MPI_RX_NEN_GPIO_Port, MPI_RX_NEN_Pin, GPIO_PIN_SET); // RESET to activate MISO
+		HAL_GPIO_WritePin(MPI_TX_EN_GPIO_Port, MPI_TX_EN_Pin, GPIO_PIN_SET); // SET to activate MOSI
+	}
+	else { // disable
+		HAL_GPIO_WritePin(MPI_RX_NEN_GPIO_Port, MPI_RX_NEN_Pin, GPIO_PIN_SET); // RESET to activate MISO
+		HAL_GPIO_WritePin(MPI_TX_EN_GPIO_Port, MPI_TX_EN_Pin, GPIO_PIN_RESET); // SET to activate MOSI
+	}
+}
+
 // Send telecommand without parameters
 // TODO: Add error check
-uint8_t sendTelecommand(uint8_t commandCode, uint8_t *parameters){
+uint8_t sendTelecommand(uint8_t commandCode, uint8_t *parameters) {
+	// set to OBC transmitting
+	set_mpi_transceiver_state(MPI_TRANSCEIVER_STATE_MOSI);
 
 	// Turn on frame transmitting TC
 	UART1_txBuffer[0] = 0x54;
@@ -400,8 +419,13 @@ uint8_t sendTelecommand(uint8_t commandCode, uint8_t *parameters){
 	// Transmit Telecommand
 	HAL_UART_Transmit(&hlpuart1, (uint8_t *)UART1_txBuffer, strlen((char*)UART1_txBuffer), 100);
 
+	// set back to the OBC receiving
+	set_mpi_transceiver_state(MPI_TRANSCEIVER_STATE_MISO);
+
 	return 1;
 }
+
+
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *hlpuart1)
 {
