@@ -60,7 +60,7 @@ static void MX_LPUART1_UART_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 /* USER CODE BEGIN PFP */
-uint8_t send_telecommand(uint8_t id, uint8_t* data, int data_length);
+uint8_t send_telecommand(uint8_t id, uint8_t* data, uint32_t data_length);
 void COMMS_Crc8Init();
 uint8_t COMMS_Crc8Checksum(uint8_t* buffer, uint16_t len);
 /* USER CODE END PFP */
@@ -104,6 +104,20 @@ int main(void)
   MX_USART3_UART_Init();
   MX_USB_OTG_FS_PCD_Init();
   /* USER CODE BEGIN 2 */
+
+  //Testing send_telecommand function
+
+  //Data being transmitted
+  uint8_t data[5] = {10, 11, 12, 13, 14};
+
+  //Length of Data
+  uint32_t data_length = sizeof(data);
+
+  //TC ID (Indicated by 7th bit being 0)
+  uint8_t id = 0b01011110;
+
+  //Calling the send_telecommand function
+  send_telecommand(id, data, data_length);
 
   /* USER CODE END 2 */
 
@@ -357,12 +371,11 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
-uint8_t send_telecommand(uint8_t id, uint8_t* data, uint8_t data_length) {
+uint8_t send_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
 	// Telemetry Request or Telecommand Format:
 	// ADCS_ESC_CHARACTER, ADCS_START_MESSAGE [uint8_t TLM/TC ID], ADCS_ESC_CHARACTER, ADCS_END_MESSAGE
 	// The defines in adcs_types.h already include the 7th bit of the ID to distinguish TLM and TC
 	// data bytes can be up to a maximum of 8 bytes; data_length ranges from 0 to 8
-
 
 	//Allocate only required memory by checking last bit of ID
 	uint8_t buf[5 + (!(id & 0b00000001))*data_length];
@@ -373,7 +386,7 @@ uint8_t send_telecommand(uint8_t id, uint8_t* data, uint8_t data_length) {
 	buf[2] = id;
 
 	//Fill buffer with Data if transmitting a Telecommand
-	if (id & 0b00000001 == 0) {
+	if ((id & 0b00000001) == 0) {
 		for (int i = 0; i < data_length; i++) {
 			buf[i + 3] = data[i];
 		}
