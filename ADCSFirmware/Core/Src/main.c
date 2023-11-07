@@ -357,24 +357,37 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
-uint8_t send_telecommand(uint8_t id, uint8_t* data, int data_length) {
+uint8_t send_telecommand(uint8_t id, uint8_t* data, uint8_t data_length) {
 	// Telemetry Request or Telecommand Format:
 	// ADCS_ESC_CHARACTER, ADCS_START_MESSAGE [uint8_t TLM/TC ID], ADCS_ESC_CHARACTER, ADCS_END_MESSAGE
 	// The defines in adcs_types.h already include the 7th bit of the ID to distinguish TLM and TC
 	// data bytes can be up to a maximum of 8 bytes; data_length ranges from 0 to 8
 
-	uint8_t buf[5 + data_length / 2];
 
+	//Allocate only required memory by checking last bit of ID
+	uint8_t buf[5 + (!(id & 0b00000001))*data_length];
+
+	//Fill buffer with ESC, SOM and ID
 	buf[0] = ADCS_ESC_CHARACTER;
 	buf[1] = ADCS_START_MESSAGE;
 	buf[2] = id;
 
-	for (int i = 0; i < data_length/2; i++) {
-		buf[i + 3] = data[i];
-	}
+	//Fill buffer with Data if transmitting a Telecommand
+	if (id & 0b00000001 == 0) {
+		for (int i = 0; i < data_length; i++) {
+			buf[i + 3] = data[i];
+		}
 
-	buf[3 + data_length / 2] = ADCS_ESC_CHARACTER;
-	buf[4 + data_length / 2] = ADCS_END_MESSAGE;
+		//Fill buffer with ESC and EOM
+		buf[3 + data_length] = ADCS_ESC_CHARACTER;
+		buf[4 + data_length] = ADCS_END_MESSAGE;
+	} else {
+
+		//If transmitting Telemetry Request
+		//Fill buffer with ESC and EOM without data_length
+		buf[3] = ADCS_ESC_CHARACTER;
+		buf[4] = ADCS_END_MESSAGE;
+	}
 
 	HAL_UART_Transmit(&huart3, buf, strlen((char*)buf), HAL_MAX_DELAY);
 
