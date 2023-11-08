@@ -55,6 +55,12 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 
+typedef enum {
+	MPI_TRANSCEIVER_STATE_MISO,
+	MPI_TRANSCEIVER_STATE_MOSI,
+	MPI_TRANSCEIVER_STATE_DISABLE
+} mpi_transceiver_state_t;
+
 void set_mpi_transceiver_state(mpi_transceiver_state_t new_state);
 
 /* USER CODE END EFP */
@@ -92,11 +98,7 @@ void set_mpi_transceiver_state(mpi_transceiver_state_t new_state);
 #define LD2_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
-typedef enum {
-	MPI_TRANSCEIVER_STATE_MISO,
-	MPI_TRANSCEIVER_STATE_MOSI,
-	MPI_TRANSCEIVER_STATE_DISABLE
-} mpi_transceiver_state_t;
+
 
 /* USER CODE END Private defines */
 
