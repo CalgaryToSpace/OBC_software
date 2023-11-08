@@ -82,9 +82,10 @@ void Error_Handler(void);
 #define MPI_TX_EN_Pin GPIO_PIN_5
 #define MPI_TX_EN_GPIO_Port GPIOG
 
-//Addresses gotten from S25FL512S Datasheet
-//(https://drive.google.com/drive/folders/1BChqVnutp1Wtl-kCByhXuXNezaatGcF3)
-static const uint8_t FLASH_STATREG1 = 0X05; 	//Section 9.3.1 Page 81
+// Addresses from S25FL512S Datasheet
+// S70 Datasheet (final deployment): https://www.infineon.com/dgdl/Infineon-S70FL01GS_1_Gbit_(128_Mbyte)_3.0V_SPI_Flash-DataSheet-v15_00-EN.pdf
+// S25 Datasheet (with addresses): https://www.infineon.com/dgdl/Infineon-S25FL128SS25FL256S_128_Mb_(16_MB)256_Mb_(32_MB)_3.0V_SPI_Flash_Memory-DataSheet-v20_00-EN.pdf
+static const uint8_t FLASH_STATREG1 = 0x05; 	//Section 9.3.1 Page 81
 static const uint8_t FLASH_WREN = 0x06; 		//Section 9.3.8 Page 86
 static const uint8_t FLASH_WRDI = 0x04; 		//Section 9.3.9 Page 86
 static const uint8_t FLASH_READ = 0x03; 		//Section 9.4.1 Page 91
