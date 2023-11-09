@@ -113,8 +113,8 @@ int main(void)
   //Length of Data
   uint32_t data_length = sizeof(data);
 
-  //TC ID (Indicated by 7th bit being 0)
-  uint8_t id = 0b01011110;
+  //TC ID (Indicated by 7th bit being 0, TC value < 128)
+  uint8_t id = TC_LOAD_FILE_DOWNLOAD_BLOCK;
 
   //Calling the send_telecommand function
   send_telecommand(id, data, data_length);
@@ -378,7 +378,7 @@ uint8_t send_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
 	// data bytes can be up to a maximum of 8 bytes; data_length ranges from 0 to 8
 
 	//Allocate only required memory by checking last bit of ID
-	uint8_t buf[5 + (!(id & 0b00000001))*data_length];
+	uint8_t buf[5 + (!(id & 0b10000000))*data_length];
 
 	//Fill buffer with ESC, SOM and ID
 	buf[0] = ADCS_ESC_CHARACTER;
@@ -386,7 +386,7 @@ uint8_t send_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
 	buf[2] = id;
 
 	//Fill buffer with Data if transmitting a Telecommand
-	if ((id & 0b00000001) == 0) {
+	if ((id & 0b10000000) == 0) {
 		for (int i = 0; i < data_length; i++) {
 			buf[i + 3] = data[i];
 		}
