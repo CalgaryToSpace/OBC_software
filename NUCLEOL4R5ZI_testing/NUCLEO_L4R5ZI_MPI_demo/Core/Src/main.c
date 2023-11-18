@@ -66,7 +66,7 @@ static void MX_DMA_Init(void);
 static void MX_LPUART1_UART_Init(void);
 static void MX_SPI1_Init(void);
 /* USER CODE BEGIN PFP */
-uint8_t sendTelecommand(uint8_t commandCode, uint8_t *parameters);
+//uint8_t sendTelecommand(uint8_t commandCode, uint8_t *parameters);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -74,7 +74,7 @@ uint8_t sendTelecommand(uint8_t commandCode, uint8_t *parameters);
 uint8_t UART1_rxBuffer[160] = {0};
 uint8_t MPI_sync_bytes[4] = {0x0c, 0xff, 0xff, 0x0c};
 uint8_t MPI_housekeeping[18] = {0};
-uint8_t UART1_txBuffer[160] = {0};
+//uint8_t UART1_txBuffer[160] = {0};
 uint8_t flash_buffer[256] = {0};
 uint8_t flash_buffer_capacity = 0;
 uint32_t page_number = 0;
@@ -118,9 +118,9 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   // Send commands to the MPI
-  uint8_t parameters = NULL;
+  uint8_t parameters = 0xFF;
   uint8_t command_code = 4;
-  sendTelecommand(command_code,&parameters);
+  sendTelecommand(command_code, parameters, &hlpuart1);
 
   HAL_UART_Receive_DMA(&hlpuart1, UART1_rxBuffer, 160);
 
