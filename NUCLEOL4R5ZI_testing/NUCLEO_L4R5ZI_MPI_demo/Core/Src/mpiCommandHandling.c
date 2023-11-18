@@ -4,10 +4,11 @@
  */
 #include <mpiCommandHandling.h>
 #include <stdio.h>
+#include "main.h"
 
 // This function sends commands to the MPI. Parameters argument is set to NULL when no parameters are required as part of a command.
 // TODO: Add error check
-uint8_t sendTelecommand(uint8_t commandCode, uint8_t parameters, UART_HandleTypeDef *huart){
+uint8_t sendTelecommand(uint8_t commandCode, uint8_t parameters){
 
 	uint8_t UART1_txBuffer[160] = {0};
 	// Turn on frame transmitting TC
@@ -21,7 +22,7 @@ uint8_t sendTelecommand(uint8_t commandCode, uint8_t parameters, UART_HandleType
 	}
 
 	// Transmit command
-	HAL_UART_Transmit(huart, (uint8_t *)UART1_txBuffer, strlen((char*)UART1_txBuffer), 100);
+	HAL_UART_Transmit(&huart1, (uint8_t *)UART1_txBuffer, strlen((char*)UART1_txBuffer), 100);
 
 	return 1;
 }
