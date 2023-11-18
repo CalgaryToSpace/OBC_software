@@ -20,7 +20,7 @@ uint8_t sendTelecommand(uint8_t commandCode, uint8_t parameters, UART_HandleType
 		UART1_txBuffer[3] = parameters;
 	}
 
-	// Transmit Telecommand
+	// Transmit command
 	HAL_UART_Transmit(huart, (uint8_t *)UART1_txBuffer, strlen((char*)UART1_txBuffer), 100);
 
 	return 1;
