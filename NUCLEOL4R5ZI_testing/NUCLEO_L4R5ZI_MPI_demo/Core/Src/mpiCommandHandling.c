@@ -11,6 +11,8 @@
 uint8_t sendTelecommand(uint8_t commandCode, uint8_t parameters){
 
 	uint8_t UART1_txBuffer[160] = {0};
+	uint8_t UART1_rxBuffer[160] = {0};
+
 	// Turn on frame transmitting TC
 	UART1_txBuffer[0] = 0x54;
 	UART1_txBuffer[1] = 0x43;
@@ -23,6 +25,7 @@ uint8_t sendTelecommand(uint8_t commandCode, uint8_t parameters){
 
 	// Transmit command
 	HAL_UART_Transmit(&huart1, (uint8_t *)UART1_txBuffer, strlen((char*)UART1_txBuffer), 100);
+	HAL_UART_Receive_DMA(&huart1, UART1_rxBuffer, 160);
 
 	return 1;
 }

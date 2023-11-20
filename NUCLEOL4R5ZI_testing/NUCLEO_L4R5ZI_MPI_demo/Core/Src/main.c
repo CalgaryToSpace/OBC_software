@@ -126,7 +126,7 @@ int main(void)
   uint8_t command_code = 4;
   sendTelecommand(command_code, parameters, &huart1);
 
-  HAL_UART_Receive_DMA(&hlpuart1, UART1_rxBuffer, 160);
+//  HAL_UART_Receive_DMA(&huart1, UART1_rxBuffer, 160);
 
   /* USER CODE END 2 */
 
