@@ -19,6 +19,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "mpiCommandHandling.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -124,7 +125,7 @@ int main(void)
   // Send commands to the MPI
   uint8_t parameters = 0xFF;
   uint8_t command_code = 4;
-  sendTelecommand(command_code, parameters, &huart1);
+  sendTelecommand(command_code, parameters);
 
 //  HAL_UART_Receive_DMA(&huart1, UART1_rxBuffer, 160);
 
