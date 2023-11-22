@@ -119,6 +119,8 @@ int main(void)
   //Calling the send_telecommand function
   send_telecommand(id, data, data_length);
 
+  //TODO: Do something with telemetry reply
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -419,10 +421,8 @@ uint8_t send_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
 		//Ignoring ESC, EOM, SOM and storing the rest of the values in data
 		for (int i = 3; i < sizeof(buf_rec)-2; i++) {
 			// put the data into the data array excluding TC ID or TLM ID
-			data[i] = buf_rec[i];
+			data[i-3] = buf_rec[i];
 		}
-
-		//TODO: Do something with telemetry reply
 
 		return TC_ERROR_NONE;
 	}
