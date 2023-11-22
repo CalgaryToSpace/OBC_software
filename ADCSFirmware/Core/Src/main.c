@@ -385,8 +385,8 @@ uint8_t send_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
 	buf[1] = ADCS_START_MESSAGE;
 	buf[2] = id;
 
-	bool telemetry_request = (id & 0b10000000);
-	bool telecommand = ((id & 0b10000000) == 0);
+	uint8_t telemetry_request = (id & 0b10000000);
+	uint8_t telecommand = ((id & 0b10000000) == 0);
 
 	//Fill buffer with Data if transmitting a Telecommand
 	if (telecommand) {
@@ -423,6 +423,7 @@ uint8_t send_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
 	HAL_UART_Receive(&huart3, buf_rec, strlen((char*)buf_rec), HAL_MAX_DELAY);
 
 	for (int i = 0; i < received_data_length; i++) {
+		// put the data into the data array
 		data[i] = buf_rec[i + 3];
 	}
 
