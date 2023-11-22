@@ -377,6 +377,7 @@ uint8_t send_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
 	// The defines in adcs_types.h already include the 7th bit of the ID to distinguish TLM and TC
 	// data bytes can be up to a maximum of 8 bytes; data_length ranges from 0 to 8
 
+	//Check id to identify if it's Telecommand or Telemetry Request
 	uint8_t telemetry_request = id & 0b10000000; // 1 = TLM, 0 = TC
 
 	//Allocate only required memory by checking first bit of ID
@@ -386,7 +387,6 @@ uint8_t send_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
 	buf[0] = ADCS_ESC_CHARACTER;
 	buf[1] = ADCS_START_MESSAGE;
 	buf[2] = id;
-
 
 	if (telemetry_request) {
 		//If transmitting Telemetry Request
@@ -403,20 +403,14 @@ uint8_t send_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
 		buf[4 + data_length] = ADCS_END_MESSAGE;
 	}
 
+	//Transmit the TLM or TC via UART
 	HAL_UART_Transmit(&huart3, buf, strlen((char*)buf), HAL_MAX_DELAY);
 
-	uint32_t received_data_length;
 	//receiving from telecommand: data is one byte exactly
 	//receiving from telemetry request: data is up to 8 bytes
 
-	if (telemetry_request) {
-		received_data_length = data_length;
-	} else {
-		received_data_length = 1;
-	}
-
 	//Allocate only required memory
-	uint8_t buf_rec[5 + received_data_length];
+	uint8_t buf_rec[6 + (telemetry_request)*data_length];
 
 	HAL_UART_Receive(&huart3, buf_rec, strlen((char*)buf_rec), HAL_MAX_DELAY);
 
