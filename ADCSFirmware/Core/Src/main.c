@@ -380,7 +380,7 @@ uint8_t send_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
 	uint8_t telemetry_request = id & 0b10000000; // 1 = TLM, 0 = TC
 
 	//Allocate only required memory by checking first bit of ID
-	uint8_t buf[5 + (telecommand)*data_length];
+	uint8_t buf[5 + (!telemetry_request)*data_length];
 
 	//Fill buffer with ESC, SOM and ID
 	buf[0] = ADCS_ESC_CHARACTER;
