@@ -412,19 +412,26 @@ uint8_t send_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
 	//Allocate only required memory
 	uint8_t buf_rec[6 + (telemetry_request)*(data_length-1)];
 
+	//Start receiving acknowledgment or reply from the CubeComputer
 	HAL_UART_Receive(&huart3, buf_rec, strlen((char*)buf_rec), HAL_MAX_DELAY);
 
-	for (int i = 0; i < received_data_length; i++) {
-		// put the data into the data array
-		data[i] = buf_rec[i + 3];
+	if (telemetry_request) {
+		//Ignoring ESC, EOM, SOM and storing the rest of the values in data
+		for (int i = 3; i < sizeof(buf_rec)-2; i++) {
+			// put the data into the data array excluding TC ID or TLM ID
+			data[i] = buf_rec[i];
+		}
+
+		//TODO: Do something with telemetry reply
+
+		return TC_ERROR_NONE;
 	}
 
-	return buf_rec[2]; // buf_rec[2] contains the reply ID
+	return buf_rec[3]; // buf_rec[3] contains the TC Error Flag
 
   // The reply will contain two data bytes, the last one being the TC Error flag.
   // The receipt of the acknowledge will indicate that another telecommand may be sent.
   // Sending another telecommand before the acknowledge will corrupt the telecommand buffer.
-
 }
 
 
