@@ -410,7 +410,7 @@ uint8_t send_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
 	//receiving from telemetry request: data is up to 8 bytes
 
 	//Allocate only required memory
-	uint8_t buf_rec[6 + (telemetry_request)*data_length];
+	uint8_t buf_rec[6 + (telemetry_request)*(data_length-1)];
 
 	HAL_UART_Receive(&huart3, buf_rec, strlen((char*)buf_rec), HAL_MAX_DELAY);
 
