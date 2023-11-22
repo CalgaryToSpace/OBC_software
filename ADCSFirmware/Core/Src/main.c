@@ -377,7 +377,7 @@ uint8_t send_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
 	// The defines in adcs_types.h already include the 7th bit of the ID to distinguish TLM and TC
 	// data bytes can be up to a maximum of 8 bytes; data_length ranges from 0 to 8
 
-	//Allocate only required memory by checking last bit of ID
+	//Allocate only required memory by checking first bit of ID
 	uint8_t buf[5 + (!(id & 0b10000000))*data_length];
 
 	//Fill buffer with ESC, SOM and ID
@@ -385,8 +385,11 @@ uint8_t send_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
 	buf[1] = ADCS_START_MESSAGE;
 	buf[2] = id;
 
+	bool telemetry_request = (id & 0b10000000);
+	bool telecommand = ((id & 0b10000000) == 0);
+
 	//Fill buffer with Data if transmitting a Telecommand
-	if ((id & 0b10000000) == 0) {
+	if (telecommand) {
 		for (int i = 0; i < data_length; i++) {
 			buf[i + 3] = data[i];
 		}
@@ -404,10 +407,29 @@ uint8_t send_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
 
 	HAL_UART_Transmit(&huart3, buf, strlen((char*)buf), HAL_MAX_DELAY);
 
-	return 0X00; // TODO: add functionality to get response from ADCS
+	uint32_t received_data_length;
+	//receiving from telecommand: data is up to 8 bytes
+	//receiving from telemetry request: data is one byte exactly
+
+	if (telemetry_request) {
+		received_data_length = 1;
+	} else {
+		received_data_length = data_length;
+	}
+
+	//Allocate only required memory
+	uint8_t buf_rec[5 + received_data_length];
+
+	HAL_UART_Receive(&huart3, buf_rec, strlen((char*)buf_rec), HAL_MAX_DELAY);
+
+	for (int i = 0; i < received_data_length; i++) {
+		data[i] = buf_rec[i + 3];
+	}
+
+	return buf_rec[2]; // buf_rec[2] contains the reply ID
 
   // The reply will contain two data bytes, the last one being the TC Error flag.
-  // The receipt of the acklowledge will indicate that another telecommand may be sent. 
+  // The receipt of the acknowledge will indicate that another telecommand may be sent.
   // Sending another telecommand before the acknowledge will corrupt the telecommand buffer.
 
 }
