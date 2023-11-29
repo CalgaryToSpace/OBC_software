@@ -1,0 +1,10 @@
+../Core/Src/main.c:77:5:main	1
+../Core/Src/main.c:141:6:SystemClock_Config	4
+../Core/Src/main.c:192:13:MX_LPUART1_UART_Init	5
+../Core/Src/main.c:240:13:MX_USART3_UART_Init	5
+../Core/Src/main.c:288:13:MX_USB_OTG_FS_PCD_Init	2
+../Core/Src/main.c:323:13:MX_GPIO_Init	1
+../Core/Src/main.c:376:9:send_telecommand	5
+../Core/Src/main.c:441:6:COMMS_Crc8Init	4
+../Core/Src/main.c:467:9:COMMS_Crc8Checksum	3
+../Core/Src/main.c:488:6:Error_Handler	1
