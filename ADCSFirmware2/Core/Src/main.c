@@ -21,7 +21,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "adcs_types.h"
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,6 +48,8 @@ PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
 /* USER CODE BEGIN PV */
 
+uint8_t CRC8Table[256];
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -56,7 +59,9 @@ static void MX_LPUART1_UART_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 /* USER CODE BEGIN PFP */
-
+uint8_t send_telecommand(uint8_t id, uint8_t* data, uint32_t data_length);
+void COMMS_Crc8Init();
+uint8_t COMMS_Crc8Checksum(uint8_t* buffer, uint16_t len);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -96,6 +101,22 @@ int main(void)
   MX_USART3_UART_Init();
   MX_USB_OTG_FS_PCD_Init();
   /* USER CODE BEGIN 2 */
+
+  //Testing send_telecommand function
+
+  //Data being transmitted
+  uint8_t data[5] = {10, 11, 12, 13, 14};
+
+  //Length of Data
+  uint32_t data_length = sizeof(data);
+
+  //TC ID (Indicated by 7th bit being 0, TC value < 128)
+  uint8_t id = TC_LOAD_FILE_DOWNLOAD_BLOCK;
+
+  //Calling the send_telecommand function
+  send_telecommand(id, data, data_length);
+
+  //TODO: Do something with telemetry reply
 
   /* USER CODE END 2 */
 
@@ -348,6 +369,111 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+uint8_t send_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
+	// Telemetry Request or Telecommand Format:
+	// ADCS_ESC_CHARACTER, ADCS_START_MESSAGE [uint8_t TLM/TC ID], ADCS_ESC_CHARACTER, ADCS_END_MESSAGE
+	// The defines in adcs_types.h already include the 7th bit of the ID to distinguish TLM and TC
+	// data bytes can be up to a maximum of 8 bytes; data_length ranges from 0 to 8
+
+	//Check id to identify if it's Telecommand or Telemetry Request
+	uint8_t telemetry_request = id & 0b10000000; // 1 = TLM, 0 = TC
+
+	//Allocate only required memory by checking first bit of ID
+	uint8_t buf[5 + (!telemetry_request)*data_length];
+
+	//Fill buffer with ESC, SOM and ID
+	buf[0] = ADCS_ESC_CHARACTER;
+	buf[1] = ADCS_START_MESSAGE;
+	buf[2] = id;
+
+	if (telemetry_request) {
+		//If transmitting Telemetry Request
+		//Fill buffer with ESC and EOM without data_length
+		buf[3] = ADCS_ESC_CHARACTER;
+		buf[4] = ADCS_END_MESSAGE;
+	} else {
+		//Fill buffer with Data if transmitting a Telecommand
+		for (int i = 0; i < data_length; i++) {
+			buf[i + 3] = data[i];
+		}
+		//Fill buffer with ESC and EOM
+		buf[3 + data_length] = ADCS_ESC_CHARACTER;
+		buf[4 + data_length] = ADCS_END_MESSAGE;
+	}
+
+	//Transmit the TLM or TC via UART
+	HAL_UART_Transmit(&huart3, buf, strlen((char*)buf), HAL_MAX_DELAY);
+
+	//receiving from telecommand: data is one byte exactly
+	//receiving from telemetry request: data is up to 8 bytes
+
+	//Allocate only required memory
+	uint8_t buf_rec[6 + (telemetry_request)*(data_length-1)];
+
+	//Start receiving acknowledgment or reply from the CubeComputer
+	HAL_UART_Receive(&huart3, buf_rec, strlen((char*)buf_rec), HAL_MAX_DELAY);
+
+	if (telemetry_request) {
+		//Ignoring ESC, EOM, SOM and storing the rest of the values in data
+		for (int i = 3; i < sizeof(buf_rec)-2; i++) {
+			// put the data into the data array excluding TC ID or TLM ID
+			data[i-3] = buf_rec[i];
+		}
+
+		return TC_ERROR_NONE;
+	}
+
+	return buf_rec[3]; // buf_rec[3] contains the TC Error Flag
+
+  // The reply will contain two data bytes, the last one being the TC Error flag.
+  // The receipt of the acknowledge will indicate that another telecommand may be sent.
+  // Sending another telecommand before the acknowledge will corrupt the telecommand buffer.
+}
+
+
+
+// CRC initialisation
+// init lookup table for 8-bit crc calculation
+void COMMS_Crc8Init()
+	{
+	int val;
+	for (int i = 0; i < 256; i++)
+	{
+		val = i;
+		for (int j = 0; j < 8; j++)
+		{
+			if (val & 1)
+			val ^= CRC_POLY;
+			val >>= 1;
+		}
+		CRC8Table[i] = val;
+	}
+}
+
+
+
+/***************************************************************************//**
+* Calculates an 8-bit CRC value
+*
+* @param[in] buffer
+* the buffer containing data for which to calculate the crc value
+* @param[in] len
+* the number of bytes of valid data in the buffer
+******************************************************************************/
+uint8_t COMMS_Crc8Checksum(uint8_t* buffer, uint16_t len)
+{
+	if (len == 0) return 0xff;
+
+	uint16_t i;
+	uint8_t crc = 0;
+
+	for (i = 0; i < len; i++)
+		crc = CRC8Table[crc ^ buffer[i]];
+
+	return crc;
+}
+
 
 /* USER CODE END 4 */
 
