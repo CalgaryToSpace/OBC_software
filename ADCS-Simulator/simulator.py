@@ -2,6 +2,7 @@ import serial
 import datetime
 import os
 import polars as pl
+import time
 
 ########### SETTINGS ############
 TEST_DATA_PATH: str = (
@@ -17,6 +18,7 @@ elif os.name == "posix":
 
 
 def load_data(file: str):
+    # load data from the .csv file
     try:
         data_csv = pl.read_csv(file)
     except Exception:
@@ -25,15 +27,26 @@ def load_data(file: str):
     return data_csv
 
 
+def send_frames(data, ser, n_frames):
+    # send n_frames of data to the serial port
+    for i in range(0, n_frames):
+        time.sleep(1 / 32)
+        ser.write(bytes(data[i]))
+        print(i)
+        print(data[i])
+
+
 def print_data(rx: list):
+    # print received data to the console
     now = datetime.datetime.now().strftime("%H:%M:%S")
     print(f"{now} Message (BYTES): {rx}")
 
-    msg = bytes(rx).decode("utf-8")
+    msg = bytes(rx).hex()
     print(f"{now} Message (ASCII): {msg}")
 
 
 def listen(ser: serial.Serial):
+    # read from the serial port
     print("Listening...")
     while True:
         line = ser.readline()
@@ -72,5 +85,6 @@ if __name__ == "__main__":
 
         # begin tests
         sim_driver(ser)
+
     except serial.serialutil.SerialException:
         print("Serial Port Connection: Failed")
