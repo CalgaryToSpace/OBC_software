@@ -6,7 +6,7 @@ import time
 
 ########### SETTINGS ############
 TEST_DATA_PATH: str = (
-    "path/to/test_data_file.csv"  # test data that we want to send to the ADCS
+    "TLM_Nov18.csv"  # test data that we want to send to the ADCS
 )
 BAUDRATE: int = 115200
 PORT: str = None
@@ -20,11 +20,10 @@ elif os.name == "posix":
 def load_data(file: str):
     # load data from the .csv file
     try:
-        data_csv = pl.read_csv(file)
+        data_csv = pl.read_csv(file, truncate_ragged_lines=True)
+        return data_csv
     except Exception:
-        return None
-
-    return data_csv
+        return None   
 
 
 def send_frames(data, ser, n_frames):
@@ -57,9 +56,13 @@ def listen(ser: serial.Serial):
 
 
 def sim_driver(ser: serial.Serial, mode: int = None):
-    print("Loading test data")
+    print("Loading test data...")
     data: pl.DataFrame = load_data(TEST_DATA_PATH)
-    print("Test data loaded")
+    if data.is_empty():
+        print("Error loading test data.")
+        quit()
+    else:
+        print("Test data loaded.")
 
     print("Listening for incoming serial messages...")
     while 1:
@@ -76,7 +79,7 @@ def sim_driver(ser: serial.Serial, mode: int = None):
 if __name__ == "__main__":
     try:
         if not PORT:
-            print("Check your port name")
+            print("Check your port name.")
             exit()
 
         ser = serial.Serial(port=PORT, baudrate=BAUDRATE, timeout=1)
