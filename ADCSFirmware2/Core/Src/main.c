@@ -59,9 +59,18 @@ static void MX_LPUART1_UART_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 /* USER CODE BEGIN PFP */
+
+// TC/TLM functions
 uint8_t send_telecommand(uint8_t id, uint8_t* data, uint32_t data_length);
+
+// CRC functions
 void COMMS_Crc8Init();
 uint8_t COMMS_Crc8Checksum(uint8_t* buffer, uint16_t len);
+
+// UART debug functions
+void PRINT_STRING_UART(void *string);
+void PRINT_NEW_LINE();
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -103,6 +112,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   //Testing send_telecommand function
+  PRINT_STRING_UART("Testing send TC...");
 
   //Data being transmitted
   uint8_t data[5] = {10, 11, 12, 13, 14};
@@ -198,7 +208,7 @@ static void MX_LPUART1_UART_Init(void)
   /* USER CODE END LPUART1_Init 1 */
   hlpuart1.Instance = LPUART1;
   hlpuart1.Init.BaudRate = 209700;
-  hlpuart1.Init.WordLength = UART_WORDLENGTH_7B;
+  hlpuart1.Init.WordLength = UART_WORDLENGTH_8B;
   hlpuart1.Init.StopBits = UART_STOPBITS_1;
   hlpuart1.Init.Parity = UART_PARITY_NONE;
   hlpuart1.Init.Mode = UART_MODE_TX_RX;
@@ -403,7 +413,7 @@ uint8_t send_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
 	}
 
 	//Transmit the TLM or TC via UART
-	HAL_UART_Transmit(&huart3, buf, strlen((char*)buf), HAL_MAX_DELAY);
+	HAL_UART_Transmit(&hlpuart1, buf, strlen((char*)buf), HAL_MAX_DELAY);
 
 	//receiving from telecommand: data is one byte exactly
 	//receiving from telemetry request: data is up to 8 bytes
@@ -412,7 +422,7 @@ uint8_t send_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
 	uint8_t buf_rec[6 + (telemetry_request)*(data_length-1)];
 
 	//Start receiving acknowledgment or reply from the CubeComputer
-	HAL_UART_Receive(&huart3, buf_rec, strlen((char*)buf_rec), HAL_MAX_DELAY);
+	HAL_UART_Receive(&hlpuart1, buf_rec, strlen((char*)buf_rec), HAL_MAX_DELAY);
 
 	if (telemetry_request) {
 		//Ignoring ESC, EOM, SOM and storing the rest of the values in data
@@ -430,7 +440,6 @@ uint8_t send_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
   // The receipt of the acknowledge will indicate that another telecommand may be sent.
   // Sending another telecommand before the acknowledge will corrupt the telecommand buffer.
 }
-
 
 
 // CRC initialisation
@@ -473,6 +482,23 @@ uint8_t COMMS_Crc8Checksum(uint8_t* buffer, uint16_t len)
 
 	return crc;
 }
+
+
+//Debug function to print a new line (\n) in UART
+void PRINT_NEW_LINE() {
+    char buf[] = "\r\n";
+    HAL_UART_Transmit(&hlpuart1, (uint8_t*) buf, strlen(buf), 100);
+}
+
+//Debug function to print a given string to UART
+void PRINT_STRING_UART(void *string) {
+
+//    char *buff = (char*) string;
+    HAL_UART_Transmit(&hlpuart1, (uint8_t*) string, strlen((char*) string), 100);
+    PRINT_NEW_LINE();
+//    memset(string, 0, strlen((char*) string));
+}
+
 
 
 /* USER CODE END 4 */

@@ -8,7 +8,7 @@ import time
 TEST_DATA_PATH: str = (
     "TLM_Nov18.csv"  # test data that we want to send to the ADCS
 )
-BAUDRATE: int = 115200
+BAUDRATE: int = 209700
 PORT: str = None
 if os.name == "nt":
     PORT = "COM3"  # windows
