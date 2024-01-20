@@ -112,7 +112,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   //Testing send_telecommand function
-  PRINT_STRING_UART("Testing send TC...");
+  //PRINT_STRING_UART("Testing send TC...");
 
   //Data being transmitted
   uint8_t data[5] = {10, 11, 12, 13, 14};

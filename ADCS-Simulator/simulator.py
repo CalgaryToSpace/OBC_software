@@ -64,6 +64,13 @@ def sim_driver(ser: serial.Serial, mode: int = None):
     else:
         print("Test data loaded.")
 
+    tc_id = 0x00
+    tc_data = []
+
+    id_flag = 0
+    data_flag = 0
+    finished_flag = 0
+
     print("Listening for incoming serial messages...")
     while 1:
         line = ser.readline()
@@ -72,6 +79,38 @@ def sim_driver(ser: serial.Serial, mode: int = None):
         # display incoming data
         if rx:
             print_data(rx)
+            
+            # FORMAT: [0x1f, 0x7f, ID, {data}, 0x1f, 0xff]
+
+            prev = 0x00
+            for item in bytes(rx):
+
+                if data_flag == 1:
+                    tc_data.append(item)
+
+                if id_flag == 1:
+                    tc_id = item
+                    id_flag = 0
+                    data_flag = 1
+                
+                if prev == 0x1f and item == 0x7f:
+                    id_flag = 1
+                elif prev == 0x1f and item == 0xff:
+                    id_flag = 0
+                    data_flag = 0
+                    finished_flag = 1
+                    tc_data = tc_data[:-2]
+                
+                prev = item
+
+            if finished_flag == 1:
+                print(f'TC/TLM ID: {tc_id}')
+                print(f'Data: {tc_data}')
+                finished_flag = 0
+                tc_id = 0x00
+                data = []
+                
+
 
             # cases where we send data to the ADCS
 
