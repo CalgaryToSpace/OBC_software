@@ -100,6 +100,9 @@ void processFrameData(MpiFrame_t frame){
 
 	// Send data over HLPUART
 	HAL_UART_Transmit(&hlpuart1, (uint8_t*)variable_buffer, strlen(variable_buffer), HAL_MAX_DELAY);
+
+	//TODO: For testing write parsed and raw data to files to verify and update test plans
+
 }
 
 
