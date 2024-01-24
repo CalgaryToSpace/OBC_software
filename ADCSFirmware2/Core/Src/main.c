@@ -64,7 +64,8 @@ static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
 
 // TC/TLM functions
-uint8_t I2C_telecommand_wrapper(uint8_t *command, uint32_t length);
+uint8_t I2C_telecommand_wrapper(uint8_t id, uint8_t* data, uint32_t data_length);
+void send_I2C_telecommand(uint8_t id, uint8_t* data, uint32_t data_length);
 uint8_t send_UART_telecommand(uint8_t id, uint8_t* data, uint32_t data_length);
 
 // CRC functions
@@ -129,7 +130,7 @@ int main(void)
   uint8_t id = TC_LOAD_FILE_DOWNLOAD_BLOCK;
 
   //Calling the send_telecommand function
-  send_telecommand(id, data, data_length);
+  send_I2C_telecommand(id, data, data_length);
 
   //TODO: Do something with telemetry reply
 
@@ -433,30 +434,58 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
-uint8_t I2C_telecommand_wrapper(uint8_t *command, uint32_t length) {
+uint8_t I2C_telecommand_wrapper(uint8_t id, uint8_t* data, uint32_t data_length) {
     // Send telecommand
-    send_I2C_telecommand(ADCS_I2C, ADCS_I2C_ADDRESS, length, command);
+    send_I2C_telecommand(id, data, data_length);
 
     // Poll TC Acknowledge Telemetry Format until the Processed flag equals 1.
-    bool processed = false;
+    uint8_t processed = 0;
     uint8_t tc_ack[4];
     while (!processed) {
-        request_i2c_telemetry(LAST_TC_ACK_ID, tc_ack, 4);
+        send_I2C_telecommand(TLF_TC_ACK, tc_ack, 4);
         processed = tc_ack[1] & 1;
     }
 
     // Confirm telecommand validity by checking the TC Error flag of the last read TC Acknowledge Telemetry Format.
-    request_i2c_telemetry(LAST_TC_ACK_ID, tc_ack, 4);
-    ADCS_returnState TC_err_flag = (ADCS_returnState) tc_ack[2];
+    send_I2C_telecommand(TLF_TC_ACK, tc_ack, 4);
+    uint8_t TC_err_flag = tc_ack[2];
 
     return TC_err_flag;
 }
 
+void send_I2C_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
+	// Telemetry Request or Telecommand Format:
+	// ADCS_ESC_CHARACTER, ADCS_START_MESSAGE [uint8_t TLM/TC ID], ADCS_ESC_CHARACTER, ADCS_END_MESSAGE
+	// The defines in adcs_types.h already include the 7th bit of the ID to distinguish TLM and TC
+	// data bytes can be up to a maximum of 8 bytes; data_length ranges from 0 to 8
 
+	//Check id to identify if it's Telecommand or Telemetry Request
+	uint8_t telemetry_request = id & 0b10000000; // 1 = TLM, 0 = TC
 
+	//Allocate only required memory by checking first bit of ID
+	uint8_t buf[2 + telemetry_request + (!telemetry_request)*data_length];
 
+	buf[0] = ADCS_I2C_WRITE;
+	buf[1] = id;
+
+	if (telemetry_request) {
+		buf[2] = ADCS_I2C_READ;
+	} else {
+	// Fill buffer with Data if transmitting a Telecommand
+		for (int i = 0; i < data_length; i++) {
+					buf[i + 3] = data[i];
+				}
+	}
+
+	HAL_I2C_Master_Transmit(&hi2c1, ADCS_I2C_ADDRESS, buf, sizeof(buf)/sizeof(uint8_t), HAL_MAX_DELAY);
+
+}
 
 uint8_t send_UART_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
+	// WARNING: DEPRECATED FUNCTION
+	// This function is incomplete, and will not be updated.
+	// USE AT YOUR OWN RISK.
+
 	// Telemetry Request or Telecommand Format:
 	// ADCS_ESC_CHARACTER, ADCS_START_MESSAGE [uint8_t TLM/TC ID], ADCS_ESC_CHARACTER, ADCS_END_MESSAGE
 	// The defines in adcs_types.h already include the 7th bit of the ID to distinguish TLM and TC
