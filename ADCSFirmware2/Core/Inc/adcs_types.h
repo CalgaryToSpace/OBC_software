@@ -15,9 +15,14 @@
 //ADCS Magic Number defined in Section 5.1 Table 10 of Firmware Manual
 #define ADCS_MAGIC_NUMBER 0x5A // Used to make sure that the reset command is valid
 
-//Identifiers of Start of Message and End of Message - Section 4.2 of Firmware Manual
+//I2C Write and Read Addresses - Section 5.3 Table 5 of Firmware Manual
+#define ADCS_I2C_WRITE 0xAE
+#define ADCS_I2C_READ 0xAF
+#define ADCS_I2C_ADDRESS 0x57
+
+//Identifiers of UART Start of Message and End of Message - Section 4.2 of Firmware Manual
 // 0x1F | 0x7F ....... | 0x1F 0xFF
-#define ADCS_ESC_CHARACTER 0X1F
+#define ADCS_ESC_CHARACTER 0x1F
 #define ADCS_START_MESSAGE 0x7F
 #define ADCS_END_MESSAGE 0xFF
 

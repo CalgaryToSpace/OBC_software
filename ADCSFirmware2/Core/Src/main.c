@@ -41,6 +41,8 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+I2C_HandleTypeDef hi2c1;
+
 UART_HandleTypeDef hlpuart1;
 UART_HandleTypeDef huart3;
 
@@ -58,10 +60,12 @@ static void MX_GPIO_Init(void);
 static void MX_LPUART1_UART_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
+static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
 
 // TC/TLM functions
-uint8_t send_telecommand(uint8_t id, uint8_t* data, uint32_t data_length);
+uint8_t I2C_telecommand_wrapper(uint8_t *command, uint32_t length);
+uint8_t send_UART_telecommand(uint8_t id, uint8_t* data, uint32_t data_length);
 
 // CRC functions
 void COMMS_Crc8Init();
@@ -109,6 +113,7 @@ int main(void)
   MX_LPUART1_UART_Init();
   MX_USART3_UART_Init();
   MX_USB_OTG_FS_PCD_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
   //Testing send_telecommand function
@@ -189,6 +194,54 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief I2C1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_I2C1_Init(void)
+{
+
+  /* USER CODE BEGIN I2C1_Init 0 */
+
+  /* USER CODE END I2C1_Init 0 */
+
+  /* USER CODE BEGIN I2C1_Init 1 */
+
+  /* USER CODE END I2C1_Init 1 */
+  hi2c1.Instance = I2C1;
+  hi2c1.Init.Timing = 0x107075B0;
+  hi2c1.Init.OwnAddress1 = 0;
+  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c1.Init.OwnAddress2 = 0;
+  hi2c1.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Analogue filter
+  */
+  if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Digital filter
+  */
+  if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN I2C1_Init 2 */
+
+  /* USER CODE END I2C1_Init 2 */
+
 }
 
 /**
@@ -380,7 +433,30 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
-uint8_t send_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
+uint8_t I2C_telecommand_wrapper(uint8_t *command, uint32_t length) {
+    // Send telecommand
+    send_I2C_telecommand(ADCS_I2C, ADCS_I2C_ADDRESS, length, command);
+
+    // Poll TC Acknowledge Telemetry Format until the Processed flag equals 1.
+    bool processed = false;
+    uint8_t tc_ack[4];
+    while (!processed) {
+        request_i2c_telemetry(LAST_TC_ACK_ID, tc_ack, 4);
+        processed = tc_ack[1] & 1;
+    }
+
+    // Confirm telecommand validity by checking the TC Error flag of the last read TC Acknowledge Telemetry Format.
+    request_i2c_telemetry(LAST_TC_ACK_ID, tc_ack, 4);
+    ADCS_returnState TC_err_flag = (ADCS_returnState) tc_ack[2];
+
+    return TC_err_flag;
+}
+
+
+
+
+
+uint8_t send_UART_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
 	// Telemetry Request or Telecommand Format:
 	// ADCS_ESC_CHARACTER, ADCS_START_MESSAGE [uint8_t TLM/TC ID], ADCS_ESC_CHARACTER, ADCS_END_MESSAGE
 	// The defines in adcs_types.h already include the 7th bit of the ID to distinguish TLM and TC
