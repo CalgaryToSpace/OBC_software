@@ -479,6 +479,11 @@ void send_I2C_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
 
 	HAL_I2C_Master_Transmit(&hi2c1, ADCS_I2C_ADDRESS, buf, sizeof(buf)/sizeof(uint8_t), HAL_MAX_DELAY);
 
+	if (telemetry_request) {
+		// populate data with received telemetry
+		HAL_I2C_Master_Receive(&hi2c1, ADCS_I2C_ADDRESS, data, data_length, HAL_MAX_DELAY);
+	}
+
 }
 
 uint8_t send_UART_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
