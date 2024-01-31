@@ -5,7 +5,6 @@
 #include <mpiCommandHandling.h>
 #include <stdio.h>
 #include "main.h"
-#include "../../../../S70-Memory-Module/Core/Inc/packetReadWrite.h"
 
 #define BUFFER_SIZE 160
 

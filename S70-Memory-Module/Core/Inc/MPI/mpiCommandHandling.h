@@ -8,7 +8,6 @@
 #ifndef INC_MPICOMMANDHANDLING_H_
 #define INC_MPICOMMANDHANDLING_H_
 #include "main.h"
-#include "../../../../S70-Memory-Module/Core/Inc/packetReadWrite.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdint.h>
