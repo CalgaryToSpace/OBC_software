@@ -7,7 +7,7 @@
 
 // Includes----------------------------------------------------------
 // Include header libraries for commands, functions, and pin Names
-#include "MemoryUtilities.h"
+#include "../Inc/MemoryUtilities.h"
 
 // Include string header library to use strcpy
 #include <string.h>

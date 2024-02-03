@@ -8,7 +8,8 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
-#include "PacketEnum.h"
+#include <stdint.h>
+#include "../Inc/PacketEnum.h"
 
 void DECODE_PACKET_0(void *);
 void CREATE_PACKET_0(void *);

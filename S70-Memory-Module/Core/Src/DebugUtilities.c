@@ -7,7 +7,7 @@
 
 // Includes----------------------------------------------------------
 // Includes Memory Utilities and String header files
-#include "MemoryUtilities.h"
+#include "../Inc/MemoryUtilities.h"
 #include "string.h"
 
 // Variables---------------------------------------------------------

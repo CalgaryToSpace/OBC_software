@@ -7,8 +7,8 @@
 
 // Includes----------------------------------------------------------
 // Include header libraries for commands, functions, and pin Names and debugging
-#include "MemoryUtilities.h"
-#include "DebugUtilities.h"
+#include "../Inc/MemoryUtilities.h"
+#include "../Inc/DebugUtilities.h"
 
 /*
  * Chip Select set to LOW

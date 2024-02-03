@@ -18,8 +18,8 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include <mpiCommandHandling.h>
 #include "main.h"
-#include "mpiCommandHandling.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -50,15 +50,15 @@ SPI_HandleTypeDef hspi1;
 /* USER CODE BEGIN PV */
 
 //note assuming allocating all storage for MPI
-const uint8_t FLASH_READ = 0x03;
-const uint8_t FLASH_WRITE = 0x02;
-const uint8_t FLASH_WREN = 0x06;
-const uint8_t FLASH_WRDI = 0x04;
-const uint8_t FLASH_ER4 = 0x20;
-const uint8_t FLASH_ER32 = 0x52;
-const uint8_t FLASH_ER64 = 0xd8;
-const uint8_t FLASH_ERCP = 0xC7;
-const uint8_t FLASH_STATREG1 = 0X05;
+//const uint8_t FLASH_READ = 0x03;
+//const uint8_t FLASH_WRITE = 0x02;
+//const uint8_t FLASH_WREN = 0x06;
+//const uint8_t FLASH_WRDI = 0x04;
+//const uint8_t FLASH_ER4 = 0x20;
+//const uint8_t FLASH_ER32 = 0x52;
+//const uint8_t FLASH_ER64 = 0xd8;
+//const uint8_t FLASH_ERCP = 0xC7;
+//const uint8_t FLASH_STATREG1 = 0X05;
 
 /* USER CODE END PV */
 
