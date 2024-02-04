@@ -1,8 +1,10 @@
 /*
  * mpiCommandHandling.c
  *
+ * Author: Vaibhav Kapoor
  */
-#include <mpiCommandHandling.h>
+
+#include <../Inc/mpiCommandHandling.h>
 #include <stdio.h>
 #include "main.h"
 
