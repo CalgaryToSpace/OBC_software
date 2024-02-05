@@ -8,10 +8,10 @@ import time
 TEST_DATA_PATH: str = (
     "TLM_Nov18.csv"  # test data that we want to send to the ADCS
 )
-BAUDRATE: int = 209700
+BAUDRATE: int = 115200
 PORT: str = None
 if os.name == "nt":
-    PORT = "COM3"  # windows
+    PORT = "COM5"  # windows
 elif os.name == "posix":
     PORT = "/dev/ttyACM0"  # unix
 #################################
@@ -80,7 +80,8 @@ def sim_driver(ser: serial.Serial, mode: int = None):
         if rx:
             print_data(rx)
             
-            # FORMAT: [0x1f, 0x7f, ID, {data}, 0x1f, 0xff]
+            '''
+            # UART FORMAT: [0x1f, 0x7f, ID, {data}, 0x1f, 0xff]
 
             prev = 0x00
             for item in bytes(rx):
@@ -109,6 +110,8 @@ def sim_driver(ser: serial.Serial, mode: int = None):
                 finished_flag = 0
                 tc_id = 0x00
                 data = []
+
+            '''
                 
 
 
