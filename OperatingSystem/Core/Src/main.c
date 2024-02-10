@@ -486,11 +486,22 @@ void StartSysCritInfo(void *argument)
 {
   /* USER CODE BEGIN StartSysCritInfo */
 	char * buf = "SysCritInfo Task\r\n";
+	uint8_t sct_input[10];
+	char * expected = "SCT\n";
+	memset(sct_input, '\0',10);
   /* Infinite loop */
   for(;;)
   {
-	HAL_UART_Transmit(&hlpuart1, (uint8_t*)buf, strlen(buf), HAL_MAX_DELAY);
-    osDelay(500);
+//	GET INPUT
+	HAL_UART_Receive(&hlpuart1, sct_input, 4, HAL_MAX_DELAY);
+//	NULL TERMINATE INPUT
+//	input[3] = '\0';
+//	CHECK INPUT
+	if(strcmp(sct_input, expected) == 0){
+		HAL_UART_Transmit(&hlpuart1, (uint8_t*)buf, strlen(buf), HAL_MAX_DELAY);
+	}
+//	memset(sct_input, '\0',3);
+	osDelay(500);
   }
   /* USER CODE END StartSysCritInfo */
 }
