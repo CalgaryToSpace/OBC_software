@@ -62,3 +62,36 @@ extern Digi digi; //digipeater state
 //defined in dra_system.h
 #define DRA_RESPONSE_BUF_SIZE 100
 extern uint8_t latest_dra_response_buf[DRA_RESPONSE_BUF_SIZE];
+
+
+// defined in mboss_handler
+//referenced in beacon.c and mboss_handler.c
+
+// APRS = Automatic Packet Reporting System
+typedef enum {
+	RF_APRS_MODE_INACTIVE = 0,
+	RF_APRS_MODE_DIGIPEAT = 1,
+	RF_APRS_MODE_STORE_AND_FORWARD = 2,
+} RF_APRS_Mode_t;
+
+extern RF_APRS_Mode_t current_aprs_mode;
+extern uint32_t timestamp_sec_at_boot;
+extern uint32_t uptime_at_last_success_failure_led_on;
+
+// defined in sys_reboot_reason.h
+
+//referenced in main.c and sys_reboot_reason.c
+/// @brief  Possible STM32 system reset causes
+typedef enum reset_cause_e
+{
+    RESET_CAUSE_UNKNOWN = 0,
+    RESET_CAUSE_LOW_POWER_RESET,
+    RESET_CAUSE_WINDOW_WATCHDOG_RESET,
+    RESET_CAUSE_INDEPENDENT_WATCHDOG_RESET,
+    RESET_CAUSE_SOFTWARE_RESET,
+    RESET_CAUSE_POWER_ON_POWER_DOWN_RESET,
+    RESET_CAUSE_EXTERNAL_RESET_PIN_RESET,
+    RESET_CAUSE_BROWNOUT_RESET,
+} reset_cause_t;
+extern reset_cause_t this_boot_reset_cause; // NOTES FROM CODE: store once at boot because it can only be fetched once via `reset_cause_get()
+
