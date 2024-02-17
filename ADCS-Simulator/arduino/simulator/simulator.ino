@@ -18,7 +18,7 @@ void I2C_RxHandler(int bytes) {
   rx_buffer[rx_count] = '\0';
   rx_count = 0;
 
-  Serial.print("Received Data:");  
+  Serial.print("Received Data: ");  
   Serial.println((char*)rx_buffer);  
   
 }
