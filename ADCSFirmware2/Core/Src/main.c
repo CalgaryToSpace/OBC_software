@@ -124,14 +124,16 @@ int main(void)
 
   uint8_t aTxBuffer[] = " ****I2C_TwoBoards communication based on Polling****  ****I2C_TwoBoards communication based on Polling****  ****I2C_TwoBoards communication based on Polling**** ";
   HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
+  // turn on blue LED to test transmission
 
-  while(HAL_I2C_Master_Transmit(&hi2c3, ADCS_I2C_ADDRESS, (uint8_t*)aTxBuffer, TXBUFFERSIZE, 10000)!= HAL_OK)
+  while(HAL_I2C_Master_Transmit(&hi2c3, (uint8_t)ADCS_I2C_ADDRESS, (uint8_t*)aTxBuffer, TXBUFFERSIZE, 10000)!= HAL_OK)
+	  // trying left-shift of address by 1 due to 7-bit protocol
   {
     if (HAL_I2C_GetError(&hi2c3) != HAL_I2C_ERROR_AF)
     {
       while (1) {
     	// repeatedly blink for error
-    	HAL_GPIO_TogglePin(GPIOB, 7);
+    	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
     	HAL_Delay(1000);
       }
     }
@@ -417,7 +419,6 @@ static void MX_GPIO_Init(void)
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
-  __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOG_CLK_ENABLE();
@@ -455,14 +456,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(USB_PowerSwitchOn_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : PB8 PB9 */
-  GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_9;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-  GPIO_InitStruct.Alternate = GPIO_AF4_I2C1;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
