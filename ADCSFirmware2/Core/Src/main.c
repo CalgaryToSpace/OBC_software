@@ -117,6 +117,32 @@ int main(void)
   MX_I2C3_Init();
   /* USER CODE BEGIN 2 */
 
+  // Step 1: test I2C connection with Arduino (code from demo)
+
+#define TXBUFFERSIZE (COUNTOF(aTxBuffer) - 1)
+#define COUNTOF(__BUFFER__)   (sizeof(__BUFFER__) / sizeof(*(__BUFFER__)))
+
+  uint8_t aTxBuffer[] = " ****I2C_TwoBoards communication based on Polling****  ****I2C_TwoBoards communication based on Polling****  ****I2C_TwoBoards communication based on Polling**** ";
+  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
+
+  while(HAL_I2C_Master_Transmit(&hi2c3, ADCS_I2C_ADDRESS, (uint8_t*)aTxBuffer, TXBUFFERSIZE, 10000)!= HAL_OK)
+  {
+    if (HAL_I2C_GetError(&hi2c3) != HAL_I2C_ERROR_AF)
+    {
+      while (1) {
+    	// repeatedly blink for error
+    	HAL_GPIO_TogglePin(GPIOB, 7);
+    	HAL_Delay(1000);
+      }
+    }
+  }
+
+  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
+  // turns off on successful transmission
+
+
+
+/*
   //Testing send_telecommand function
   //PRINT_STRING_UART("Testing send TC...");
 
@@ -131,6 +157,7 @@ int main(void)
 
   //Calling the send_telecommand function
   send_I2C_telecommand(id, data, data_length);
+*/
 
   //TODO: Do something with telemetry reply
 

@@ -1,5 +1,6 @@
 #include <Wire.h>
 // Pins for Arduino Uno: A4 (SDA), A5 (SCL)
+// Pins for Nucleo: A3 (PC1, SDA), A1 (PC0, SCL)
 
 uint8_t tx_byte;
 uint8_t rx_buffer[32];
