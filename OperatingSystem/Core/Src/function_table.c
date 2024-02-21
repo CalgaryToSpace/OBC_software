@@ -10,7 +10,6 @@
 #include <stdint.h>
 #include "function_table.h"
 #include "main.h"
-#include "cmsis_os.h"
 
 // no idea if this will work
 extern UART_HandleTypeDef hlpuart1;
