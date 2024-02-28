@@ -41,6 +41,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+I2C_HandleTypeDef hi2c1;
 I2C_HandleTypeDef hi2c3;
 
 UART_HandleTypeDef hlpuart1;
@@ -61,6 +62,7 @@ static void MX_LPUART1_UART_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_I2C3_Init(void);
+static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
 
 // TC/TLM functions
@@ -116,10 +118,17 @@ int main(void)
   MX_USART3_UART_Init();
   MX_USB_OTG_FS_PCD_Init();
   MX_I2C3_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
-  // Step 1: test I2C connection with Arduino (code from demo)
 
+  uint8_t TX_Buffer [] = "test" ; // DATA to send
+  HAL_I2C_Master_Transmit(&hi2c1,0x57 <<1,TX_Buffer,4,HAL_MAX_DELAY); //Sending in Blocking mode
+  HAL_Delay(100);
+
+
+/*
+  // Step 1: test I2C connection with Arduino (code from demo)
 #define TXBUFFERSIZE (COUNTOF(aTxBuffer) - 1)
 #define COUNTOF(__BUFFER__)   (sizeof(__BUFFER__) / sizeof(*(__BUFFER__)))
 
@@ -127,10 +136,10 @@ int main(void)
   HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
   // turn on blue LED to test transmission
 
-  while(HAL_I2C_Master_Transmit(&hi2c3, (uint8_t)ADCS_I2C_ADDRESS << 1, (uint8_t*)aTxBuffer, TXBUFFERSIZE, 10000)!= HAL_OK)
+  while(HAL_I2C_Master_Transmit(&hi2c1, (uint8_t)ADCS_I2C_ADDRESS << 1, (uint8_t*)aTxBuffer, TXBUFFERSIZE, 10000)!= HAL_OK)
 	  // trying left-shift of address by 1 due to 7-bit protocol
   {
-    if (HAL_I2C_GetError(&hi2c3) != HAL_I2C_ERROR_AF)
+    if (HAL_I2C_GetError(&hi2c1) != HAL_I2C_ERROR_AF)
     {
       while (1) {
     	// repeatedly blink for error
@@ -143,7 +152,7 @@ int main(void)
   HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
   // turns off on successful transmission
 
-
+*/
 
 /*
   //Testing send_telecommand function
@@ -196,15 +205,14 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48|RCC_OSCILLATORTYPE_MSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48|RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSI48State = RCC_HSI48_ON;
-  RCC_OscInitStruct.MSIState = RCC_MSI_ON;
-  RCC_OscInitStruct.MSICalibrationValue = 0;
-  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_6;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_MSI;
-  RCC_OscInitStruct.PLL.PLLM = 1;
-  RCC_OscInitStruct.PLL.PLLN = 60;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+  RCC_OscInitStruct.PLL.PLLM = 2;
+  RCC_OscInitStruct.PLL.PLLN = 30;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
   RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;
@@ -219,13 +227,61 @@ void SystemClock_Config(void)
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief I2C1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_I2C1_Init(void)
+{
+
+  /* USER CODE BEGIN I2C1_Init 0 */
+
+  /* USER CODE END I2C1_Init 0 */
+
+  /* USER CODE BEGIN I2C1_Init 1 */
+
+  /* USER CODE END I2C1_Init 1 */
+  hi2c1.Instance = I2C1;
+  hi2c1.Init.Timing = 0x107075B0;
+  hi2c1.Init.OwnAddress1 = 0;
+  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c1.Init.OwnAddress2 = 0;
+  hi2c1.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
+  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Analogue filter
+  */
+  if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Digital filter
+  */
+  if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN I2C1_Init 2 */
+
+  /* USER CODE END I2C1_Init 2 */
+
 }
 
 /**
@@ -500,7 +556,7 @@ void send_I2C_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
 		buf[i + 3] = data[i];
 	}
 
-	HAL_I2C_Master_Transmit(&hi2c3, ADCS_I2C_ADDRESS << 1, buf, sizeof(buf)/sizeof(uint8_t), HAL_MAX_DELAY);
+	HAL_I2C_Master_Transmit(&hi2c1, ADCS_I2C_ADDRESS << 1, buf, sizeof(buf)/sizeof(uint8_t), HAL_MAX_DELAY);
 
 }
 
@@ -512,22 +568,20 @@ void send_I2C_telemetry_request (uint8_t id, uint8_t* data, uint32_t data_length
 	// The defines in adcs_types.h already include the 7th bit of the ID to distinguish TLM and TC
 	// data bytes can be up to a maximum of 8 bytes; data_length ranges from 0 to 8
 
-	//Check id to identify if it's Telecommand or Telemetry Request
-	uint8_t telemetry_request = id & 0b10000000; // 1 = TLM, 0 = TC
-
 	//Allocate only required memory
 	uint8_t buf[2];
 
 	buf[0] = ADCS_I2C_WRITE;
 	buf[1] = id;
 
-	uint8_t read_buf = ADCS_I2C_READ;
+	uint8_t read_buf[1];
+	read_buf[0] = ADCS_I2C_READ;
 
-	HAL_I2C_Master_Seq_Transmit_IT(&hi2c3, ADCS_I2C_ADDRESS << 1, buf, sizeof(buf)/sizeof(uint8_t), I2C_FIRST_AND_NEXT_FRAME);
-	HAL_I2C_Master_Seq_Transmit_IT(&hi2c3, ADCS_I2C_ADDRESS << 1, read_buf, sizeof(read_buf)/sizeof(uint8_t), I2C_FIRST_AND_NEXT_FRAME);
+	HAL_I2C_Master_Seq_Transmit_IT(&hi2c1, ADCS_I2C_ADDRESS << 1, buf, sizeof(buf)/sizeof(uint8_t), I2C_FIRST_AND_NEXT_FRAME);
+	HAL_I2C_Master_Seq_Transmit_IT(&hi2c1, ADCS_I2C_ADDRESS << 1, read_buf, sizeof(read_buf)/sizeof(uint8_t), I2C_FIRST_AND_NEXT_FRAME);
 	// I2C_FIRST_AND_NEXT_FRAME has start condition, no stop condition, and allows for continuing on with another I2C Seq command
 
-	HAL_I2C_Master_Seq_Receive_IT(&hi2c3, ADCS_I2C_ADDRESS << 1, data, data_length, I2C_LAST_FRAME);
+	HAL_I2C_Master_Seq_Receive_IT(&hi2c1, ADCS_I2C_ADDRESS << 1, data, data_length, I2C_LAST_FRAME);
 	// This is my best guess at receiving data_length bytes of data and ending with a stop condition
 	// But I will admit I don't really understand the XferOptions part of any of these commands
 
