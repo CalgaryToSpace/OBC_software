@@ -66,6 +66,7 @@ static void MX_I2C3_Init(void);
 // TC/TLM functions
 uint8_t I2C_telecommand_wrapper(uint8_t id, uint8_t* data, uint32_t data_length);
 void send_I2C_telecommand(uint8_t id, uint8_t* data, uint32_t data_length);
+void send_I2C_telemetry_request (uint8_t id, uint8_t* data, uint32_t data_length);
 uint8_t send_UART_telecommand(uint8_t id, uint8_t* data, uint32_t data_length);
 
 // CRC functions
@@ -483,35 +484,52 @@ uint8_t I2C_telecommand_wrapper(uint8_t id, uint8_t* data, uint32_t data_length)
 }
 
 void send_I2C_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
-	// Telemetry Request or Telecommand Format:
+	// Telecommand Format:
 	// ADCS_ESC_CHARACTER, ADCS_START_MESSAGE [uint8_t TLM/TC ID], ADCS_ESC_CHARACTER, ADCS_END_MESSAGE
+	// The defines in adcs_types.h already include the 7th bit of the ID to distinguish TLM and TC
+	// data bytes can be up to a maximum of 8 bytes; data_length ranges from 0 to 8
+
+	//Allocate only required memory
+	uint8_t buf[2 + data_length];
+
+	buf[0] = ADCS_I2C_WRITE;
+	buf[1] = id;
+
+	// Fill buffer with Data if transmitting a Telecommand
+	for (int i = 0; i < data_length; i++) {
+		buf[i + 3] = data[i];
+	}
+
+	HAL_I2C_Master_Transmit(&hi2c3, ADCS_I2C_ADDRESS << 1, buf, sizeof(buf)/sizeof(uint8_t), HAL_MAX_DELAY);
+
+}
+
+
+void send_I2C_telemetry_request (uint8_t id, uint8_t* data, uint32_t data_length) {
+	// Telemetry Request Format:
+	// Note: requires a repeated start condition; data_lenth is number of bits to read.
+	// [start], ADCS_I2C_WRITE, id, [start] ADCS_I2C_READ, [read all the data], [stop]
 	// The defines in adcs_types.h already include the 7th bit of the ID to distinguish TLM and TC
 	// data bytes can be up to a maximum of 8 bytes; data_length ranges from 0 to 8
 
 	//Check id to identify if it's Telecommand or Telemetry Request
 	uint8_t telemetry_request = id & 0b10000000; // 1 = TLM, 0 = TC
 
-	//Allocate only required memory by checking first bit of ID
-	uint8_t buf[2 + telemetry_request + (!telemetry_request)*data_length];
+	//Allocate only required memory
+	uint8_t buf[2];
 
 	buf[0] = ADCS_I2C_WRITE;
 	buf[1] = id;
 
-	if (telemetry_request) {
-		buf[2] = ADCS_I2C_READ;
-	} else {
-	// Fill buffer with Data if transmitting a Telecommand
-		for (int i = 0; i < data_length; i++) {
-					buf[i + 3] = data[i];
-				}
-	}
+	uint8_t read_buf = ADCS_I2C_READ;
 
-	HAL_I2C_Master_Transmit(&hi2c3, ADCS_I2C_ADDRESS, buf, sizeof(buf)/sizeof(uint8_t), HAL_MAX_DELAY);
+	HAL_I2C_Master_Seq_Transmit_IT(&hi2c3, ADCS_I2C_ADDRESS << 1, buf, sizeof(buf)/sizeof(uint8_t), I2C_FIRST_AND_NEXT_FRAME);
+	HAL_I2C_Master_Seq_Transmit_IT(&hi2c3, ADCS_I2C_ADDRESS << 1, read_buf, sizeof(read_buf)/sizeof(uint8_t), I2C_FIRST_AND_NEXT_FRAME);
+	// I2C_FIRST_AND_NEXT_FRAME has start condition, no stop condition, and allows for continuing on with another I2C Seq command
 
-	if (telemetry_request) {
-		// populate data with received telemetry
-		HAL_I2C_Master_Receive(&hi2c3, ADCS_I2C_ADDRESS, data, data_length, HAL_MAX_DELAY);
-	}
+	HAL_I2C_Master_Seq_Receive_IT(&hi2c3, ADCS_I2C_ADDRESS << 1, data, data_length, I2C_LAST_FRAME);
+	// This is my best guess at receiving data_length bytes of data and ending with a stop condition
+	// But I will admit I don't really understand the XferOptions part of any of these commands
 
 }
 
