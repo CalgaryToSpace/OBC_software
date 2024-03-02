@@ -11,16 +11,20 @@ uint32_t rx_count = 0;
 
 void I2C_RxHandler(int bytes) {
 
+  Serial.print("Received Data: ");  
+
   while(Wire.available()) { 
     rx_buffer[rx_count] = Wire.read();
+    Serial.print(rx_buffer[rx_count], HEX);
+    Serial.print(" ");
     rx_count++;
   }
   rx_buffer[rx_count] = '\0';
   rx_count = 0;
-
-  Serial.print("Received Data: ");  
-  Serial.println((char*)rx_buffer);  
   
+  // Serial.println((char*)rx_buffer);  
+  Serial.println();
+
 }
 
 void I2C_TxHandler() {

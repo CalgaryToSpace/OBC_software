@@ -121,55 +121,30 @@ int main(void)
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
-
+/*
+ // Minimal I2C test code
   uint8_t TX_Buffer [] = "test" ; // DATA to send
   HAL_I2C_Master_Transmit(&hi2c1,0x57 <<1,TX_Buffer,4,HAL_MAX_DELAY); //Sending in Blocking mode
   HAL_Delay(100);
-
-
-/*
-  // Step 1: test I2C connection with Arduino (code from demo)
-#define TXBUFFERSIZE (COUNTOF(aTxBuffer) - 1)
-#define COUNTOF(__BUFFER__)   (sizeof(__BUFFER__) / sizeof(*(__BUFFER__)))
-
-  uint8_t aTxBuffer[] = " ****I2C_TwoBoards communication based on Polling****  ****I2C_TwoBoards communication based on Polling****  ****I2C_TwoBoards communication based on Polling**** ";
-  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
-  // turn on blue LED to test transmission
-
-  while(HAL_I2C_Master_Transmit(&hi2c1, (uint8_t)ADCS_I2C_ADDRESS << 1, (uint8_t*)aTxBuffer, TXBUFFERSIZE, 10000)!= HAL_OK)
-	  // trying left-shift of address by 1 due to 7-bit protocol
-  {
-    if (HAL_I2C_GetError(&hi2c1) != HAL_I2C_ERROR_AF)
-    {
-      while (1) {
-    	// repeatedly blink for error
-    	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
-    	HAL_Delay(1000);
-      }
-    }
-  }
-
-  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_7);
-  // turns off on successful transmission
-
 */
 
-/*
   //Testing send_telecommand function
   //PRINT_STRING_UART("Testing send TC...");
 
   //Data being transmitted
   uint8_t data[5] = {10, 11, 12, 13, 14};
+  // in hexadecimal: 0A, 0B, 0C, 0D, 0E
 
   //Length of Data
   uint32_t data_length = sizeof(data);
 
   //TC ID (Indicated by 7th bit being 0, TC value < 128)
   uint8_t id = TC_LOAD_FILE_DOWNLOAD_BLOCK;
+  	  	  	  // in hexadecimal: 70
 
   //Calling the send_telecommand function
   send_I2C_telecommand(id, data, data_length);
-*/
+
 
   //TODO: Do something with telemetry reply
 
@@ -553,7 +528,7 @@ void send_I2C_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
 
 	// Fill buffer with Data if transmitting a Telecommand
 	for (int i = 0; i < data_length; i++) {
-		buf[i + 3] = data[i];
+		buf[i + 2] = data[i];
 	}
 
 	HAL_I2C_Master_Transmit(&hi2c1, ADCS_I2C_ADDRESS << 1, buf, sizeof(buf)/sizeof(uint8_t), HAL_MAX_DELAY);
