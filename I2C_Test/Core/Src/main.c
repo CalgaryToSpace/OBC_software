@@ -48,7 +48,8 @@ UART_HandleTypeDef huart3;
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
 /* USER CODE BEGIN PV */
-uint8_t TX_Buffer [] = "A" ; // DATA to send
+uint8_t TX_Buffer [] = "BAB" ; // DATA to send (hex 42 41 42)
+uint8_t TX_Buffer_Two [] = "test" ; // DATA to send (hex 74 65 73 74)
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -59,6 +60,47 @@ static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
+void send_I2C_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
+	// Telecommand Format:
+	// ADCS_ESC_CHARACTER, ADCS_START_MESSAGE [uint8_t TLM/TC ID], ADCS_ESC_CHARACTER, ADCS_END_MESSAGE
+	// The defines in adcs_types.h already include the 7th bit of the ID to distinguish TLM and TC
+	// data bytes can be up to a maximum of 8 bytes; data_length ranges from 0 to 8
+
+	//Allocate only required memory
+	uint8_t buf[2 + data_length];
+
+	buf[0] = 0xAE;
+	buf[1] = id;
+
+	// Fill buffer with Data if transmitting a Telecommand
+	for (int i = 0; i < data_length; i++) {
+		buf[i + 2] = data[i];
+	}
+
+	while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY) {} // implement delay for interrupt
+	HAL_I2C_Master_Seq_Transmit_IT(&hi2c1, 0x57 << 1, buf, sizeof(buf)/sizeof(uint8_t), I2C_FIRST_AND_LAST_FRAME);
+
+}
+
+void seq2(uint8_t* foo) {
+	HAL_I2C_Master_Seq_Transmit_IT(&hi2c1, 0x57 << 1, foo, 7, I2C_FIRST_AND_LAST_FRAME);
+}
+
+void minimal_seq(uint8_t* stuff, uint8_t size) {
+
+	uint8_t buf[2 + size];
+
+	buf[0] = 0xAE;
+	buf[1] = 0x70;
+
+	// Fill buffer with Data if transmitting a Telecommand
+	for (int i = 0; i < size; i++) {
+		buf[i + 2] = stuff[i];
+	}
+
+	HAL_I2C_Master_Seq_Transmit_IT(&hi2c1, 0x57 << 1, buf, 2 + size, I2C_FIRST_AND_LAST_FRAME);
+	HAL_Delay(100);
+}
 
 /* USER CODE END PFP */
 
@@ -100,8 +142,63 @@ int main(void)
   MX_USB_OTG_FS_PCD_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-  HAL_I2C_Master_Transmit(&hi2c1,0x57 <<1,TX_Buffer,1,1000000000000); //Sending in Blocking mode
+
+  /*
+  //HAL_I2C_Master_Transmit(&hi2c1,0x57 <<1,TX_Buffer,3,HAL_MAX_DELAY); //Sending in Blocking mode
+  HAL_I2C_Master_Seq_Transmit_IT(&hi2c1, 0x57<<1,TX_Buffer,3, I2C_FIRST_AND_LAST_FRAME); //Non-Blocking mode
   HAL_Delay(100);
+  HAL_I2C_Master_Seq_Transmit_IT(&hi2c1, 0x57<<1,TX_Buffer_Two,4, I2C_FIRST_AND_LAST_FRAME); //Non-Blocking mode
+  HAL_Delay(100);
+
+  // try with ASCII values
+  uint8_t bufe[7] = {0xAE, 0x70, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E};
+  HAL_I2C_Master_Seq_Transmit_IT(&hi2c1, 0x57<<1,bufe,7, I2C_FIRST_AND_LAST_FRAME);
+  HAL_Delay(100);
+
+
+  uint8_t data_length = 5;
+  uint8_t id = 0x70;
+  uint8_t data[5] = {0x0A, 0x0B, 0x0C, 0x0D, 0x0E};
+
+  // BEGIN CODE FROM send_I2C_telecommand FUNCTION (inputs id, *data, data_length)
+  uint8_t buff[2 + data_length];
+
+  buff[0] = 0xAE;
+  buff[1] = id;
+
+  // Fill buffer with Data if transmitting a Telecommand
+  for (int i = 0; i < data_length; i++) {
+  	buff[i + 2] = data[i];
+  }
+
+  while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY) {} // implement delay for interrupt
+  HAL_I2C_Master_Seq_Transmit_IT(&hi2c1, 0x57 << 1, buff, sizeof(buff)/sizeof(uint8_t), I2C_FIRST_AND_LAST_FRAME);
+  // END CODE FROM send_I2C_telecommand FUNCTION
+
+
+
+  HAL_Delay(100);
+
+  send_I2C_telecommand(0x70, data, 5);
+  HAL_Delay(100);
+
+
+  uint8_t stuffe[] = {0xAE, 0x0A, 0x07, 0x70};
+  HAL_I2C_Master_Seq_Transmit_IT(&hi2c1, 0x57 << 1, stuffe, sizeof(stuffe)/sizeof(uint8_t), I2C_FIRST_AND_LAST_FRAME);
+
+  HAL_Delay(100);
+
+  seq2(stuffe);
+
+
+  HAL_Delay(100);
+
+  minimal_seq(stuffe);
+   */
+
+  uint8_t bar[6] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06};
+  minimal_seq(bar, 6);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */

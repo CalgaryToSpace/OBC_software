@@ -42,7 +42,6 @@
 
 /* Private variables ---------------------------------------------------------*/
 I2C_HandleTypeDef hi2c1;
-I2C_HandleTypeDef hi2c3;
 
 UART_HandleTypeDef hlpuart1;
 UART_HandleTypeDef huart3;
@@ -61,7 +60,6 @@ static void MX_GPIO_Init(void);
 static void MX_LPUART1_UART_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
-static void MX_I2C3_Init(void);
 static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
 
@@ -117,16 +115,17 @@ int main(void)
   MX_LPUART1_UART_Init();
   MX_USART3_UART_Init();
   MX_USB_OTG_FS_PCD_Init();
-  MX_I2C3_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
-/*
+
  // Minimal I2C test code
-  uint8_t TX_Buffer [] = "test" ; // DATA to send
-  HAL_I2C_Master_Transmit(&hi2c1,0x57 <<1,TX_Buffer,4,HAL_MAX_DELAY); //Sending in Blocking mode
+  uint8_t TX_Buffer [] = "test" ; // DATA to send (hex: 74 65 73 74)
+  //HAL_I2C_Master_Transmit(&hi2c1,0x57 <<1,TX_Buffer,4,HAL_MAX_DELAY); //Sending in Blocking mode
+  HAL_I2C_Master_Seq_Transmit_IT(&hi2c1, ADCS_I2C_ADDRESS << 1, TX_Buffer, 4, I2C_FIRST_AND_LAST_FRAME); //Sending in Non-Blocking mode
   HAL_Delay(100);
-*/
+
+
 
   //Testing send_telecommand function
   //PRINT_STRING_UART("Testing send TC...");
@@ -144,7 +143,6 @@ int main(void)
 
   //Calling the send_telecommand function
   send_I2C_telecommand(id, data, data_length);
-
 
   //TODO: Do something with telemetry reply
 
@@ -256,54 +254,6 @@ static void MX_I2C1_Init(void)
   /* USER CODE BEGIN I2C1_Init 2 */
 
   /* USER CODE END I2C1_Init 2 */
-
-}
-
-/**
-  * @brief I2C3 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_I2C3_Init(void)
-{
-
-  /* USER CODE BEGIN I2C3_Init 0 */
-
-  /* USER CODE END I2C3_Init 0 */
-
-  /* USER CODE BEGIN I2C3_Init 1 */
-
-  /* USER CODE END I2C3_Init 1 */
-  hi2c3.Instance = I2C3;
-  hi2c3.Init.Timing = 0x20600714;
-  hi2c3.Init.OwnAddress1 = 0;
-  hi2c3.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
-  hi2c3.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
-  hi2c3.Init.OwnAddress2 = 0;
-  hi2c3.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
-  hi2c3.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
-  hi2c3.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-  if (HAL_I2C_Init(&hi2c3) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /** Configure Analogue filter
-  */
-  if (HAL_I2CEx_ConfigAnalogFilter(&hi2c3, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /** Configure Digital filter
-  */
-  if (HAL_I2CEx_ConfigDigitalFilter(&hi2c3, 0) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN I2C3_Init 2 */
-
-  /* USER CODE END I2C3_Init 2 */
 
 }
 
@@ -499,16 +449,15 @@ uint8_t I2C_telecommand_wrapper(uint8_t id, uint8_t* data, uint32_t data_length)
     // Send telecommand
     send_I2C_telecommand(id, data, data_length);
 
-    // Poll TC Acknowledge Telemetry Format until the Processed flag equals 1.
+    // Poll Acknowledge Telemetry Format until the Processed flag equals 1.
     uint8_t processed = 0;
     uint8_t tc_ack[4];
     while (!processed) {
-        send_I2C_telecommand(TLF_TC_ACK, tc_ack, 4);
+        send_I2C_telemetry_request(TLF_TC_ACK, tc_ack, 4);
         processed = tc_ack[1] & 1;
     }
 
     // Confirm telecommand validity by checking the TC Error flag of the last read TC Acknowledge Telemetry Format.
-    send_I2C_telecommand(TLF_TC_ACK, tc_ack, 4);
     uint8_t TC_err_flag = tc_ack[2];
 
     return TC_err_flag;
@@ -531,7 +480,9 @@ void send_I2C_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
 		buf[i + 2] = data[i];
 	}
 
-	HAL_I2C_Master_Transmit(&hi2c1, ADCS_I2C_ADDRESS << 1, buf, sizeof(buf)/sizeof(uint8_t), HAL_MAX_DELAY);
+	//while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY) {} // implement delay for interrupt
+	HAL_I2C_Master_Seq_Transmit_IT(&hi2c1, ADCS_I2C_ADDRESS << 1, buf, sizeof(buf)/sizeof(uint8_t), I2C_FIRST_AND_LAST_FRAME);
+	HAL_Delay(100);
 
 }
 
