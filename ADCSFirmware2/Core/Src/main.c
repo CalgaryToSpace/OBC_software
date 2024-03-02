@@ -480,7 +480,7 @@ void send_I2C_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
 		buf[i + 2] = data[i];
 	}
 
-	//while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY) {} // implement delay for interrupt
+	while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY) {} // implement delay for interrupt
 	HAL_I2C_Master_Seq_Transmit_IT(&hi2c1, ADCS_I2C_ADDRESS << 1, buf, sizeof(buf)/sizeof(uint8_t), I2C_FIRST_AND_LAST_FRAME);
 	HAL_Delay(100);
 
