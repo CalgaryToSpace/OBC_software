@@ -118,14 +118,16 @@ int main(void)
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
-
+/*
  // Minimal I2C test code
-  uint8_t TX_Buffer [] = "test" ; // DATA to send (hex: 74 65 73 74)
+  uint8_t TX_Buffer[] = "test" ; // DATA to send (hex: 74 65 73 74)
   //HAL_I2C_Master_Transmit(&hi2c1,0x57 <<1,TX_Buffer,4,HAL_MAX_DELAY); //Sending in Blocking mode
   HAL_I2C_Master_Seq_Transmit_IT(&hi2c1, ADCS_I2C_ADDRESS << 1, TX_Buffer, 4, I2C_FIRST_AND_LAST_FRAME); //Sending in Non-Blocking mode
   HAL_Delay(100);
-
-
+  uint8_t RX_Buffer[4];
+  HAL_I2C_Master_Seq_Receive_IT(&hi2c1, ADCS_I2C_ADDRESS << 1, RX_Buffer, 4, I2C_FIRST_AND_LAST_FRAME); //Receiving in Non-Blocking mode
+  HAL_Delay(100);
+*/
 
   //Testing send_telecommand function
   //PRINT_STRING_UART("Testing send TC...");
@@ -144,7 +146,12 @@ int main(void)
   //Calling the send_telecommand function
   send_I2C_telecommand(id, data, data_length);
 
-  //TODO: Do something with telemetry reply
+  //Calling the send_telemetry_request function for an ACK
+  //ACK response is 4 bytes in length
+  //TC ID, Processed Flag, Error Status, Error Index
+  uint8_t data_rec[4];
+  data_length = sizeof(data_rec);
+  send_I2C_telemetry_request(id, data_rec, sizeof(data_rec));
 
   /* USER CODE END 2 */
 
@@ -482,7 +489,7 @@ void send_I2C_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
 
 	while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY) {} // implement delay for interrupt
 	HAL_I2C_Master_Seq_Transmit_IT(&hi2c1, ADCS_I2C_ADDRESS << 1, buf, sizeof(buf)/sizeof(uint8_t), I2C_FIRST_AND_LAST_FRAME);
-	HAL_Delay(100);
+	while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY) {} // delay again until ready
 
 }
 
@@ -503,13 +510,19 @@ void send_I2C_telemetry_request (uint8_t id, uint8_t* data, uint32_t data_length
 	uint8_t read_buf[1];
 	read_buf[0] = ADCS_I2C_READ;
 
+	while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY) {} // delay until ready
+
 	HAL_I2C_Master_Seq_Transmit_IT(&hi2c1, ADCS_I2C_ADDRESS << 1, buf, sizeof(buf)/sizeof(uint8_t), I2C_FIRST_AND_NEXT_FRAME);
+	while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY) {}
 	HAL_I2C_Master_Seq_Transmit_IT(&hi2c1, ADCS_I2C_ADDRESS << 1, read_buf, sizeof(read_buf)/sizeof(uint8_t), I2C_FIRST_AND_NEXT_FRAME);
+	while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY) {}
 	// I2C_FIRST_AND_NEXT_FRAME has start condition, no stop condition, and allows for continuing on with another I2C Seq command
 
 	HAL_I2C_Master_Seq_Receive_IT(&hi2c1, ADCS_I2C_ADDRESS << 1, data, data_length, I2C_LAST_FRAME);
 	// This is my best guess at receiving data_length bytes of data and ending with a stop condition
 	// But I will admit I don't really understand the XferOptions part of any of these commands
+
+	while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY) {}
 
 }
 

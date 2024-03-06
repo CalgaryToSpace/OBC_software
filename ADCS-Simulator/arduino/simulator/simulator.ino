@@ -2,7 +2,8 @@
 // Pins for Arduino Uno: A4 (SDA), A5 (SCL)
 // Pins for Nucleo: A3 (PC1, SDA), A1 (PC0, SCL)
 
-uint8_t tx_byte;
+uint8_t tx_buffer[4] = {0x01, 0x02, 0x03, 0x04};
+uint32_t tx_count = 0;
 uint8_t rx_buffer[32];
 uint32_t rx_count = 0;
 
@@ -19,6 +20,7 @@ void I2C_RxHandler(int bytes) {
     Serial.print(" ");
     rx_count++;
   }
+
   rx_buffer[rx_count] = '\0';
   rx_count = 0;
   
@@ -29,8 +31,16 @@ void I2C_RxHandler(int bytes) {
 
 void I2C_TxHandler() {
   Serial.println("Transmitting data...");
-  Serial.println(tx_byte);
-  Wire.write(tx_byte);
+
+  for(tx_count = 0; tx_count < 4; tx_count++) { 
+    // peripheral doesn't know how many bytes are requested
+    // so we send bytes until no more are requested for now
+      Serial.print(tx_buffer[tx_count], HEX);
+      Wire.write(tx_buffer[tx_count]);
+      Serial.print(" ");
+    }
+  Serial.println();
+  tx_count = 0;
 }
 
 void setup() {
