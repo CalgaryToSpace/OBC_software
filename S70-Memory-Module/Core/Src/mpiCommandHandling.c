@@ -7,6 +7,8 @@
 #include <../Inc/mpiCommandHandling.h>
 #include <stdio.h>
 #include "main.h"
+#include "packetReadWrite.h"
+#include "DebugUtilities.h"
 
 #define BUFFER_SIZE 160
 
@@ -104,7 +106,19 @@ void processFrameData(MpiFrame_t frame){
 	HAL_UART_Transmit(&hlpuart1, (uint8_t*)variable_buffer, strlen(variable_buffer), HAL_MAX_DELAY);
 
 	//TODO: For testing write parsed and raw data to files to verify and update test plans
+	writeFrameToMemory(frame);
 
+}
+
+// This function deals with writing data packets to memory using MEMORY UTILITIES
+void writeFrameToMemory(MpiFrame_t frame){
+
+	//Calling the WRITE function and making sure it's successful
+	if (WRITE(&hspi1, (uint8_t*) &frame) == 0) {
+		PRINT_STRING_UART("Written successfully");
+	} else {
+		PRINT_STRING_UART("Error Occurred during writing");
+	}
 }
 
 

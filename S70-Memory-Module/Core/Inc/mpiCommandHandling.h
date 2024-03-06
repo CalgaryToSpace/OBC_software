@@ -36,6 +36,7 @@ typedef struct {
 uint8_t sendTelecommand(uint8_t commandCode, uint8_t parameters);
 uint8_t parseIncomingMPIFrames();
 void processFrameData(MpiFrame_t frame);
+void writeFrameToMemory(MpiFrame_t frame);
 
 
 #endif /* INC_MPICOMMANDHANDLING_H_ */

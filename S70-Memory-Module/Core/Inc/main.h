@@ -38,6 +38,8 @@ extern "C" {
 /* USER CODE BEGIN ET */
 extern UART_HandleTypeDef hlpuart1;
 extern UART_HandleTypeDef huart1;
+extern DMA_HandleTypeDef hdma_lpuart1_rx;
+extern SPI_HandleTypeDef hspi1;
 
 /* USER CODE END ET */
 
@@ -69,6 +71,8 @@ void Error_Handler(void);
 #define GPLED3_GPIO_Port GPIOE
 #define CAMERA_EN_Pin GPIO_PIN_2
 #define CAMERA_EN_GPIO_Port GPIOA
+#define USB_OverCurrent_Pin GPIO_PIN_4
+#define USB_OverCurrent_GPIO_Port GPIOA
 #define GPS_PPS_Pin GPIO_PIN_6
 #define GPS_PPS_GPIO_Port GPIOA
 #define FLASH_NCS_A2_Pin GPIO_PIN_0
@@ -81,18 +85,18 @@ void Error_Handler(void);
 #define FRAM_NCS_1_GPIO_Port GPIOE
 #define FRAM_NCS_0_Pin GPIO_PIN_9
 #define FRAM_NCS_0_GPIO_Port GPIOE
-#define MOTOR_NFAULT_Pin GPIO_PIN_12
-#define MOTOR_NFAULT_GPIO_Port GPIOB
-#define MOTOR_NEN_Pin GPIO_PIN_13
-#define MOTOR_NEN_GPIO_Port GPIOB
+#define USB_PowerSwitchOn_Pin GPIO_PIN_12
+#define USB_PowerSwitchOn_GPIO_Port GPIOB
+#define B1_Pin GPIO_PIN_13
+#define B1_GPIO_Port GPIOB
 #define MOTOR_PWM_Pin GPIO_PIN_14
 #define MOTOR_PWM_GPIO_Port GPIOB
 #define MOTOR_DIR_Pin GPIO_PIN_15
 #define MOTOR_DIR_GPIO_Port GPIOB
-#define ENCODER_EN_Pin GPIO_PIN_8
-#define ENCODER_EN_GPIO_Port GPIOD
-#define ENCODER_I_Pin GPIO_PIN_9
-#define ENCODER_I_GPIO_Port GPIOD
+#define STLK_RX_Pin GPIO_PIN_8
+#define STLK_RX_GPIO_Port GPIOD
+#define STLK_TX_Pin GPIO_PIN_9
+#define STLK_TX_GPIO_Port GPIOD
 #define ENCODER_B_Pin GPIO_PIN_10
 #define ENCODER_B_GPIO_Port GPIOD
 #define ENCODER_A_Pin GPIO_PIN_11

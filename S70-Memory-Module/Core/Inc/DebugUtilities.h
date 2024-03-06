@@ -9,6 +9,9 @@
 #define INC_DEBUGUTILITIES_H_
 
 #include "MemoryUtilities.h"
+#include "main.h"
+
+extern UART_HandleTypeDef huart1; // Declare huart1 as an external variable
 
 void PRINT_STRING_UART(void *);
 void PRINT_NEW_LINE();
