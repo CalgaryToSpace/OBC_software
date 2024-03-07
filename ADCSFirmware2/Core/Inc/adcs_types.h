@@ -5,6 +5,9 @@
  *      Authors: Saksham Puri, Zachary Uy, Nadeem Moosa
  */
 
+#include "main.h"
+#include <string.h>
+
 #ifndef INC_ADCS_TYPES_H_
 #define INC_ADCS_TYPES_H_
 
@@ -86,5 +89,21 @@
 #define TC_ERROR_WRONG_LENGTH 2
 #define TC_ERROR_INVALID_PARAMS 3
 #define TC_ERROR_CRC 4
+
+/* Function Definitions */
+
+// TC/TLM functions
+uint8_t I2C_telecommand_wrapper(I2C_HandleTypeDef *hi2c, uint8_t id, uint8_t* data, uint32_t data_length);
+void send_I2C_telecommand(I2C_HandleTypeDef *hi2c, uint8_t id, uint8_t* data, uint32_t data_length);
+void send_I2C_telemetry_request (I2C_HandleTypeDef *hi2c, uint8_t id, uint8_t* data, uint32_t data_length);
+uint8_t send_UART_telecommand(UART_HandleTypeDef *huart, uint8_t id, uint8_t* data, uint32_t data_length);
+
+// CRC functions
+void COMMS_Crc8Init();
+uint8_t COMMS_Crc8Checksum(uint8_t* buffer, uint16_t len);
+
+// UART debug functions
+void PRINT_STRING_UART(UART_HandleTypeDef *huart, void *string);
+void PRINT_NEW_LINE(UART_HandleTypeDef *huart);
 
 #endif /* INC_ADCS_TYPES_H_ */
