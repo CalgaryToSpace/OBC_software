@@ -21,7 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "stdio.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -50,6 +50,12 @@ PCD_HandleTypeDef hpcd_USB_OTG_FS;
 /* USER CODE BEGIN PV */
 uint8_t TX_Buffer [] = "BAB" ; // DATA to send (hex 42 41 42)
 uint8_t TX_Buffer_Two [] = "test" ; // DATA to send (hex 74 65 73 74)
+
+uint8_t Buffer[25] = {0};
+uint8_t Space[] = " - ";
+uint8_t StartMSG[] = "Starting I2C Scanning: \r\n";
+uint8_t EndMSG[] = "Done! \r\n\r\n";
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -60,6 +66,8 @@ static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
+int I2C_Scan(void);
+
 void send_I2C_telecommand(uint8_t id, uint8_t* data, uint32_t data_length) {
 	// Telecommand Format:
 	// ADCS_ESC_CHARACTER, ADCS_START_MESSAGE [uint8_t TLM/TC ID], ADCS_ESC_CHARACTER, ADCS_END_MESSAGE
@@ -143,6 +151,10 @@ int main(void)
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
+  HAL_UART_Transmit(&hlpuart1, "Potato", strlen("Potato"), 100);
+
+  I2C_Scan();
+
   /*
   //HAL_I2C_Master_Transmit(&hi2c1,0x57 <<1,TX_Buffer,3,HAL_MAX_DELAY); //Sending in Blocking mode
   HAL_I2C_Master_Seq_Transmit_IT(&hi2c1, 0x57<<1,TX_Buffer,3, I2C_FIRST_AND_LAST_FRAME); //Non-Blocking mode
@@ -196,8 +208,8 @@ int main(void)
   minimal_seq(stuffe);
    */
 
-  uint8_t bar[6] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06};
-  minimal_seq(bar, 6);
+  //uint8_t bar[6] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06};
+  //minimal_seq(bar, 6);
 
   /* USER CODE END 2 */
 
@@ -326,8 +338,8 @@ static void MX_LPUART1_UART_Init(void)
 
   /* USER CODE END LPUART1_Init 1 */
   hlpuart1.Instance = LPUART1;
-  hlpuart1.Init.BaudRate = 209700;
-  hlpuart1.Init.WordLength = UART_WORDLENGTH_7B;
+  hlpuart1.Init.BaudRate = 115200;
+  hlpuart1.Init.WordLength = UART_WORDLENGTH_8B;
   hlpuart1.Init.StopBits = UART_STOPBITS_1;
   hlpuart1.Init.Parity = UART_PARITY_NONE;
   hlpuart1.Init.Mode = UART_MODE_TX_RX;
@@ -498,6 +510,36 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+
+
+int I2C_Scan(void)
+{
+
+	uint8_t i = 0, ret;
+
+    HAL_Delay(1000);
+
+    /*-[ I2C Bus Scanning ]-*/
+    HAL_UART_Transmit(&hlpuart1, StartMSG, sizeof(StartMSG), 10000);
+    for(i=1; i<128; i++)
+    {
+    	ret = HAL_I2C_IsDeviceReady(&hi2c1, (uint16_t)(i<<1), 3, 5);
+    	if (ret != HAL_OK) /* No ACK Received At That Address */
+    	{
+    		HAL_UART_Transmit(&hlpuart1, Space, sizeof(Space), 10000);
+        }
+    	else if(ret == HAL_OK)
+    	{
+    		sprintf(Buffer, "0x%X", i);
+    		HAL_UART_Transmit(&hlpuart1, Buffer, sizeof(Buffer), 10000);
+    	}
+    }
+    HAL_UART_Transmit(&hlpuart1, EndMSG, sizeof(EndMSG), 10000);
+    /*--[ Scanning Done ]--*/
+}
+
+
 
 /* USER CODE END 4 */
 
