@@ -196,7 +196,7 @@ int main(void)
       memset(spiRxBuffer, 0, strlen((char*) spiRxBuffer));
 
       // Turn off LED
-      HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_RESET);
+      //HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_RESET);
 
   /* USER CODE END 2 */
 
