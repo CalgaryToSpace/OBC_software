@@ -7,15 +7,15 @@
 
 #include <adcs_types.h>
 
-uint8_t I2C_telecommand_wrapper(I2C_HandleTypeDef *hi2c, uint8_t id, uint8_t* data, uint32_t data_length) {
+uint8_t I2C_telecommand_wrapper(I2C_HandleTypeDef *hi2c, uint8_t id, uint8_t* data, uint32_t data_length, uint8_t include_checksum) {
     // Send telecommand
-    send_I2C_telecommand(hi2c, id, data, data_length);
+    send_I2C_telecommand(hi2c, id, data, data_length, include_checksum);
 
     // Poll Acknowledge Telemetry Format until the Processed flag equals 1.
     uint8_t processed = 0;
     uint8_t tc_ack[4];
     while (!processed) {
-        send_I2C_telemetry_request(hi2c, TLF_TC_ACK, tc_ack, 4);
+        send_I2C_telemetry_request(hi2c, TLF_TC_ACK, tc_ack, 4, include_checksum);
         processed = tc_ack[1] & 1;
     }
 
@@ -25,14 +25,13 @@ uint8_t I2C_telecommand_wrapper(I2C_HandleTypeDef *hi2c, uint8_t id, uint8_t* da
     return TC_err_flag;
 }
 
-void send_I2C_telecommand(I2C_HandleTypeDef *hi2c, uint8_t id, uint8_t* data, uint32_t data_length) {
+void send_I2C_telecommand(I2C_HandleTypeDef *hi2c, uint8_t id, uint8_t* data, uint32_t data_length, uint8_t include_checksum) {
 	// Telecommand Format:
 	// ADCS_ESC_CHARACTER, ADCS_START_MESSAGE [uint8_t TLM/TC ID], ADCS_ESC_CHARACTER, ADCS_END_MESSAGE
 	// The defines in adcs_types.h already include the 7th bit of the ID to distinguish TLM and TC
-	// data bytes can be up to a maximum of 8 bytes; data_length ranges from 0 to 8
 
 	//Allocate only required memory
-	uint8_t buf[2 + data_length];
+	uint8_t buf[2 + data_length + include_checksum]; // add additional bit for checksum if needed
 
 	buf[0] = ADCS_I2C_WRITE;
 	buf[1] = id;
@@ -42,21 +41,36 @@ void send_I2C_telecommand(I2C_HandleTypeDef *hi2c, uint8_t id, uint8_t* data, ui
 		buf[i + 2] = data[i];
 	}
 
+	// include checksum following data if enabled
+	if (include_checksum) {buf[2 + data_length] = COMMS_Crc8Checksum(buf, data_length);}
+
 	while (HAL_I2C_GetState(hi2c) != HAL_I2C_STATE_READY) {} // implement delay for interrupt
 	HAL_I2C_Master_Seq_Transmit_IT(hi2c, ADCS_I2C_ADDRESS << 1, buf, sizeof(buf)/sizeof(uint8_t), I2C_FIRST_AND_LAST_FRAME);
 	while (HAL_I2C_GetState(hi2c) != HAL_I2C_STATE_READY) {} // delay again until ready
 
+	/* When sending a command to the CubeACP, it is possible to include an 8-bit CRC checksum.
+	For instance, when sending a command that has a length of 8 bytes, it is possible to include a
+	9th byte that is computed from the previous 8 bytes. The extra byte will be interpreted as a
+	checksum and used to validate the message. If the checksum fails, the command will be
+	ignored. For I2C communication, the Tc Error Status in the Telecommand Acknowledge telemetry frame
+	(Table 39: Telecommand Acknowledge Telemetry Format) will have a value of 4. */
+
 }
 
-void send_I2C_telemetry_request (I2C_HandleTypeDef *hi2c, uint8_t id, uint8_t* data, uint32_t data_length) {
+uint8_t send_I2C_telemetry_request (I2C_HandleTypeDef *hi2c, uint8_t id, uint8_t* data, uint32_t data_length, uint8_t include_checksum) {
 	// Telemetry Request Format:
 	// Note: requires a repeated start condition; data_lenth is number of bits to read.
 	// [start], ADCS_I2C_WRITE, id, [start] ADCS_I2C_READ, [read all the data], [stop]
 	// The defines in adcs_types.h already include the 7th bit of the ID to distinguish TLM and TC
-	// data bytes can be up to a maximum of 8 bytes; data_length ranges from 0 to 8
+
+	/* When requesting telemetry through I2C, it is possible to read one extra byte past the allowed
+	length of the telemetry frame. In this case, the extra byte will also be an 8-bit checksum
+	computed by the CubeACP and can be used by the interfacing OBC to validate the message.*/
 
 	//Allocate only required memory
 	uint8_t buf[2];
+	uint8_t temp_data[data_length + include_checksum];
+		// temp data used for checksum checking
 
 	buf[0] = ADCS_I2C_WRITE;
 	buf[1] = id;
@@ -72,11 +86,25 @@ void send_I2C_telemetry_request (I2C_HandleTypeDef *hi2c, uint8_t id, uint8_t* d
 	while (HAL_I2C_GetState(hi2c) != HAL_I2C_STATE_READY) {}
 	// I2C_FIRST_AND_NEXT_FRAME has start condition, no stop condition, and allows for continuing on with another I2C Seq command
 
-	HAL_I2C_Master_Seq_Receive_IT(hi2c, ADCS_I2C_ADDRESS << 1, data, data_length, I2C_LAST_FRAME);
+	HAL_I2C_Master_Seq_Receive_IT(hi2c, ADCS_I2C_ADDRESS << 1, temp_data, data_length, I2C_LAST_FRAME);
+	while (HAL_I2C_GetState(hi2c) != HAL_I2C_STATE_READY) {}
 	// This is my best guess at receiving data_length bytes of data and ending with a stop condition
 	// But I will admit I don't really understand the XferOptions part of any of these commands
 
-	while (HAL_I2C_GetState(hi2c) != HAL_I2C_STATE_READY) {}
+	for (int i = 0; i < data_length; i++) {
+			// populate external data
+			data[i] = temp_data[i];
+	}
+
+	if (include_checksum) {
+		uint8_t checksum = temp_data[data_length];
+		uint8_t checksum_test = COMMS_Crc8Checksum(data, data_length);
+		if (checksum != checksum_test) {
+			return 1;
+		}
+	}
+
+	return 0;
 
 }
 

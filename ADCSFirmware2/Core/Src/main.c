@@ -101,6 +101,8 @@ int main(void)
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
+  COMMS_Crc8Init(); // initiate CRC table for checksums
+
 /*
  // Minimal I2C test code
   uint8_t TX_Buffer[] = "test" ; // DATA to send (hex: 74 65 73 74)
@@ -142,14 +144,30 @@ int main(void)
   //TC ID, Processed Flag, Error Status, Error Index
 
   	uint8_t data_received[8];
-    send_I2C_telemetry_request(ADCS_I2C_HANDLE, TLF_IDENTIFICATION, data_received, sizeof(data_received));
-    HAL_UART_Transmit(&hlpuart1, data_received, 8, HAL_MAX_DELAY);
-/*
+    send_I2C_telemetry_request(ADCS_I2C_HANDLE, TLF_IDENTIFICATION, data_received, sizeof(data_received), ADCS_NO_CHECKSUM);
+    HAL_UART_Transmit(&hlpuart1, data_received, 1, HAL_MAX_DELAY);
+
+
+
+
   //test the telecommand wrapper function with the CubeComputer
    uint8_t data_send[1] = {ADCS_MAGIC_NUMBER};
-   uint8_t err_flag[1] = I2C_telecommand_wrapper(ADCS_I2C_HANDLE, TC_RESET, data_send, sizeof(data_send));
-   HAL_UART_Transmit(&hlpuart1, err_flag, 1, HAL_MAX_DELAY);
-*/
+
+   //Allocate only required memory
+   	uint8_t buf[2 + 1]; // add additional bit for checksum if needed
+
+   	buf[0] = ADCS_I2C_WRITE;
+   	buf[1] = TC_RESET;
+   	buf[2] = ADCS_MAGIC_NUMBER;
+
+   //HAL_I2C_Master_Transmit(&hi2c1, ADCS_I2C_ADDRESS << 1, buf, sizeof(buf)/sizeof(uint8_t), HAL_MAX_DELAY);
+
+
+  //send_I2C_telecommand(ADCS_I2C_HANDLE, TC_RESET, data_send, sizeof(data_send), ADCS_NO_CHECKSUM);
+
+   //uint8_t err_flag = I2C_telecommand_wrapper(ADCS_I2C_HANDLE, TC_RESET, data_send, sizeof(data_send), ADCS_NO_CHECKSUM);
+   //HAL_UART_Transmit(&hlpuart1, err_flag, 1, HAL_MAX_DELAY);
+
 
   /* USER CODE END 2 */
 
