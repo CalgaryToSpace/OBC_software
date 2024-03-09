@@ -105,13 +105,13 @@ int main(void)
  // Minimal I2C test code
   uint8_t TX_Buffer[] = "test" ; // DATA to send (hex: 74 65 73 74)
   //HAL_I2C_Master_Transmit(&hi2c1,0x57 <<1,TX_Buffer,4,HAL_MAX_DELAY); //Sending in Blocking mode
-  HAL_I2C_Master_Seq_Transmit_IT(&hi2c1, ADCS_I2C_ADDRESS << 1, TX_Buffer, 4, I2C_FIRST_AND_LAST_FRAME); //Sending in Non-Blocking mode
+  HAL_I2C_Master_Seq_Transmit_IT(ADCS_I2C_HANDLE, ADCS_I2C_ADDRESS << 1, TX_Buffer, 4, I2C_FIRST_AND_LAST_FRAME); //Sending in Non-Blocking mode
   HAL_Delay(100);
   uint8_t RX_Buffer[4];
-  HAL_I2C_Master_Seq_Receive_IT(&hi2c1, ADCS_I2C_ADDRESS << 1, RX_Buffer, 4, I2C_FIRST_AND_LAST_FRAME); //Receiving in Non-Blocking mode
+  HAL_I2C_Master_Seq_Receive_IT(ADCS_I2C_HANDLE, ADCS_I2C_ADDRESS << 1, RX_Buffer, 4, I2C_FIRST_AND_LAST_FRAME); //Receiving in Non-Blocking mode
   HAL_Delay(100);
 */
-
+/*
   //Testing send_telecommand function
   //PRINT_STRING_UART("Testing send TC...");
 
@@ -127,14 +127,29 @@ int main(void)
   	  	  	  // in hexadecimal: 70
 
   //Calling the send_telecommand function
-  send_I2C_telecommand(&hi2c1, id, data, data_length);
+  send_I2C_telecommand(ADCS_I2C_HANDLE, id, data, data_length);
 
   //Calling the send_telemetry_request function for an ACK
   //ACK response is 4 bytes in length
   //TC ID, Processed Flag, Error Status, Error Index
   uint8_t data_rec[4];
   data_length = sizeof(data_rec);
-  send_I2C_telemetry_request(&hi2c1, id, data_rec, sizeof(data_rec));
+  send_I2C_telemetry_request(ADCS_I2C_HANDLE, id, data_rec, sizeof(data_rec));
+*/
+
+  //Calling the send_telemetry_request function
+  //Identification response is 8 bytes in length
+  //TC ID, Processed Flag, Error Status, Error Index
+
+  	uint8_t data_received[8];
+    send_I2C_telemetry_request(ADCS_I2C_HANDLE, TLF_IDENTIFICATION, data_received, sizeof(data_received));
+    HAL_UART_Transmit(&hlpuart1, data_received, 8, HAL_MAX_DELAY);
+/*
+  //test the telecommand wrapper function with the CubeComputer
+   uint8_t data_send[1] = {ADCS_MAGIC_NUMBER};
+   uint8_t err_flag[1] = I2C_telecommand_wrapper(ADCS_I2C_HANDLE, TC_RESET, data_send, sizeof(data_send));
+   HAL_UART_Transmit(&hlpuart1, err_flag, 1, HAL_MAX_DELAY);
+*/
 
   /* USER CODE END 2 */
 
