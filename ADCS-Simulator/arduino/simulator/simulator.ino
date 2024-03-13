@@ -2,7 +2,7 @@
 // Pins for Arduino Uno: A4 (SDA), A5 (SCL)
 // Pins for Nucleo: A3 (PC1, SDA), A1 (PC0, SCL)
 
-uint8_t tx_buffer[4] = {0x01, 0x02, 0x03, 0x04};
+uint8_t tx_buffer[8] = {0x01, 0x02, 0x03, 0x04, 0x01, 0x02, 0x03, 0x04};
 uint32_t tx_count = 0;
 uint8_t rx_buffer[32];
 uint32_t rx_count = 0;
