@@ -5,6 +5,8 @@
  */
 
 #include <../Inc/mpiCommandHandling.h>
+#include <../Inc/DebugUtilities.h>
+#include "string.h"
 #include <stdio.h>
 #include "main.h"
 #include "packetReadWrite.h"
@@ -103,7 +105,8 @@ void processFrameData(MpiFrame_t frame){
 	);
 
 	// Send formatted data over HLPUART for verification
-	HAL_UART_Transmit(&hlpuart1, (uint8_t*)variable_buffer, strlen(variable_buffer), HAL_MAX_DELAY);
+	//HAL_UART_Transmit(&hlpuart1, (uint8_t*)variable_buffer, strlen(variable_buffer), HAL_MAX_DELAY);
+	PRINT_STRING_UART(variable_buffer);
 
 	//TODO: For testing write parsed and raw data to files to verify and update test plans
 	writeFrameToMemory(frame);
@@ -115,9 +118,9 @@ void writeFrameToMemory(MpiFrame_t frame){
 
 	//Calling the WRITE function and making sure it's successful
 	if (WRITE(&hspi1, (uint8_t*) &frame) == 0) {
-		PRINT_STRING_UART("Written successfully");
+		PRINT_STRING_UART("Frame Written successfully");
 	} else {
-		PRINT_STRING_UART("Error Occurred during writing");
+		PRINT_STRING_UART("Error Occurred while writing frame");
 	}
 }
 

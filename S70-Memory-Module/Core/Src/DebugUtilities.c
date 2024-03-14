@@ -13,7 +13,7 @@
 
 // Variables---------------------------------------------------------
 // huart1 to use the UART protocol for debugging purposes
-//UART_HandleTypeDef huart1;
+UART_HandleTypeDef huart1;
 
 //variable to check if above UART variable has been initialized or not
 uint8_t initialized = 0;
