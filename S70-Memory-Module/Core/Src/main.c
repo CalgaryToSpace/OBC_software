@@ -32,21 +32,12 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-typedef struct DecoderInput {
-	uint64_t Port;
-	uint16_t Pin;
-	uint8_t State;
-
-} DecoderInput;
 
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define BUFFER_SIZE 128
 
-// 256 KB per sector (256 * 1000) * 256 sectors
-#define MEMORY_MODULE_SIZE (256 * 1000) * 256 // About 65 megabytes
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -70,71 +61,14 @@ UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
 
-// Equal to GPIO_PIN_SET, for this architecture
-// 1 is the inactive state
-// 0 is the active state
-const uint8_t INACTIVE_STATE = 1;
-const uint8_t ACTIVE_STATE = 0;
-
 //LittleFS variables
 lfs_t lfs;
 lfs_file_t file;
 struct lfs_config cfg;
 
+//LittleFS Buffers for reading and writing
 uint8_t lfs_read_buf[512];
 uint8_t lfs_prog_buf[512];
-//uint8_t lfs_lookahead_buf[32];
-
-//static DecoderInput A0;
-//static DecoderInput A1;
-//static DecoderInput A2;
-
-/***************************************
- * 	Look at Pages 75, 76, 77
- *
- ****************************************/
-
-/* The following are defined in the S25... Manual
- * Section 7.6.1, 9.3
- */
-//const uint8_t WRR_WriteRegister = 0x01;
-const uint8_t CLSR_ClearStatusReg = 0x30;
-//
-//const uint8_t RDSR1_ReadStatusReg1 = 0x05;
-//const uint8_t RDSR2_ReadStatusReg2 = 0x07;
-//const uint8_t RDCR_ReadConfigReg = 0x35;
-//const uint8_t BRRD_ReadBankReg = 0x16;
-//
-//const uint8_t BRWR_WriteBankReg = 0x17;
-//const uint8_t BRAC_BankRegAccess = 0xB9;
-////const uint8_t WriteReg = 0x01;
-//const uint8_t WREN_WriteEnable = 0x06;
-//const uint8_t WRDI_WriteDisable = 0x04;
-//
-//const uint8_t ECCRD_ECCRead = 0x18;
-//
-
-uint8_t memory_bank_counter = 0;
-
-/*
- * The instruction
- * 03h (ExtAdd=0) is followed by a 3-byte address (A23-A0) or
- * 03h (ExtAdd=1) is followed by a 4-byte address (A31-A0) or
- * 13h is followed by a 4-byte address (A31-A0)
- *
- * Then the memory contents, at the address given, are shifted out on SO. The maximum operating clock frequency
- * for the READ command is 50 MHz.
- *
- * The address can start at any byte location of the memory array. The address is automatically incremented to the
- * next higher address in sequential order after each byte of data is shifted out.
- *
- * The entire memory can therefore
- * be read out with one single read instruction and address 000000h provided.
- *
- * When the highest address is reached,the address counter will wrap around and roll back to 000000h, allowing the read sequence to be continued
- * indefinitely.
- *
- */
 
 /* USER CODE END PV */
 
@@ -151,13 +85,6 @@ static void MX_UART4_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_USART3_UART_Init(void);
 /* USER CODE BEGIN PFP */
-//static void INIT_DECODER_INPUTS(void);
-//static void init_buffer(void);
-void PRINT_STRING_UART(void*);
-void PULL_ALL_LOW();
-void PRINT_NEW_LINE();
-void ENABLE_WREN();
-void ENABLE_WRDI();
 
 void LFS_Config(void);
 int block_device_read(const struct lfs_config *c, lfs_block_t block,
@@ -171,110 +98,7 @@ int block_device_sync(const struct lfs_config *c);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-//typedef struct CircularBuffer{
-//	uint8_t data[BUFFER_SIZE];
-//	uint16_t head;
-//	uint16_t tail;
-//	uint16_t count;
-//	// add counter for which of 1 out 8 memory modules we are in
-//	// the buffersize should be changed to be the size of 1 module
-//	// every time it passes it, this variable gets updated by mod 8
-//
-//	// receive stream of data, must turn into packet of some size (established soon)
-//
-//
-//} CircularBuffer;
-//
-//	void setMemoryBank()
-//	void init_buffer(CircularBuffer *cb) {
-//		cb->head = 0;
-//		cb->tail = 0;
-//		cb->count = 0;
-//	}
-//bool is_empty(void) {
-//	return cb.count == 0;
-//}
-//bool is_full(void) {
-//	return cb.count == BUFFER_SIZE;
-//}
-/*
- * This to write data to memory
- * This only writes 8 bits of data at a time
- * Increments counter based on 8 bits of data
- */
-//Added the if statement to check if it's the first element being added
-//If it is, we need to keep the tail value the same since we want the tail
-//to point to the 0th element in data
-//If it's not the first element being added
-//add element to the index in front of tail
-//This was implemented because the tail value would never reach 8 because of the mod BUFFER_SIZE = 8
-//Could change the mod value to be 9 and revert to previous enqueue function
-//	void enqueue(CircularBuffer *cb, uint8_t data) {
-//		if (!is_full(cb)) {
-//
-//		    if ((cb->count) == 0) {
-//		        cb->data[cb->tail] = data;
-//		        cb->tail = (cb->tail) % BUFFER_SIZE;
-//		    }
-//		    else {
-//		        cb->data[cb->tail+1] = data;
-//		        cb->tail = (cb->tail + 1) % BUFFER_SIZE;
-//		    }
-//
-//		    cb->count++;
-//		}
-//	}
-/*
- * This is to retrieve memory
- */
-//Just set the head to 0 for the dequeue before incrementing it
-//		uint8_t dequeue(CircularBuffer *cb) {
-//			if (!is_empty(cb)) {
-//				uint8_t data = cb->data[cb->head];
-//				cb->data[cb->head] = 0;
-//				cb->head = (cb->head + 1) % BUFFER_SIZE;
-//				cb->count--;
-//
-//				return data;
-//			}
-//			return 0;
-//		}
-/*
- * 	There are 7 memory banks on board this chip,
- * 	every time it reaches the end of the memory bank,
- * 	it will need to be incremented, done by Allocate function
- */
-//void WHICH_MEMORY_BANK() {
-//
-//	uint8_t mem_bank = (memory_bank_counter % 8);
-//	A0.State = mem_bank & 0x1; // LSB
-//	A1.State = mem_bank & 0x2; // Middle Bit
-//	A2.State = mem_bank & 0x4; // MSB
-//
-//
-//}
-//	bool is_empty(CircularBuffer *cb) {
-//		return cb->count == 0;
-//	}
-//	bool is_full(CircularBuffer *cb) {
-//		return cb->count == BUFFER_SIZE;
-//	}
-//	void enqueue(CircularBuffer *cb, uint8_t data) {
-//		if (!is_full(cb)) {
-//			cb->data[cb->tail] = data;
-//			cb->tail = (cb->tail + 1) % BUFFER_SIZE;
-//			cb->count++;
-//		}
-//	}
-//	uint8_t dequeue(CircularBuffer *cb) {
-//		if (!is_empty(cb)) {
-//			uint8_t data = cb->data[cb->head];
-//			cb->head = (cb->head + 1) % BUFFER_SIZE;
-//			cb->count--;
-//			return data;
-//		}
-//		return 0;
-//	}
+
 /* USER CODE END 0 */
 
 /**
@@ -283,61 +107,6 @@ int block_device_sync(const struct lfs_config *c);
  */
 int main(void) {
 	/* USER CODE BEGIN 1 */
-
-//	char spiRxBuffer[513] = { 0 };
-//	char spiTxBuffer[513] = { 0 };
-//	char statusRegBuffer[9] = {0};
-//
-//	char testBuffer[100] = {0};
-//	char testBuffer2[100] = {0};
-//
-//	memset(testBuffer, 0x0, 100);
-//	memset(testBuffer2, 0x0, 100);
-//
-//	uint8_t addr[3] = {0};
-//	uint8_t wip;
-//
-//	tel t;
-//
-//	t.secondsSinceBoot = 12;
-//	t.temperature = 3.2;
-//	t.type = PowerSystems;
-//
-//	uint8_t typeSize = sizeof(t.type);
-//	uint8_t secondsSize = sizeof(t.secondsSinceBoot);
-//
-//	memcpy(testBuffer, &t, sizeof(t));
-//
-//	size_t i = 0;
-//	uint8_t del_size = 0;
-//
-//	//7D 01 21 0C0C0C0C 21 FLOAT
-//	// 0  1  2  3 4 5 6  7 8
-//
-//	while (i < sizeof(t) + 3) {
-//		if (i == 0) { // if i == 0, add starting character
-//			sprintf(testBuffer2 + (i * 2), "%02X", '}'); //7D
-//			del_size++;
-//		}
-//		else if (i < typeSize + 1) { // If i < 2, accessing i == 1, buffer indices 0
-//			sprintf(testBuffer2 + (i * 2), "%02X", testBuffer[i-del_size]);
-//		}
-//		else if (i == typeSize + 1) { // If i == 2, add a delimiter
-//			sprintf(testBuffer2 + (i * 2), "%02X", '!'); //21
-//			del_size++;
-//		}
-//		else if (i < secondsSize + typeSize + 2) { // If i < 7, accessing i == 3, 4, 5, 6, buffer indices 1, 2, 3, 4
-//			sprintf(testBuffer2 + (i * 2), "%02X", testBuffer[i-del_size]);
-//		}
-//		else if (i == secondsSize + typeSize + 2) { // i == 7, add a delimiter
-//			sprintf(testBuffer2 + (i * 2), "%02X", '!');
-//			del_size++;
-//		}
-//		else { // If i > 7, accessing i == 8, 9, ..., 15, buffer indices 5, 6, ... ,12
-//			sprintf(testBuffer2 + (i * 2), "%02X", testBuffer[i-del_size]);
-//		}
-//		i++;
-//	}
 
 	/* USER CODE END 1 */
 
@@ -373,242 +142,76 @@ int main(void) {
 	//Turn on LED1 to indicate program starting
 	HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_SET);
 
-	//Initialize the circular buffer with default values
-//	INITIALIZE();
-//
-//	//Copying the data to write in spiTxBuffer - 512 (bytes) chars
-////	strcpy((char*) spiTxBuffer, "Minimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 Char"
-////			"Minimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 Char"
-////			"Minimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 Char1234567890"
-////			"Second OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond One"
-////			"Second OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond One"
-////			"Second OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond One"
-////			"Extra Twelve");
-//
-//	strcpy((char*) spiTxBuffer, "Test 1234 String");
-//
-//	//Calling the WRITE function and making sure it's successful
-//	if (WRITE(&hspi1, (uint8_t*) spiTxBuffer) == 0) {
-//		PRINT_STRING_UART("Written successfully");
-//	} else {
-//		PRINT_STRING_UART("Error Occurred during writing");
-//	}
-//
-//	//Calling the READ function and making sure it's successful
-//	if (READ(&hspi1, (uint8_t*) spiRxBuffer) == 0) {
-//		PRINT_STRING_UART("Data Read Successfully");
-//		PRINT_STRING_UART(spiRxBuffer);
-//	} else {
-//		PRINT_STRING_UART("Error Occurred during Reading");
-//	}
-//
-//	//Clear the buffer after reading
-//	memset(spiRxBuffer, 0, strlen((char*) spiRxBuffer));
-//
-//	//Copying the data to write in spiTxBuffer - 500 (bytes) chars
-//	strcpy((char*) spiTxBuffer, "Next String");
-//
-//	//Calling the WRITE function and making sure it's successful
-//	if (WRITE(&hspi1, (uint8_t*) spiTxBuffer) == 0) {
-//		PRINT_STRING_UART("Written successfully");
-//	} else {
-//		PRINT_STRING_UART("Error Occurred during writing");
-//	}
-//
-//	//Calling the READ function and making sure it's successful
-//	if (READ(&hspi1, (uint8_t*) spiRxBuffer) == 0) {
-//		PRINT_STRING_UART("Data Read Successfully");
-//		PRINT_STRING_UART(spiRxBuffer);
-//	} else {
-//		PRINT_STRING_UART("Error Occurred during Reading");
-//	}
-//
-//	//Clear the buffer after reading
-//	memset(spiRxBuffer, 0, strlen((char*) spiRxBuffer));
-//
-//	strcpy((char*) spiTxBuffer,
-//			"Minimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 Char"
-//					"Minimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 Char"
-//					"Minimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 Char1234567890"
-//					"Second OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond One"
-//					"Second OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond One"
-//					"Second OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond One"
-//					"Extra Twelve");
-//
-//	//Calling the WRITE function and making sure it's successful
-//	if (WRITE(&hspi1, (uint8_t*) spiTxBuffer) == 0) {
-//		PRINT_STRING_UART("Written successfully");
-//	} else {
-//		PRINT_STRING_UART("Error Occurred during writing");
-//	}
-
-//	BULK_MEM_CLEAR(&hspi1);
-
-//Configure all the LittleFS values
+	// Configure all the LittleFS values
 	LFS_Config();
 
+	//Try mounting littleFS to Memory
 	int result = lfs_mount(&lfs, &cfg);
+
+	//If it doesn't work, try formatting the memory, and mounting again
 	if (result < 0) {
 		result = lfs_format(&lfs, &cfg);
-		if (result < 0) {
-			PRINT_STRING_UART("Error Formatting!");
-			return -1;
-		}
+		if (result < 0) { PRINT_STRING_UART("Error Formatting!"); return -1; }
+		else PRINT_STRING_UART("Formatting! Successful");
+
 		result = lfs_mount(&lfs, &cfg);
-		if (result < 0) {
-			PRINT_STRING_UART("Error Mounting after Formatting!");
-			return -1;
-		}
-	}
+		if (result < 0) { PRINT_STRING_UART("Error Mounting after Formatting!"); return -1; }
+		else PRINT_STRING_UART("Mounting Successful");
+	} else PRINT_STRING_UART("Mounting Successful");
 
-	// read current count
-	char *boot_count = "";
-	result = lfs_file_open(&lfs, &file, "boot_count", LFS_O_RDWR | LFS_O_CREAT);
-	if (result < 0) {
-		PRINT_STRING_UART("Error Opening File!");
-		lfs_unmount(&lfs);
-	}
+	//Setup buffers for read and write
+	char write_buffer[16] = {0};
+	char read_buffer[16] = {0};
 
-	result = lfs_file_read(&lfs, &file, &boot_count, sizeof(boot_count));
-	if (result < 0) {
-		PRINT_STRING_UART("Error Reading File!");
-		lfs_unmount(&lfs);
-	}
+	//Open a file using LittleFS with Read / Write Flag, and Create if doesn't exist flag
+	result = lfs_file_open(&lfs, &file, "test", LFS_O_RDWR | LFS_O_CREAT);
+	if (result < 0) PRINT_STRING_UART("Error Opening / Creating a File!");
+	else PRINT_STRING_UART("Opened / Created a file named 'test'");
 
-	// update boot count
-	boot_count = "TEST WOAH";
+	//Read the first 16 bytes of the file, should be empty
+	result = lfs_file_read(&lfs, &file, read_buffer, sizeof(read_buffer));
+	if (result < 0) PRINT_STRING_UART("Error Reading File!");
+	else { PRINT_STRING_UART("Successfully read from file 'test':"); PRINT_STRING_UART(read_buffer); }
+
+	//Rewind the file pointer to beginning of file
 	result = lfs_file_rewind(&lfs, &file);
-	if (result < 0) {
-		PRINT_STRING_UART("Error Rewinding File!");
-		lfs_unmount(&lfs);
-	}
+	if (result < 0) PRINT_STRING_UART("Error Rewinding File!");
+	else PRINT_STRING_UART("Successfully rewinded file pointer!");
 
-	result = lfs_file_write(&lfs, &file, &boot_count, sizeof(boot_count));
-	if (result < 0) {
-		PRINT_STRING_UART("Error Writing to File!");
-		lfs_unmount(&lfs);
-	}
+	//Clear the read_buffer in case it has non-zero values
+	memset(read_buffer, 0, strlen((char*) read_buffer));
 
-	// remember the storage is not updated until the file is closed successfully
+	//Initialize Data to be written to memory
+	strcpy((char*) write_buffer, "Hello LittleFS!");
+
+	//Write defined data to file
+	result = lfs_file_write(&lfs, &file, write_buffer, sizeof(write_buffer));
+	if (result < 0) PRINT_STRING_UART("Error Writing to File!");
+	else PRINT_STRING_UART("Successfully wrote data to file!");
+
+	//Close the File, the storage is not updated until the file is closed successfully
+	result = lfs_file_close(&lfs, &file);
+	if (result < 0) PRINT_STRING_UART("Error Closing the File!");
+	else PRINT_STRING_UART("Successfully closed the File!");
+
+	//Open 'test' file using LittleFS with Read Only Flag
+	result = lfs_file_open(&lfs, &file, "test", LFS_O_RDONLY);
+	if (result < 0) PRINT_STRING_UART("Error Opening 'test' File!");
+	else PRINT_STRING_UART("Opened 'test' file");
+
+	//Read the content of the file, should be "Hello LittleFS!"
+	result = lfs_file_read(&lfs, &file, read_buffer, sizeof(write_buffer));
+	if (result < 0) PRINT_STRING_UART("Error Reading File!");
+	else { PRINT_STRING_UART("Successfully read from file 'test':"); PRINT_STRING_UART(read_buffer); }
+
+	//Close the file
 	lfs_file_close(&lfs, &file);
 
-	// release any resources we were using
+	//Unmount LittleFS to release any resources used by LittleFS
 	lfs_unmount(&lfs);
 
-	PRINT_STRING_UART(boot_count);
-
-//	result = lfs_file_open(&lfs, &file, "test.txt", LFS_O_WRONLY | LFS_O_CREAT);
-//	if (result < 0) {
-//		PRINT_STRING_UART("Error opening file for writing\n");
-//		lfs_unmount(&lfs);
-//		return -1;
-//	}
-//
-//	// Write data to the file
-//	const char *data = "Hello, LittleFS!";
-//	result = lfs_file_write(&lfs, &file, data, strlen(data));
-//	if (result < 0) {
-//		PRINT_STRING_UART("Error writing data to file\n");
-//		lfs_file_close(&lfs, &file);
-//		lfs_unmount(&lfs);
-//		return -1;
-//	}
-//
-//	// Close the file
-//	lfs_file_close(&lfs, &file);
-//
-//	// Open the file for reading
-//	result = lfs_file_open(&lfs, &file, "test.txt", LFS_O_RDONLY);
-//	if (result < 0) {
-//		PRINT_STRING_UART("Error opening file for reading\n");
-//		lfs_unmount(&lfs);
-//		return -1;
-//	}
-//
-//	// Read data from the file
-//	char read_buffer[256]; // Adjust buffer size as needed
-//	result = lfs_file_read(&lfs, &file, read_buffer, sizeof(read_buffer));
-//	if (result < 0) {
-//		PRINT_STRING_UART("Error reading data from file\n");
-//		lfs_file_close(&lfs, &file);
-//		lfs_unmount(&lfs);
-//		return -1;
-//	}
-//
-//	// Print the read data
-//	PRINT_STRING_UART("Read data: %s\n");
-//	PRINT_STRING_UART(read_buffer);
-//
-//	// Close the file
-//	lfs_file_close(&lfs, &file);
-//
-//	// Unmount LittleFS
-//	lfs_unmount(&lfs);
-
-// Turn off LED
+	//Turn off LED1 to indicate Program End
 	HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_RESET);
-
-//
-//	//Clear Memory before using memory
-//	MEM_CLEAR(hspi1, addr);
-//
-//	//Read the Status Register and store it in the corresponding buffer
-//	READ_STATUS_REGISTER(hspi1, spiRxBuffer);
-//
-//	// Clear 1 sector starting from 0x0
-//	// Note how I am sending 3 bytes from addr,
-//	// This is because the Sector Erase requires a 3 byte address
-//
-//	ENABLE_WREN(&hspi1);
-//	PULL_CS();
-//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_SECTOR_ERASE, 1, 100);
-//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
-//	SET_CS();
-//
-//	wip = 1;
-//	while (wip) {
-//		READ_STATUS_REGISTER(&hspi1, spiRxBuffer);
-//
-//		wip = spiRxBuffer[0] & 1;
-//	}
-//
-//	// Write data
-//	ENABLE_WREN(&hspi1);
-//
-//	strcpy((char*) spiTxBuffer, "Does it work now??");
-////	strcpy((char*) spiTxBuffer, testBuffer2);
-//	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET);
-//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_WRITE, 1, 100);
-//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
-//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &spiTxBuffer, 100, 100);
-//	SET_CS();
-//
-//	wip = 1;
-//	while (wip) {
-//		READ_STATUS_REGISTER(&hspi1, (uint8_t*)spiRxBuffer);
-//
-//		wip = spiRxBuffer[0] & 1;
-//	}
-//
-//	if (READ(&hspi1, (uint8_t*) spiRxBuffer) == 0) {
-//		PRINT_STRING_UART("Data Read Successfully");
-//		PRINT_STRING_UART(spiRxBuffer);
-//	} else {
-//		PRINT_STRING_UART("Error Occurred during Reading");
-//	}
-//
-//	// Turn off LED
-//	HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_RESET);
-//
-//	// Read
-//	PULL_CS();
-//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &FLASH_READ, 1, 100);
-//	HAL_SPI_Transmit(&hspi1, (uint8_t*) &addr, 3, 100);
-//	HAL_SPI_Receive(&hspi1, (uint8_t*) spiRxBuffer, 100, 100);
-//	SET_CS();
-//
-//	PRINT_STRING_UART(spiRxBuffer);
-//
 
 	/* USER CODE END 2 */
 
@@ -944,50 +547,6 @@ static void MX_UART4_Init(void) {
 }
 
 /**
- * @brief USART1 Initialization Function
- * @param None
- * @retval None
- */
-//static void MX_USART1_UART_Init(void) {
-//
-//	/* USER CODE BEGIN USART1_Init 0 */
-//
-//	/* USER CODE END USART1_Init 0 */
-//
-//	/* USER CODE BEGIN USART1_Init 1 */
-//
-//	/* USER CODE END USART1_Init 1 */
-//	huart1.Instance = USART1;
-//	huart1.Init.BaudRate = 115200;
-//	huart1.Init.WordLength = UART_WORDLENGTH_8B;
-//	huart1.Init.StopBits = UART_STOPBITS_1;
-//	huart1.Init.Parity = UART_PARITY_NONE;
-//	huart1.Init.Mode = UART_MODE_TX_RX;
-//	huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-//	huart1.Init.OverSampling = UART_OVERSAMPLING_16;
-//	huart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-//	huart1.Init.ClockPrescaler = UART_PRESCALER_DIV1;
-//	huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-//	if (HAL_UART_Init(&huart1) != HAL_OK) {
-//		Error_Handler();
-//	}
-//	if (HAL_UARTEx_SetTxFifoThreshold(&huart1, UART_TXFIFO_THRESHOLD_1_8)
-//			!= HAL_OK) {
-//		Error_Handler();
-//	}
-//	if (HAL_UARTEx_SetRxFifoThreshold(&huart1, UART_RXFIFO_THRESHOLD_1_8)
-//			!= HAL_OK) {
-//		Error_Handler();
-//	}
-//	if (HAL_UARTEx_DisableFifoMode(&huart1) != HAL_OK) {
-//		Error_Handler();
-//	}
-//	/* USER CODE BEGIN USART1_Init 2 */
-//
-//	/* USER CODE END USART1_Init 2 */
-//
-//}
-/**
  * @brief USART2 Initialization Function
  * @param None
  * @retval None
@@ -1168,7 +727,7 @@ static void MX_GPIO_Init(void) {
 /* USER CODE BEGIN 4 */
 
 /**
- * Initialize LittleFS
+ * Initialize LittleFS configurations
  */
 void LFS_Config(void) {
 	// block device operations
@@ -1213,53 +772,6 @@ int block_device_sync(const struct lfs_config *c) {
 	return 0;
 }
 
-/*
- * @param expects a char pointer
- * @return Nothing, just prints the string to UART
- */
-
-/*
- * Pulls all Chip Selects Low
- * Essentially, accessing Memory bank 0, (000)
- */
-void PULL_ALL_LOW() {
-//	HAL_GPIO_WritePin(FLASH_CS_A0_GPIO_Port, FLASH_CS_A0_Pin, GPIO_PIN_RESET);
-	// Below is A0
-	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET);
-	// A1
-	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_1, GPIO_PIN_RESET);
-	// A2
-	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_0, GPIO_PIN_RESET);
-//	HAL_GPIO_WritePin(FLASH_NCS_A1_GPIO_Port, FLASH_NCS_A1_Pin, GPIO_PIN_RESET);
-//	HAL_GPIO_WritePin(FLASH_NCS_A2_GPIO_Port, FLASH_NCS_A2_Pin, GPIO_PIN_RESET);
-}
-
-/*
- * Write's new Line to UART
- */
-
-//static void init_DecoderInputs(DecoderInput * LSB, DecoderInput * MiddleBit, DecoderInput * MSB) {
-////		LSB->ACTIVE_STATE, MiddleBit->ACTIVE_STATE, MSB->ACTIVE_STATE = 0;
-////		LSB->INACTIVE_STATE, MiddleBit->INACTIVE_STATE, MSB->INACTIVE_STATE = 1;
-//
-//	LSB->Port = FLASH_CS_A0_GPIO_Port;
-//	MiddleBit->Port = FLASH_NCS_A1_GPIO_Port;
-//	MSB->Port = FLASH_NCS_A2_GPIO_Port;
-//
-//	LSB->Pin = FLASH_CS_A0_Pin;
-//	MiddleBit->Pin = FLASH_NCS_A1_Pin;
-//	MSB->Pin = FLASH_NCS_A2_Pin;
-//
-//	// Equivalent to making state = GPIO_PIN_SET
-//	LSB->State, MiddleBit->State, MSB->State = INACTIVE_STATE;
-//}
-//
-//void init_buffer(void) {
-////			cb.size = BUFFER_SIZE;
-//	cb.head = 0;
-//	cb.tail = 0;
-//	cb.count = 0;
-//}
 /* USER CODE END 4 */
 
 /**

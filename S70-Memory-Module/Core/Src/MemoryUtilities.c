@@ -161,7 +161,6 @@ void BULK_MEM_CLEAR(SPI_HandleTypeDef *ptr_hspi1) {
  */
 void MEM_CLEAR_LFS(SPI_HandleTypeDef *ptr_hspi1, lfs_block_t block) {
 	ENABLE_WREN(ptr_hspi1);
-//	PRINT_STRING_UART("Mounting Used CLEAR");
 
 	PULL_CS();
 	HAL_SPI_Transmit(ptr_hspi1, (uint8_t*)&FLASH_SECTOR_ERASE, 1, 100);

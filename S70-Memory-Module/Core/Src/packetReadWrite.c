@@ -129,7 +129,7 @@ uint8_t WRITE(SPI_HandleTypeDef *hspi1, uint8_t * packetBuffer) {
 }
 
 /**
- * This function writes data into memory using ADDRESS FROM CIRCULAR BUFFER
+ * This function writes data into memory using ADDRESS from LittleFS
  * and stays in the function until the writing is done.
  * Precondition of running WREN command is done within the function
  *
@@ -137,16 +137,13 @@ uint8_t WRITE(SPI_HandleTypeDef *hspi1, uint8_t * packetBuffer) {
  * 			void * packetBuffer holds the buffer to write to memory
  *
  * @return - 0 if written successfully
- * 			 1 if an error occurred during writing to memory
+ * 			 -1 if an error occurred during writing to memory
  */
 uint8_t WRITE_LFS(SPI_HandleTypeDef *hspi1, uint8_t * packetBuffer, lfs_block_t block, lfs_size_t size) {
 	uint8_t addr[3] = {(block >> 16) & 0xFF,(block >> 8) & 0xFF, block & 0xFF};
-//	PRINT_STRING_UART("Mounting Used WRITE");
 
-	// Buffers for transmitting data, and receiving status register data
-	uint8_t spiTxBuffer[513] = {0};
-	uint8_t statusRegBuffer[2] = {0};
-
+	// Buffer for receiving status register data
+	uint8_t statusRegBuffer[1] = {0};
 
 	// Clear the address where writing will be done when the clearFlag is 1
 	if (clearFlag == 1) {
@@ -163,9 +160,8 @@ uint8_t WRITE_LFS(SPI_HandleTypeDef *hspi1, uint8_t * packetBuffer, lfs_block_t 
 	PULL_CS();
 	HAL_SPI_Transmit(hspi1, (uint8_t*) &FLASH_WRITE, 1, 100);
 	HAL_SPI_Transmit(hspi1, (uint8_t*) &addr, 3, 100);
-	HAL_SPI_Transmit(hspi1, (uint8_t*) &spiTxBuffer, size, 100);
+	HAL_SPI_Transmit(hspi1, (uint8_t*) packetBuffer, size, 100);
 	SET_CS();
-
 
 	// Stay in the While loop until writing isn't done
 	uint8_t wip = 1;
@@ -177,7 +173,7 @@ uint8_t WRITE_LFS(SPI_HandleTypeDef *hspi1, uint8_t * packetBuffer, lfs_block_t 
 
 		// If error while writing break from loop
 		if (err == 1) {
-			err = 1;
+			err = -1;
 			break;
 		}
 	}
@@ -225,7 +221,7 @@ uint8_t READ(SPI_HandleTypeDef *hspi1, uint8_t * spiRxBuffer) {
  */
 uint8_t READ_LFS(SPI_HandleTypeDef *hspi1, uint8_t * spiRxBuffer, lfs_block_t block, lfs_size_t size) {
 	uint8_t addr[3] = {(block >> 16) & 0xFF,(block >> 8) & 0xFF, block & 0xFF};
-//	PRINT_STRING_UART("Mounting Used READ");
+
 	// Set Chip select to LOW and read from the address and store data in given buffer
 	PULL_CS();
 	HAL_SPI_Transmit(hspi1, (uint8_t*) &FLASH_READ, 1, 100);
