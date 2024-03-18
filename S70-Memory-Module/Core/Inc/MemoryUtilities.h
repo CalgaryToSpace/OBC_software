@@ -10,6 +10,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32l4xx_hal.h"
+#include "./LittleFS/lfs_util.h"
+#include "./LittleFS/lfs.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -104,6 +106,8 @@ void SET_CS();
 void READ_STATUS_REGISTER(SPI_HandleTypeDef *, uint8_t *);
 void ENABLE_WREN(SPI_HandleTypeDef *);
 void ENABLE_WRDI(SPI_HandleTypeDef *);
+void BULK_MEM_CLEAR(SPI_HandleTypeDef *);
 void MEM_CLEAR(SPI_HandleTypeDef *, uint8_t *);
+void MEM_CLEAR_LFS(SPI_HandleTypeDef *, lfs_block_t);
 
 #endif /* INC_MEMORYUTILITIES_H_ */

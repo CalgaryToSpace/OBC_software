@@ -126,3 +126,59 @@ void MEM_CLEAR(SPI_HandleTypeDef *ptr_hspi1, uint8_t * addr) {
 		}
 	}
 }
+
+/*
+ * @param Takes a void pointer which is converted to uint8_t used as an address
+ * The function takes an address and clears the memory in that address
+ * We wait until the clearing is done and then end the function
+ */
+void BULK_MEM_CLEAR(SPI_HandleTypeDef *ptr_hspi1) {
+	ENABLE_WREN(ptr_hspi1);
+
+	PULL_CS();
+	HAL_SPI_Transmit(ptr_hspi1, (uint8_t*)&FLASH_ERCP, 1, 100);
+	SET_CS();
+
+	uint8_t statusRegBuffer[1] = {0};
+
+	//Stay in the While loop until writing isn't done
+	uint8_t wip = 1;
+	uint8_t err = 0;
+	while (wip) {
+		READ_STATUS_REGISTER(ptr_hspi1, statusRegBuffer);
+		wip = statusRegBuffer[0] & 1;
+		err = statusRegBuffer[2] & 2;
+		if (err == 1) {
+			PRINT_STRING_UART("Error during Erasing");
+		}
+	}
+}
+
+/*
+ * @param Takes a void pointer which is converted to uint8_t used as an address
+ * The function takes an address and clears the memory in that address
+ * We wait until the clearing is done and then end the function
+ */
+void MEM_CLEAR_LFS(SPI_HandleTypeDef *ptr_hspi1, lfs_block_t block) {
+	ENABLE_WREN(ptr_hspi1);
+//	PRINT_STRING_UART("Mounting Used CLEAR");
+
+	PULL_CS();
+	HAL_SPI_Transmit(ptr_hspi1, (uint8_t*)&FLASH_SECTOR_ERASE, 1, 100);
+	HAL_SPI_Transmit(ptr_hspi1, (uint8_t*)block, 3, 100);
+	SET_CS();
+
+	uint8_t statusRegBuffer[50] = {0};
+
+	//Stay in the While loop until writing isn't done
+	uint8_t wip = 1;
+	uint8_t err = 0;
+	while (wip) {
+		READ_STATUS_REGISTER(ptr_hspi1, statusRegBuffer);
+		wip = statusRegBuffer[0] & 1;
+		err = statusRegBuffer[2] & 2;
+		if (err == 1) {
+			PRINT_STRING_UART("Error during Erasing");
+		}
+	}
+}

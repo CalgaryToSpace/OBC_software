@@ -76,6 +76,15 @@ UART_HandleTypeDef huart3;
 const uint8_t INACTIVE_STATE = 1;
 const uint8_t ACTIVE_STATE = 0;
 
+//LittleFS variables
+lfs_t lfs;
+lfs_file_t file;
+struct lfs_config cfg;
+
+uint8_t lfs_read_buf[512];
+uint8_t lfs_prog_buf[512];
+//uint8_t lfs_lookahead_buf[32];
+
 //static DecoderInput A0;
 //static DecoderInput A1;
 //static DecoderInput A2;
@@ -144,12 +153,20 @@ static void MX_USART3_UART_Init(void);
 /* USER CODE BEGIN PFP */
 //static void INIT_DECODER_INPUTS(void);
 //static void init_buffer(void);
-
 void PRINT_STRING_UART(void*);
 void PULL_ALL_LOW();
 void PRINT_NEW_LINE();
 void ENABLE_WREN();
 void ENABLE_WRDI();
+
+void LFS_Config(void);
+int block_device_read(const struct lfs_config *c, lfs_block_t block,
+		lfs_off_t off, void *buffer, lfs_size_t size);
+int block_device_prog(const struct lfs_config *c, lfs_block_t block,
+		lfs_off_t off, const void *buffer, lfs_size_t size);
+int block_device_erase(const struct lfs_config *c, lfs_block_t block);
+int block_device_sync(const struct lfs_config *c);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -180,7 +197,6 @@ void ENABLE_WRDI();
 //bool is_full(void) {
 //	return cb.count == BUFFER_SIZE;
 //}
-
 /*
  * This to write data to memory
  * This only writes 8 bits of data at a time
@@ -259,7 +275,6 @@ void ENABLE_WRDI();
 //		}
 //		return 0;
 //	}
-
 /* USER CODE END 0 */
 
 /**
@@ -269,8 +284,8 @@ void ENABLE_WRDI();
 int main(void) {
 	/* USER CODE BEGIN 1 */
 
-	char spiRxBuffer[513] = {0};
-	char spiTxBuffer[513] = {0};
+//	char spiRxBuffer[513] = { 0 };
+//	char spiTxBuffer[513] = { 0 };
 //	char statusRegBuffer[9] = {0};
 //
 //	char testBuffer[100] = {0};
@@ -359,59 +374,178 @@ int main(void) {
 	HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_SET);
 
 	//Initialize the circular buffer with default values
-	INITIALIZE();
+//	INITIALIZE();
+//
+//	//Copying the data to write in spiTxBuffer - 512 (bytes) chars
+////	strcpy((char*) spiTxBuffer, "Minimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 Char"
+////			"Minimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 Char"
+////			"Minimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 Char1234567890"
+////			"Second OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond One"
+////			"Second OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond One"
+////			"Second OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond One"
+////			"Extra Twelve");
+//
+//	strcpy((char*) spiTxBuffer, "Test 1234 String");
+//
+//	//Calling the WRITE function and making sure it's successful
+//	if (WRITE(&hspi1, (uint8_t*) spiTxBuffer) == 0) {
+//		PRINT_STRING_UART("Written successfully");
+//	} else {
+//		PRINT_STRING_UART("Error Occurred during writing");
+//	}
+//
+//	//Calling the READ function and making sure it's successful
+//	if (READ(&hspi1, (uint8_t*) spiRxBuffer) == 0) {
+//		PRINT_STRING_UART("Data Read Successfully");
+//		PRINT_STRING_UART(spiRxBuffer);
+//	} else {
+//		PRINT_STRING_UART("Error Occurred during Reading");
+//	}
+//
+//	//Clear the buffer after reading
+//	memset(spiRxBuffer, 0, strlen((char*) spiRxBuffer));
+//
+//	//Copying the data to write in spiTxBuffer - 500 (bytes) chars
+//	strcpy((char*) spiTxBuffer, "Next String");
+//
+//	//Calling the WRITE function and making sure it's successful
+//	if (WRITE(&hspi1, (uint8_t*) spiTxBuffer) == 0) {
+//		PRINT_STRING_UART("Written successfully");
+//	} else {
+//		PRINT_STRING_UART("Error Occurred during writing");
+//	}
+//
+//	//Calling the READ function and making sure it's successful
+//	if (READ(&hspi1, (uint8_t*) spiRxBuffer) == 0) {
+//		PRINT_STRING_UART("Data Read Successfully");
+//		PRINT_STRING_UART(spiRxBuffer);
+//	} else {
+//		PRINT_STRING_UART("Error Occurred during Reading");
+//	}
+//
+//	//Clear the buffer after reading
+//	memset(spiRxBuffer, 0, strlen((char*) spiRxBuffer));
+//
+//	strcpy((char*) spiTxBuffer,
+//			"Minimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 Char"
+//					"Minimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 Char"
+//					"Minimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 Char1234567890"
+//					"Second OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond One"
+//					"Second OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond One"
+//					"Second OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond One"
+//					"Extra Twelve");
+//
+//	//Calling the WRITE function and making sure it's successful
+//	if (WRITE(&hspi1, (uint8_t*) spiTxBuffer) == 0) {
+//		PRINT_STRING_UART("Written successfully");
+//	} else {
+//		PRINT_STRING_UART("Error Occurred during writing");
+//	}
 
-	//Copying the data to write in spiTxBuffer - 512 (bytes) chars
-//	strcpy((char*) spiTxBuffer, "Minimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 Char"
-//			"Minimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 Char"
-//			"Minimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 CharMinimum 16 Char1234567890"
-//			"Second OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond One"
-//			"Second OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond One"
-//			"Second OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond OneSecond One"
-//			"Extra Twelve");
+//	BULK_MEM_CLEAR(&hspi1);
 
-	strcpy((char*) spiTxBuffer, "Test 1234 String");
+//Configure all the LittleFS values
+	LFS_Config();
 
-	//Calling the WRITE function and making sure it's successful
-	if (WRITE(&hspi1, (uint8_t*) spiTxBuffer) == 0) {
-		PRINT_STRING_UART("Written successfully");
-	} else {
-		PRINT_STRING_UART("Error Occurred during writing");
+	int result = lfs_mount(&lfs, &cfg);
+	if (result < 0) {
+		result = lfs_format(&lfs, &cfg);
+		if (result < 0) {
+			PRINT_STRING_UART("Error Formatting!");
+			return -1;
+		}
+		result = lfs_mount(&lfs, &cfg);
+		if (result < 0) {
+			PRINT_STRING_UART("Error Mounting after Formatting!");
+			return -1;
+		}
 	}
 
-	//Calling the READ function and making sure it's successful
-	if (READ(&hspi1, (uint8_t*) spiRxBuffer) == 0) {
-		PRINT_STRING_UART("Data Read Successfully");
-		PRINT_STRING_UART(spiRxBuffer);
-	} else {
-		PRINT_STRING_UART("Error Occurred during Reading");
+	// read current count
+	char *boot_count = "";
+	result = lfs_file_open(&lfs, &file, "boot_count", LFS_O_RDWR | LFS_O_CREAT);
+	if (result < 0) {
+		PRINT_STRING_UART("Error Opening File!");
+		lfs_unmount(&lfs);
 	}
 
-	//Clear the buffer after reading
-	memset(spiRxBuffer, 0, strlen((char*) spiRxBuffer));
-
-	//Copying the data to write in spiTxBuffer - 500 (bytes) chars
-	strcpy((char*) spiTxBuffer, "Next String");
-
-	//Calling the WRITE function and making sure it's successful
-	if (WRITE(&hspi1, (uint8_t*) spiTxBuffer) == 0) {
-		PRINT_STRING_UART("Written successfully");
-	} else {
-		PRINT_STRING_UART("Error Occurred during writing");
+	result = lfs_file_read(&lfs, &file, &boot_count, sizeof(boot_count));
+	if (result < 0) {
+		PRINT_STRING_UART("Error Reading File!");
+		lfs_unmount(&lfs);
 	}
 
-	//Calling the READ function and making sure it's successful
-	if (READ(&hspi1, (uint8_t*) spiRxBuffer) == 0) {
-		PRINT_STRING_UART("Data Read Successfully");
-		PRINT_STRING_UART(spiRxBuffer);
-	} else {
-		PRINT_STRING_UART("Error Occurred during Reading");
+	// update boot count
+	boot_count = "TEST WOAH";
+	result = lfs_file_rewind(&lfs, &file);
+	if (result < 0) {
+		PRINT_STRING_UART("Error Rewinding File!");
+		lfs_unmount(&lfs);
 	}
 
-	//Clear the buffer after reading
-	memset(spiRxBuffer, 0, strlen((char*) spiRxBuffer));
+	result = lfs_file_write(&lfs, &file, &boot_count, sizeof(boot_count));
+	if (result < 0) {
+		PRINT_STRING_UART("Error Writing to File!");
+		lfs_unmount(&lfs);
+	}
 
-	// Turn off LED
+	// remember the storage is not updated until the file is closed successfully
+	lfs_file_close(&lfs, &file);
+
+	// release any resources we were using
+	lfs_unmount(&lfs);
+
+	PRINT_STRING_UART(boot_count);
+
+//	result = lfs_file_open(&lfs, &file, "test.txt", LFS_O_WRONLY | LFS_O_CREAT);
+//	if (result < 0) {
+//		PRINT_STRING_UART("Error opening file for writing\n");
+//		lfs_unmount(&lfs);
+//		return -1;
+//	}
+//
+//	// Write data to the file
+//	const char *data = "Hello, LittleFS!";
+//	result = lfs_file_write(&lfs, &file, data, strlen(data));
+//	if (result < 0) {
+//		PRINT_STRING_UART("Error writing data to file\n");
+//		lfs_file_close(&lfs, &file);
+//		lfs_unmount(&lfs);
+//		return -1;
+//	}
+//
+//	// Close the file
+//	lfs_file_close(&lfs, &file);
+//
+//	// Open the file for reading
+//	result = lfs_file_open(&lfs, &file, "test.txt", LFS_O_RDONLY);
+//	if (result < 0) {
+//		PRINT_STRING_UART("Error opening file for reading\n");
+//		lfs_unmount(&lfs);
+//		return -1;
+//	}
+//
+//	// Read data from the file
+//	char read_buffer[256]; // Adjust buffer size as needed
+//	result = lfs_file_read(&lfs, &file, read_buffer, sizeof(read_buffer));
+//	if (result < 0) {
+//		PRINT_STRING_UART("Error reading data from file\n");
+//		lfs_file_close(&lfs, &file);
+//		lfs_unmount(&lfs);
+//		return -1;
+//	}
+//
+//	// Print the read data
+//	PRINT_STRING_UART("Read data: %s\n");
+//	PRINT_STRING_UART(read_buffer);
+//
+//	// Close the file
+//	lfs_file_close(&lfs, &file);
+//
+//	// Unmount LittleFS
+//	lfs_unmount(&lfs);
+
+// Turn off LED
 	HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_RESET);
 
 //
@@ -475,7 +609,6 @@ int main(void) {
 //
 //	PRINT_STRING_UART(spiRxBuffer);
 //
-
 
 	/* USER CODE END 2 */
 
@@ -854,7 +987,6 @@ static void MX_UART4_Init(void) {
 //	/* USER CODE END USART1_Init 2 */
 //
 //}
-
 /**
  * @brief USART2 Initialization Function
  * @param None
@@ -1035,6 +1167,52 @@ static void MX_GPIO_Init(void) {
 
 /* USER CODE BEGIN 4 */
 
+/**
+ * Initialize LittleFS
+ */
+void LFS_Config(void) {
+	// block device operations
+	cfg.read = block_device_read;
+	cfg.prog = block_device_prog;
+	cfg.erase = block_device_erase;
+	cfg.sync = block_device_sync;
+
+	// block device configuration
+	cfg.read_size = 512;
+	cfg.prog_size = 512;
+	cfg.block_size = 8192;
+	cfg.block_count = 8192;
+	cfg.block_cycles = 500; // ASK ABOUT THIS (HOW FREQUENT ARE WE USING THE MODULE)
+	cfg.cache_size = 512; // DO WE NEED CACHE SIZE (NOT SURE IF THIS IS NEEDED VALUE)
+	cfg.lookahead_size = 512;
+//	cfg.compact_thresh = 0; // Defaults to ~88% block_size when zero (lfs.h, line 232)
+
+	cfg.read_buffer = lfs_read_buf;
+	cfg.prog_buffer = lfs_prog_buf;
+}
+
+int block_device_read(const struct lfs_config *c, lfs_block_t block,
+		lfs_off_t off, void *buffer, lfs_size_t size) {
+
+	return READ_LFS(&hspi1, (uint8_t*) buffer, (block * c->block_size + off),
+			size);
+}
+
+int block_device_prog(const struct lfs_config *c, lfs_block_t block,
+		lfs_off_t off, const void *buffer, lfs_size_t size) {
+	return WRITE_LFS(&hspi1, (uint8_t*) buffer, (block * c->block_size + off),
+			size);
+}
+
+int block_device_erase(const struct lfs_config *c, lfs_block_t block) {
+	MEM_CLEAR_LFS(&hspi1, block * c->block_size);
+	return 0;
+}
+
+int block_device_sync(const struct lfs_config *c) {
+	return 0;
+}
+
 /*
  * @param expects a char pointer
  * @return Nothing, just prints the string to UART
@@ -1060,7 +1238,6 @@ void PULL_ALL_LOW() {
  * Write's new Line to UART
  */
 
-
 //static void init_DecoderInputs(DecoderInput * LSB, DecoderInput * MiddleBit, DecoderInput * MSB) {
 ////		LSB->ACTIVE_STATE, MiddleBit->ACTIVE_STATE, MSB->ACTIVE_STATE = 0;
 ////		LSB->INACTIVE_STATE, MiddleBit->INACTIVE_STATE, MSB->INACTIVE_STATE = 1;
@@ -1077,14 +1254,12 @@ void PULL_ALL_LOW() {
 //	LSB->State, MiddleBit->State, MSB->State = INACTIVE_STATE;
 //}
 //
-
 //void init_buffer(void) {
 ////			cb.size = BUFFER_SIZE;
 //	cb.head = 0;
 //	cb.tail = 0;
 //	cb.count = 0;
 //}
-
 /* USER CODE END 4 */
 
 /**
