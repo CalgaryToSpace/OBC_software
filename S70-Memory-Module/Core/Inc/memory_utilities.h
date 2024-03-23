@@ -5,42 +5,18 @@
  *      Author: Saksham Puri
  */
 
-#ifndef INC_MEMORYUTILITIES_H_
-#define INC_MEMORYUTILITIES_H_
+#ifndef INC_MEMORY_UTILITIES_H_
+#define INC_MEMORY_UTILITIES_H_
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32l4xx_hal.h"
-#include "./LittleFS/lfs_util.h"
-#include "./LittleFS/lfs.h"
-
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
-
-/* USER CODE END Includes */
-
-/* Exported types ------------------------------------------------------------*/
-/* USER CODE BEGIN ET */
-
-/* USER CODE END ET */
-
-/* Exported constants --------------------------------------------------------*/
-/* USER CODE BEGIN EC */
-
-/* USER CODE END EC */
-
-/* Exported macro ------------------------------------------------------------*/
-/* USER CODE BEGIN EM */
-
-/* USER CODE END EM */
+#include "LittleFS/lfs.h"
+#include "LittleFS/lfs_util.h"
 
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
-
-/* USER CODE BEGIN EFP */
-
-/* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
 #define GPLED1_Pin GPIO_PIN_2
@@ -95,12 +71,6 @@ static const uint8_t FLASH_ERCP = 0xC7;
 static const uint8_t FLASH_STATREG1 = 0X05;
 static const uint8_t FLASH_SECTOR_ERASE = 0xD8;
 
-typedef struct CircularBuffer {
-	uint32_t head;
-	uint32_t tail;
-	uint16_t count;
-} CircularBuffer;
-
 void PULL_CS();
 void SET_CS();
 void READ_STATUS_REGISTER(SPI_HandleTypeDef *, uint8_t *);
@@ -109,5 +79,7 @@ void ENABLE_WRDI(SPI_HandleTypeDef *);
 void BULK_MEM_CLEAR(SPI_HandleTypeDef *);
 void MEM_CLEAR(SPI_HandleTypeDef *, uint8_t *);
 void MEM_CLEAR_LFS(SPI_HandleTypeDef *, lfs_block_t);
+uint8_t WRITE_LFS(SPI_HandleTypeDef *, uint8_t *, lfs_block_t, lfs_size_t);
+uint8_t READ_LFS(SPI_HandleTypeDef *, uint8_t *, lfs_block_t, lfs_size_t);
 
-#endif /* INC_MEMORYUTILITIES_H_ */
+#endif /* INC_MEMORY_UTILITIES_H_ */

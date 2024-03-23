@@ -20,14 +20,12 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <debug_utilities.h>
+#include <memory_functions.h>
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
 
-#include "PacketEnum.h"
-#include "MemoryUtilities.h"
-#include "DebugUtilities.h"
-#include "packetReadWrite.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -61,15 +59,6 @@ UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
 
-//LittleFS variables
-lfs_t lfs;
-lfs_file_t file;
-struct lfs_config cfg;
-
-//LittleFS Buffers for reading and writing
-uint8_t lfs_read_buf[512];
-uint8_t lfs_prog_buf[512];
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -85,14 +74,6 @@ static void MX_UART4_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_USART3_UART_Init(void);
 /* USER CODE BEGIN PFP */
-
-void LFS_Config(void);
-int block_device_read(const struct lfs_config *c, lfs_block_t block,
-		lfs_off_t off, void *buffer, lfs_size_t size);
-int block_device_prog(const struct lfs_config *c, lfs_block_t block,
-		lfs_off_t off, const void *buffer, lfs_size_t size);
-int block_device_erase(const struct lfs_config *c, lfs_block_t block);
-int block_device_sync(const struct lfs_config *c);
 
 /* USER CODE END PFP */
 
@@ -139,76 +120,25 @@ int main(void) {
 	MX_USART3_UART_Init();
 	/* USER CODE BEGIN 2 */
 
-	//Turn on LED1 to indicate program starting
+	// Turn on LED1 to indicate program starting
 	HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_SET);
 
-	// Configure all the LittleFS values
-	LFS_Config();
+	// Initialize LittleFS Values, and pass SPI pointer
+	INITIALIZE(&hspi1);
 
-	//Try mounting littleFS to Memory
-	int result = lfs_mount(&lfs, &cfg);
+	// Force Mount LittleFS (FORMAT the Memory if needed)
+	FORCE_MOUNT();
 
-	//If it doesn't work, try formatting the memory, and mounting again
-	if (result < 0) {
-		result = lfs_format(&lfs, &cfg);
-		if (result < 0) { PRINT_STRING_UART("Error Formatting!"); return -1; }
-		else PRINT_STRING_UART("Formatting! Successful");
+	//Write "Hello, LittleFS!" to the file "test"
+	WRITE_FILE("hello", "Hello LittleFS!", 15);
 
-		result = lfs_mount(&lfs, &cfg);
-		if (result < 0) { PRINT_STRING_UART("Error Mounting after Formatting!"); return -1; }
-		else PRINT_STRING_UART("Mounting Successful");
-	} else PRINT_STRING_UART("Mounting Successful");
+	// Setup the buffer to read that value, and read it from the file
+	char read_buffer[16];
+	READ_FILE("hello", read_buffer, 16);
 
-	//Setup buffers for read and write
-	char write_buffer[16] = {0};
-	char read_buffer[16] = {0};
-
-	//Open a file using LittleFS with Read / Write Flag, and Create if doesn't exist flag
-	result = lfs_file_open(&lfs, &file, "test", LFS_O_RDWR | LFS_O_CREAT);
-	if (result < 0) PRINT_STRING_UART("Error Opening / Creating a File!");
-	else PRINT_STRING_UART("Opened / Created a file named 'test'");
-
-	//Read the first 16 bytes of the file, should be empty
-	result = lfs_file_read(&lfs, &file, read_buffer, sizeof(read_buffer));
-	if (result < 0) PRINT_STRING_UART("Error Reading File!");
-	else { PRINT_STRING_UART("Successfully read from file 'test':"); PRINT_STRING_UART(read_buffer); }
-
-	//Rewind the file pointer to beginning of file
-	result = lfs_file_rewind(&lfs, &file);
-	if (result < 0) PRINT_STRING_UART("Error Rewinding File!");
-	else PRINT_STRING_UART("Successfully rewinded file pointer!");
-
-	//Clear the read_buffer in case it has non-zero values
-	memset(read_buffer, 0, strlen((char*) read_buffer));
-
-	//Initialize Data to be written to memory
-	strcpy((char*) write_buffer, "Hello LittleFS!");
-
-	//Write defined data to file
-	result = lfs_file_write(&lfs, &file, write_buffer, sizeof(write_buffer));
-	if (result < 0) PRINT_STRING_UART("Error Writing to File!");
-	else PRINT_STRING_UART("Successfully wrote data to file!");
-
-	//Close the File, the storage is not updated until the file is closed successfully
-	result = lfs_file_close(&lfs, &file);
-	if (result < 0) PRINT_STRING_UART("Error Closing the File!");
-	else PRINT_STRING_UART("Successfully closed the File!");
-
-	//Open 'test' file using LittleFS with Read Only Flag
-	result = lfs_file_open(&lfs, &file, "test", LFS_O_RDONLY);
-	if (result < 0) PRINT_STRING_UART("Error Opening 'test' File!");
-	else PRINT_STRING_UART("Opened 'test' file");
-
-	//Read the content of the file, should be "Hello LittleFS!"
-	result = lfs_file_read(&lfs, &file, read_buffer, sizeof(write_buffer));
-	if (result < 0) PRINT_STRING_UART("Error Reading File!");
-	else { PRINT_STRING_UART("Successfully read from file 'test':"); PRINT_STRING_UART(read_buffer); }
-
-	//Close the file
-	lfs_file_close(&lfs, &file);
-
-	//Unmount LittleFS to release any resources used by LittleFS
-	lfs_unmount(&lfs);
+	//Print the value that is read from the file
+	PRINT_STRING_UART("Read Value:", 0);
+	PRINT_STRING_UART(read_buffer, 1);
 
 	//Turn off LED1 to indicate Program End
 	HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_RESET);
@@ -352,7 +282,6 @@ static void MX_I2C2_Init(void) {
 	/* USER CODE BEGIN I2C2_Init 2 */
 
 	/* USER CODE END I2C2_Init 2 */
-
 }
 
 /**
@@ -588,7 +517,6 @@ static void MX_USART2_UART_Init(void) {
 	/* USER CODE BEGIN USART2_Init 2 */
 
 	/* USER CODE END USART2_Init 2 */
-
 }
 
 /**
@@ -726,51 +654,6 @@ static void MX_GPIO_Init(void) {
 
 /* USER CODE BEGIN 4 */
 
-/**
- * Initialize LittleFS configurations
- */
-void LFS_Config(void) {
-	// block device operations
-	cfg.read = block_device_read;
-	cfg.prog = block_device_prog;
-	cfg.erase = block_device_erase;
-	cfg.sync = block_device_sync;
-
-	// block device configuration
-	cfg.read_size = 512;
-	cfg.prog_size = 512;
-	cfg.block_size = 8192;
-	cfg.block_count = 8192;
-	cfg.block_cycles = 500; // ASK ABOUT THIS (HOW FREQUENT ARE WE USING THE MODULE)
-	cfg.cache_size = 512; // DO WE NEED CACHE SIZE (NOT SURE IF THIS IS NEEDED VALUE)
-	cfg.lookahead_size = 512;
-//	cfg.compact_thresh = 0; // Defaults to ~88% block_size when zero (lfs.h, line 232)
-
-	cfg.read_buffer = lfs_read_buf;
-	cfg.prog_buffer = lfs_prog_buf;
-}
-
-int block_device_read(const struct lfs_config *c, lfs_block_t block,
-		lfs_off_t off, void *buffer, lfs_size_t size) {
-
-	return READ_LFS(&hspi1, (uint8_t*) buffer, (block * c->block_size + off),
-			size);
-}
-
-int block_device_prog(const struct lfs_config *c, lfs_block_t block,
-		lfs_off_t off, const void *buffer, lfs_size_t size) {
-	return WRITE_LFS(&hspi1, (uint8_t*) buffer, (block * c->block_size + off),
-			size);
-}
-
-int block_device_erase(const struct lfs_config *c, lfs_block_t block) {
-	MEM_CLEAR_LFS(&hspi1, block * c->block_size);
-	return 0;
-}
-
-int block_device_sync(const struct lfs_config *c) {
-	return 0;
-}
 
 /* USER CODE END 4 */
 

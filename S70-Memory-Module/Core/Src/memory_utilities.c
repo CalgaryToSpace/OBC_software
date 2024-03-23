@@ -7,25 +7,18 @@
 
 // Includes----------------------------------------------------------
 // Include header libraries for commands, functions, and pin Names and debugging
-#include "MemoryUtilities.h"
-#include "DebugUtilities.h"
+#include <memory_utilities.h>
+#include <memory_functions.h>
+#include <debug_utilities.h>
+
+// Memory Clear Flag for WRITE function to know when to clear flag
+uint8_t clearFlag = 1;
 
 /*
  * Chip Select set to LOW
  */
 void PULL_CS() {
-	// same as memory_bank_counter % 8
-//	uint8_t mem_bank = (memory_bank_counter & 0x7);
-//	uint8_t lsb = mem_bank & 0x1;
-//	uint8_t middle_bit = mem_bank & 0x2;
-//	uint8_t msb = mem_bank & 0x4;
-//
-//	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET); // LSB
-//	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_1, GPIO_PIN_RESET); // Middle Input
-//	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_0, GPIO_PIN_RESET); // MSB
-
 	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET); // LSB
-
 }
 
 /*
@@ -33,13 +26,6 @@ void PULL_CS() {
  * This is the default state of the CS
  */
 void SET_CS() {
-	// Below is A0
-//	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_SET);
-	// A1
-//	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_1, GPIO_PIN_SET);
-	// A2
-//	HAL_GPIO_WritePin(GPIOG, GPIO_PIN_0, GPIO_PIN_SET);
-
 	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_SET);
 }
 
@@ -65,7 +51,7 @@ void READ_STATUS_REGISTER(SPI_HandleTypeDef *hspi1, uint8_t *rxBuf) {
 void ENABLE_WREN(SPI_HandleTypeDef *hspi1) {
 	PULL_CS();
 	if (HAL_SPI_Transmit(hspi1, (uint8_t*) &FLASH_WREN, 1, HAL_MAX_DELAY) != HAL_OK) {
-		PRINT_STRING_UART("Timeout when enabling WREN");
+		PRINT_STRING_UART("Timeout when enabling WREN", 1);
 	}
 	SET_CS();
 
@@ -89,6 +75,7 @@ void ENABLE_WRDI(SPI_HandleTypeDef *hspi1) {
 	HAL_SPI_Transmit(hspi1, (uint8_t*) &FLASH_WRDI, 1, 100);
 
 	uint8_t statusRegBuffer[50] = {0};
+
 	//Stay in the While loop until writing isn't done
 	uint8_t wel = 1;
 	while (wel) {
@@ -122,34 +109,7 @@ void MEM_CLEAR(SPI_HandleTypeDef *ptr_hspi1, uint8_t * addr) {
 		wip = statusRegBuffer[0] & 1;
 		err = statusRegBuffer[2] & 2;
 		if (err == 1) {
-			PRINT_STRING_UART("Error during Erasing");
-		}
-	}
-}
-
-/*
- * @param Takes a void pointer which is converted to uint8_t used as an address
- * The function takes an address and clears the memory in that address
- * We wait until the clearing is done and then end the function
- */
-void BULK_MEM_CLEAR(SPI_HandleTypeDef *ptr_hspi1) {
-	ENABLE_WREN(ptr_hspi1);
-
-	PULL_CS();
-	HAL_SPI_Transmit(ptr_hspi1, (uint8_t*)&FLASH_ERCP, 1, 100);
-	SET_CS();
-
-	uint8_t statusRegBuffer[1] = {0};
-
-	//Stay in the While loop until writing isn't done
-	uint8_t wip = 1;
-	uint8_t err = 0;
-	while (wip) {
-		READ_STATUS_REGISTER(ptr_hspi1, statusRegBuffer);
-		wip = statusRegBuffer[0] & 1;
-		err = statusRegBuffer[2] & 2;
-		if (err == 1) {
-			PRINT_STRING_UART("Error during Erasing");
+			PRINT_STRING_UART("Error during Erasing", 1);
 		}
 	}
 }
@@ -177,7 +137,87 @@ void MEM_CLEAR_LFS(SPI_HandleTypeDef *ptr_hspi1, lfs_block_t block) {
 		wip = statusRegBuffer[0] & 1;
 		err = statusRegBuffer[2] & 2;
 		if (err == 1) {
-			PRINT_STRING_UART("Error during Erasing");
+			PRINT_STRING_UART("Error during Erasing", 1);
 		}
 	}
 }
+
+/**
+ * This function writes data into memory using ADDRESS from LittleFS
+ * and stays in the function until the writing is done.
+ * Precondition of running WREN command is done within the function
+ *
+ * @param - SPI_HandleTypeDef hspi1 holds SPI protocol data for communication
+ * 			void * packetBuffer holds the buffer to write to memory
+ *
+ * @return - 0 if written successfully
+ * 			 -1 if an error occurred during writing to memory
+ */
+uint8_t WRITE_LFS(SPI_HandleTypeDef *hspi1, uint8_t * packetBuffer, lfs_block_t block, lfs_size_t size) {
+	uint8_t addr[3] = {(block >> 16) & 0xFF,(block >> 8) & 0xFF, block & 0xFF};
+
+	// Buffer for receiving status register data
+	uint8_t statusRegBuffer[1] = {0};
+
+	// Clear the address where writing will be done when the clearFlag is 1
+	if (clearFlag == 1) {
+		clearFlag = 0;
+
+		MEM_CLEAR(hspi1, addr);
+		MEM_CLEAR(hspi1, addr);
+	}
+
+	// Enable WREN Command, so that we can write to the memory module
+	ENABLE_WREN(hspi1);
+
+	// Transmit the Data to the Memory Module
+	PULL_CS();
+	HAL_SPI_Transmit(hspi1, (uint8_t*) &FLASH_WRITE, 1, 100);
+	HAL_SPI_Transmit(hspi1, (uint8_t*) &addr, 3, 100);
+	HAL_SPI_Transmit(hspi1, (uint8_t*) packetBuffer, size, 100);
+	SET_CS();
+
+	// Stay in the While loop until writing isn't done
+	uint8_t wip = 1;
+	uint8_t err = 0;
+	while (wip) {
+		READ_STATUS_REGISTER(hspi1, statusRegBuffer);
+		wip = statusRegBuffer[0] & 1;
+		err = statusRegBuffer[0] & 0b01000000;
+
+		// If error while writing break from loop
+		if (err == 1) {
+			err = -1;
+			break;
+		}
+	}
+
+	//return err value
+	return err;
+}
+
+/**
+ * This function reads data from memory using ADDRESS FROM CIRCULAR BUFFER
+ * and stays in the function until the reading is done.
+ * The Chip Select is done within the function to ensure READ is done
+ *
+ * @param - SPI_HandleTypeDef hspi1 holds SPI protocol data for communication
+ * 			void * spiRxBuffer is the buffer data is going to be put into after reading
+ *
+ * @return - 0 if read successfully
+ * 			 1 if an error occurred during writing to memory
+ */
+uint8_t READ_LFS(SPI_HandleTypeDef *hspi1, uint8_t * spiRxBuffer, lfs_block_t block, lfs_size_t size) {
+	uint8_t addr[3] = {(block >> 16) & 0xFF,(block >> 8) & 0xFF, block & 0xFF};
+
+	// Set Chip select to LOW and read from the address and store data in given buffer
+	PULL_CS();
+	HAL_SPI_Transmit(hspi1, (uint8_t*) &FLASH_READ, 1, 100);
+	HAL_SPI_Transmit(hspi1, (uint8_t*) &addr, 3, 100);
+	HAL_SPI_Receive(hspi1, (uint8_t*) spiRxBuffer, size, 100);
+	SET_CS();
+
+	//Haven't yet implemented a way to check any errors while reading data from memory
+	return 0;
+}
+

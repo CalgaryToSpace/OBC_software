@@ -1,23 +1,26 @@
 /*
- * DebugUtilities.c
+ * debug_utilities.c
  *
  *  Created on: Jul. 10, 2023
  *      Author: Saksham Puri
  */
 
-// Includes----------------------------------------------------------
+// -----------------------------INCLUDES-----------------------------
+
 // Includes Memory Utilities and String header files
-#include "MemoryUtilities.h"
+#include <debug_utilities.h>
+#include <memory_utilities.h>
 #include "string.h"
 
-// Variables---------------------------------------------------------
-// huart1 to use the UART protocol for debugging purposes
+// -----------------------------VARIABLES-----------------------------
+
+// Huart1 to use the UART protocol for debugging purposes
 UART_HandleTypeDef huart1;
 
-//variable to check if above UART variable has been initialized or not
+// Variable to check if above UART variable has been initialized or not
 uint8_t initialized = 0;
 
-// Functions----------------------------------------------------------
+// -----------------------------FUNCTIONS-----------------------------
 
 /**
  * @brief USART1 Initialization Function
@@ -25,14 +28,6 @@ uint8_t initialized = 0;
  * @retval None
  */
 static void MX_USART1_UART_Init(void) {
-
-	/* USER CODE BEGIN USART1_Init 0 */
-
-	/* USER CODE END USART1_Init 0 */
-
-	/* USER CODE BEGIN USART1_Init 1 */
-
-	/* USER CODE END USART1_Init 1 */
 	huart1.Instance = USART1;
 	huart1.Init.BaudRate = 115200;
 	huart1.Init.WordLength = UART_WORDLENGTH_8B;
@@ -58,28 +53,35 @@ static void MX_USART1_UART_Init(void) {
 	if (HAL_UARTEx_DisableFifoMode(&huart1) != HAL_OK) {
 		Error_Handler();
 	}
-	/* USER CODE BEGIN USART1_Init 2 */
-
-	/* USER CODE END USART1_Init 2 */
 }
 
-//Function to print a new line (\n) in UART
+/**
+ * @brief Function to print a new line (\n) in UART
+ * @param None
+ * @retval None
+ */
 void PRINT_NEW_LINE() {
 	char buf[] = "\r\n";
 	HAL_UART_Transmit(&huart1, (uint8_t*) buf, strlen(buf), 100);
 }
 
-//Function to print a given string to UART
-void PRINT_STRING_UART(void *string) {
+/**
+ * @brief Function to print a given string to UART
+ * @param *string, String that needs to be transmitted through UART
+ * @param newLine, 1 if adding a \n after tranmitting string
+ * @retval None
+ */
+void PRINT_STRING_UART(void *string, uint8_t newLine) {
 
-	//If UART variable not initialized, initialize the variable
+	// If UART variable not initialized, initialize the variable
 	if (initialized == 0) {
 		MX_USART1_UART_Init();
 		initialized = 1;
 	}
 
-//	char *buff = (char*) string;
+	// Transmit the String through UART
 	HAL_UART_Transmit(&huart1, (uint8_t*) string, strlen((char*) string), 100);
-	PRINT_NEW_LINE();
-//	memset(string, 0, strlen((char*) string));
+
+	// Transmit new Line if needed
+	if (newLine) PRINT_NEW_LINE();
 }
