@@ -120,11 +120,12 @@ void MEM_CLEAR(SPI_HandleTypeDef *ptr_hspi1, uint8_t * addr) {
  * We wait until the clearing is done and then end the function
  */
 void MEM_CLEAR_LFS(SPI_HandleTypeDef *ptr_hspi1, lfs_block_t block) {
+	uint8_t addr[3] = {(block >> 16) & 0xFF,(block >> 8) & 0xFF, block & 0xFF};
 	ENABLE_WREN(ptr_hspi1);
 
 	PULL_CS();
 	HAL_SPI_Transmit(ptr_hspi1, (uint8_t*)&FLASH_SECTOR_ERASE, 1, 100);
-	HAL_SPI_Transmit(ptr_hspi1, (uint8_t*)block, 3, 100);
+	HAL_SPI_Transmit(ptr_hspi1, (uint8_t*)addr, 3, 100);
 	SET_CS();
 
 	uint8_t statusRegBuffer[50] = {0};
@@ -160,12 +161,12 @@ uint8_t WRITE_LFS(SPI_HandleTypeDef *hspi1, uint8_t * packetBuffer, lfs_block_t 
 	uint8_t statusRegBuffer[1] = {0};
 
 	// Clear the address where writing will be done when the clearFlag is 1
-	if (clearFlag == 1) {
-		clearFlag = 0;
-
-		MEM_CLEAR(hspi1, addr);
-		MEM_CLEAR(hspi1, addr);
-	}
+//	if (clearFlag == 1) {
+//		clearFlag = 0;
+//
+//		MEM_CLEAR(hspi1, addr);
+//		MEM_CLEAR(hspi1, addr);
+//	}
 
 	// Enable WREN Command, so that we can write to the memory module
 	ENABLE_WREN(hspi1);
@@ -176,6 +177,11 @@ uint8_t WRITE_LFS(SPI_HandleTypeDef *hspi1, uint8_t * packetBuffer, lfs_block_t 
 	HAL_SPI_Transmit(hspi1, (uint8_t*) &addr, 3, 100);
 	HAL_SPI_Transmit(hspi1, (uint8_t*) packetBuffer, size, 100);
 	SET_CS();
+
+	// If going over a sector, set clearFlag to 1 for next time
+	if (block % 0x0003FFFF > (block += size) % 0x0003FFFF) {
+		clearFlag = 1;
+	}
 
 	// Stay in the While loop until writing isn't done
 	uint8_t wip = 1;

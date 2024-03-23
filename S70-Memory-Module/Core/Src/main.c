@@ -120,25 +120,61 @@ int main(void) {
 	MX_USART3_UART_Init();
 	/* USER CODE BEGIN 2 */
 
+	HAL_Delay(1000);
+
 	// Turn on LED1 to indicate program starting
 	HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_SET);
+
+	uint8_t boot_count = 0;
+	int8_t result;
+	char result_read;
 
 	// Initialize LittleFS Values, and pass SPI pointer
 	INITIALIZE(&hspi1);
 
-	// Force Mount LittleFS (FORMAT the Memory if needed)
-	FORCE_MOUNT();
+//	result = FORMAT();
+//	if (result < 0) {
+//		INT_TO_STRING(result, &result_read);
+//		PRINT_STRING_UART("Formatting Error", 0);
+//		PRINT_STRING_UART(&result_read, 1);
+//	}
 
-	//Write "Hello, LittleFS!" to the file "test"
-	WRITE_FILE("hello", "Hello LittleFS!", 15);
+	// Use FORCE_MOUNT to FORMAT the Memory if needed
+	result = MOUNT();
+	if (result < 0) {
+		INT_TO_STRING(result, &result_read);
+		PRINT_STRING_UART("Mounting Error", 0);
+		PRINT_STRING_UART(&result_read, 1);
+	}
 
-	// Setup the buffer to read that value, and read it from the file
-	char read_buffer[16];
-	READ_FILE("hello", read_buffer, 16);
+	char read_buffer[32];
+	char write_buffer[32];
 
-	//Print the value that is read from the file
+	result = READ_FILE("test", read_buffer, sizeof(read_buffer));
+	if (result < 0) {
+		INT_TO_STRING(result, &result_read);
+		PRINT_STRING_UART("Reading Error", 0);
+		PRINT_STRING_UART(&result_read, 1);
+	}
+
 	PRINT_STRING_UART("Read Value:", 0);
 	PRINT_STRING_UART(read_buffer, 1);
+
+	boot_count = STRING_TO_INT(read_buffer);
+	boot_count += 1;
+
+	INT_TO_STRING(boot_count, write_buffer);
+
+	result = WRITE_FILE("test", write_buffer, sizeof(write_buffer));
+	if (result < 0) {
+		INT_TO_STRING(result, &result_read);
+		PRINT_STRING_UART("Writing Error", 0);
+		PRINT_STRING_UART(&result_read, 1);
+	}
+
+	memset(read_buffer, 0, strlen((char*) read_buffer));
+
+	UNMOUNT();
 
 	//Turn off LED1 to indicate Program End
 	HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_RESET);
@@ -653,7 +689,6 @@ static void MX_GPIO_Init(void) {
 }
 
 /* USER CODE BEGIN 4 */
-
 
 /* USER CODE END 4 */
 

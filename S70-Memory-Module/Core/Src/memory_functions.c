@@ -68,6 +68,7 @@ int block_device_prog(const struct lfs_config *c, lfs_block_t block,
 
 int block_device_erase(const struct lfs_config *c, lfs_block_t block) {
 	MEM_CLEAR_LFS(hspi_ptr, block * c->block_size);
+//	MEM_CLEAR_LFS(hspi_ptr, block * c->block_size);
 	return 0;
 }
 
@@ -96,6 +97,7 @@ int8_t MOUNT() {
 			return 0;
 		}
 	}
+	PRINT_STRING_UART("LittleFS not Initialized or already mounted", 1);
 	return -1;
 }
 
@@ -116,6 +118,7 @@ int8_t FORCE_MOUNT() {
 		}
 		return 0;
 	}
+	PRINT_STRING_UART("LittleFS not Initialized or already mounted", 1);
 	return -1;
 }
 
@@ -128,9 +131,12 @@ int8_t UNMOUNT() {
 			return result;
 		} else {
 			PRINT_STRING_UART("Successfully Un-mounted LittleFS!", 1);
+			mounted = 0;
 			return result;
 		}
-	} return -1;
+	}
+	PRINT_STRING_UART("LittleFS not Initialized or not mounted", 1);
+	return -1;
 }
 
 int8_t FORMAT() {
@@ -140,10 +146,11 @@ int8_t FORMAT() {
 			PRINT_STRING_UART("Error Formatting!", 1);
 			return result;
 		} else {
-			PRINT_STRING_UART("Formatting! Successful", 1);
+			PRINT_STRING_UART("Formatting Successful!", 1);
 			return result;
 		}
 	}
+	PRINT_STRING_UART("LittleFS not Initialized", 1);
 	return -1;
 }
 
@@ -197,7 +204,7 @@ int8_t WRITE_FILE(char *file_name, void *write_buffer, uint32_t size) {
 
 int8_t READ_FILE(char *file_name, void *read_buffer, uint32_t size) {
 	int8_t result = lfs_file_open(&lfs, &file, file_name,
-			LFS_O_RDONLY);
+			LFS_O_RDONLY | LFS_O_CREAT);
 	if (result < 0) {
 		PRINT_STRING_UART("Error Opening / Creating a File!", 1);
 		return result;
@@ -211,7 +218,7 @@ int8_t READ_FILE(char *file_name, void *read_buffer, uint32_t size) {
 			PRINT_STRING_UART("Error Reading File!", 1);
 			return result;
 		} else {
-			PRINT_STRING_UART("Successfully read data to file!", 1);
+			PRINT_STRING_UART("Successfully read file!", 1);
 
 			// Close the File, the storage is not updated until the file is closed successfully
 			result = lfs_file_close(&lfs, &file);

@@ -14,5 +14,7 @@
 
 void PRINT_STRING_UART(void *, uint8_t);
 void PRINT_NEW_LINE();
+void INT_TO_STRING(int, char*);
+int STRING_TO_INT(const char *str);
 
 #endif /* INC_DEBUG_UTILITIES_H_ */
