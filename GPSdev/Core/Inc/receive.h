@@ -8,6 +8,13 @@
 #define INC_RECEIVE_H_
 #define CRC32_POLYNOMIAL 0xEDB88320L
 
+#include "main.h"
+#include <string.h>
+#include "stm32l4xx_hal.h"
+
+extern UART_HandleTypeDef hlpuart1;
+extern UART_HandleTypeDef huart3;
+
 enum Info{
 	Sync = 0,
 	Message = 1,
@@ -22,13 +29,15 @@ enum Info{
 	ReceiverSWVersion = 10
 };
 
+void receive_log();
+
 char** gpsParseReceive(char* received);
 
 /* --------------------------------------------------------------------------
 From OEM7_Commands_Logs_Manual.pdf
 Calculate a CRC value to be used by CRC calculation functions.
 -------------------------------------------------------------------------- */
-CRC32Value(int i);
+unsigned long CRC32Value(int i);
 
 /* --------------------------------------------------------------------------
 From OEM7_Commands_Logs_Manual.pdf
@@ -36,7 +45,7 @@ Calculates the CRC-32 of a block of data all at once
 ulCount - Number of bytes in the data block
 ucBuffer - Data block
 -------------------------------------------------------------------------- */
-CalculateBlockCRC32( unsigned long ulCount, unsigned char*ucBuffer );
+unsigned long CalculateBlockCRC32( unsigned long ulCount, unsigned char*ucBuffer );
 
 #endif /* INC_RECEIVE_H_ */
 

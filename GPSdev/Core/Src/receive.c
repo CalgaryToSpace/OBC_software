@@ -7,6 +7,16 @@
 
 
 #include "receive.h"
+#include "gps_types.h"
+
+void receive_log(int wait){
+	uint8_t rec[1000] = "";
+	HAL_UART_Receive(&huart3, rec, 1000, wait);
+
+	HAL_UART_Transmit(&hlpuart1, rec, 1000, HAL_MAX_DELAY);
+	return (void *) 0;
+
+}
 
 char** gpsParseReceive(char* received){
 	if(received[0] != '#'){											// Messages should start with "#'
