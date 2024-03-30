@@ -52,20 +52,18 @@ void send_I2C_telecommand(I2C_HandleTypeDef *hi2c, uint8_t id, uint8_t* data, ui
 	// The defines in adcs_types.h already include the 7th bit of the ID to distinguish TLM and TC
 
 	//Allocate only required memory
-	uint8_t buf[2 + data_length + include_checksum]; // add additional bit for checksum if needed
-
-	buf[0] = ADCS_I2C_WRITE;
-	buf[1] = id;
+	uint8_t buf[data_length + include_checksum]; // add additional bit for checksum if needed
 
 	// Fill buffer with Data if transmitting a Telecommand
 	for (int i = 0; i < data_length; i++) {
-		buf[i + 2] = data[i];
+		buf[i] = data[i];
 	}
 
 	// include checksum following data if enabled
-	if (include_checksum) {buf[2 + data_length] = COMMS_Crc8Checksum(buf, data_length);}
+	if (include_checksum) {buf[1 + data_length] = COMMS_Crc8Checksum(buf, data_length);}
 
-	HAL_I2C_Master_Transmit(hi2c, ADCS_I2C_ADDRESS, buf, sizeof(buf), HAL_MAX_DELAY);
+	HAL_I2C_Mem_Write(hi2c, ADCS_I2C_ADDRESS << 1, id, 1, buf, sizeof(buf), HAL_MAX_DELAY);
+	//HAL_I2C_Master_Transmit(hi2c, ADCS_I2C_ADDRESS, buf, sizeof(buf), HAL_MAX_DELAY);
 
 	/* When sending a command to the CubeACP, it is possible to include an 8-bit CRC checksum.
 	For instance, when sending a command that has a length of 8 bytes, it is possible to include a

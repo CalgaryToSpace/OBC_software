@@ -143,15 +143,11 @@ int main(void)
   //Identification response is 8 bytes in length
   	uint8_t data_received[8];
     send_I2C_telemetry_request(ADCS_I2C_HANDLE, TLF_IDENTIFICATION, data_received, sizeof(data_received), ADCS_NO_CHECKSUM);
-    HAL_UART_Transmit(&hlpuart1, data_received, 1, HAL_MAX_DELAY);
-
 
   //Test 2: Test the telecommand wrapper function with the CubeComputer
   //TC ID, Processed Flag, Error Status, Error Index
     uint8_t data_send[1] = {ADCS_MAGIC_NUMBER};
-    uint8_t err_flag = I2C_telecommand_wrapper(ADCS_I2C_HANDLE, TC_RESET, data_send, sizeof(data_send), ADCS_NO_CHECKSUM);
-    HAL_UART_Transmit(&hlpuart1, err_flag, 1, HAL_MAX_DELAY);
-
+    uint8_t err_flag = I2C_telecommand_wrapper(ADCS_I2C_HANDLE, TC_FORMAT_SD, data_send, sizeof(data_send), ADCS_NO_CHECKSUM);
 
   /*
    //Allocate only required memory
