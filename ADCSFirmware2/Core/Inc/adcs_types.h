@@ -90,6 +90,12 @@
 #define TC_ERROR_INVALID_PARAMS 3
 #define TC_ERROR_CRC 4
 
+// ADCS Run Modes - Section 5.3.1 Table 75 of Firmware Manual
+#define ADCS_RUN_MODE_OFF 0x00
+#define ADCS_RUN_MODE_ENABLED 0x01
+#define ADCS_RUN_MODE_TRIGGERED 0x02
+#define ADCS_RUN_MODE_SIMULATION 0x03
+
 /* Function Definitions */
 
 #define ADCS_I2C_HANDLE &hi2c1

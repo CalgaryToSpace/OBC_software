@@ -60,7 +60,7 @@ void send_I2C_telecommand(I2C_HandleTypeDef *hi2c, uint8_t id, uint8_t* data, ui
 	}
 
 	// include checksum following data if enabled
-	if (include_checksum) {buf[1 + data_length] = COMMS_Crc8Checksum(buf, data_length);}
+	if (include_checksum) {buf[data_length] = COMMS_Crc8Checksum(data, data_length);}
 
 	HAL_I2C_Mem_Write(hi2c, ADCS_I2C_ADDRESS << 1, id, 1, buf, sizeof(buf), HAL_MAX_DELAY);
 	//HAL_I2C_Master_Transmit(hi2c, ADCS_I2C_ADDRESS, buf, sizeof(buf), HAL_MAX_DELAY);
