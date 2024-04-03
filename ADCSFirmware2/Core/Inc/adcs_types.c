@@ -7,6 +7,66 @@
 
 #include <adcs_types.h>
 
+uint8_t ADCS_Reset(I2C_HandleTypeDef *hi2c) {
+	// returns telecommand error flag
+	uint8_t data_send[1] = {ADCS_MAGIC_NUMBER};
+	return I2C_telecommand_wrapper(hi2c, TC_RESET, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
+}
+
+uint8_t ADCS_Check_Identification(I2C_HandleTypeDef *hi2c) {
+	// returns uint8_t with last four bits corresponding to differences in expected data
+	// so, for instance, a difference in node type would give 0b0000_1000 or 0x08
+
+	uint8_t data_received[8];
+	send_I2C_telemetry_request(hi2c, TLF_IDENTIFICATION, data_received, sizeof(data_received), ADCS_INCLUDE_CHECKSUM);
+
+	// expected results of ID: node type, interface version, major and minor firmware version
+	uint8_t data_expected[8] = {10, 7, 7, 12};
+
+	uint8_t diff_locations;
+	for (uint8_t i; i < 4; i++) {
+		diff_locations |= (data_expected[i] != data_received[i]) << (3 - i);
+	} return diff_locations;
+}
+
+uint32_t ADCS_Get_Time(I2C_HandleTypeDef *hi2c) {
+	// returns uint32_t with current time
+	// first 8 bits are seconds since startup, next 8 bits are ms past the second
+
+	uint8_t data_received[8];
+	send_I2C_telemetry_request(hi2c, TLF_IDENTIFICATION, data_received, sizeof(data_received), ADCS_INCLUDE_CHECKSUM);
+
+	uint16_t time_sec = data_received[5] << 8 | data_received[4];
+	uint16_t time_ms = data_received[7] << 8 | data_received[6];
+
+	uint32_t adcs_time = time_sec << 16 | time_ms;
+	return adcs_time;
+}
+
+uint8_t ADCS_Program_Status(I2C_HandleTypeDef *hi2c) {
+	// checks whether the bootloader or ADCS is running
+	// returns 0x01 for ADCS, 0x02 for bootloader
+	uint8_t data_received[6];
+	send_I2C_telemetry_request(hi2c, TLF_BOOT_RUNNING_PROGRAM_STATUS, data_received, sizeof(data_received), ADCS_INCLUDE_CHECKSUM);
+
+	return data_received[3];
+
+}
+
+uint8_t ADCS_Communication_Status(I2C_HandleTypeDef *hi2c) {
+	// returns I2C communication status of the ADCS (Table 37)
+	// bit 0 is 1 if TC buffer was overrun while receiving a telecommand
+	// bit 3 is 1 if the number of data clocked out was more than the telemetry package
+	// bit 4 is 1 if the telecommand sent exceeded the buffer size
+	// other bits are for UART and CAN; ignore them
+
+	uint8_t data_received[6];
+	send_I2C_telemetry_request(hi2c, TLF_BOOT_RUNNING_PROGRAM_STATUS, data_received, sizeof(data_received), ADCS_INCLUDE_CHECKSUM);
+
+	return data_received[4];
+}
+
+
 /**
  * send_I2C_telecommand_wrapper
  * REQUIRES:
