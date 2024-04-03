@@ -18,7 +18,7 @@ uint8_t ADCS_Check_Identification(I2C_HandleTypeDef *hi2c) {
 	// so, for instance, a difference in node type would give 0b0000_1000 or 0x08
 
 	uint8_t data_received[8];
-	send_I2C_telemetry_request(hi2c, TLF_IDENTIFICATION, data_received, sizeof(data_received), ADCS_INCLUDE_CHECKSUM);
+	I2C_telemetry_wrapper(hi2c, TLF_IDENTIFICATION, data_received, sizeof(data_received), ADCS_INCLUDE_CHECKSUM);
 
 	// expected results of ID: node type, interface version, major and minor firmware version
 	uint8_t data_expected[8] = {10, 7, 7, 12};
@@ -34,7 +34,7 @@ uint32_t ADCS_Get_Time(I2C_HandleTypeDef *hi2c) {
 	// first 8 bits are seconds since startup, next 8 bits are ms past the second
 
 	uint8_t data_received[8];
-	send_I2C_telemetry_request(hi2c, TLF_IDENTIFICATION, data_received, sizeof(data_received), ADCS_INCLUDE_CHECKSUM);
+	I2C_telemetry_wrapper(hi2c, TLF_IDENTIFICATION, data_received, sizeof(data_received), ADCS_INCLUDE_CHECKSUM);
 
 	uint16_t time_sec = data_received[5] << 8 | data_received[4];
 	uint16_t time_ms = data_received[7] << 8 | data_received[6];
@@ -47,10 +47,9 @@ uint8_t ADCS_Program_Status(I2C_HandleTypeDef *hi2c) {
 	// checks whether the bootloader or ADCS is running
 	// returns 0x01 for ADCS, 0x02 for bootloader
 	uint8_t data_received[6];
-	send_I2C_telemetry_request(hi2c, TLF_BOOT_RUNNING_PROGRAM_STATUS, data_received, sizeof(data_received), ADCS_INCLUDE_CHECKSUM);
+	I2C_telemetry_wrapper(hi2c, TLF_BOOT_RUNNING_PROGRAM_STATUS, data_received, sizeof(data_received), ADCS_INCLUDE_CHECKSUM);
 
 	return data_received[3];
-
 }
 
 uint8_t ADCS_Communication_Status(I2C_HandleTypeDef *hi2c) {
@@ -61,14 +60,14 @@ uint8_t ADCS_Communication_Status(I2C_HandleTypeDef *hi2c) {
 	// other bits are for UART and CAN; ignore them
 
 	uint8_t data_received[6];
-	send_I2C_telemetry_request(hi2c, TLF_BOOT_RUNNING_PROGRAM_STATUS, data_received, sizeof(data_received), ADCS_INCLUDE_CHECKSUM);
+	I2C_telemetry_wrapper(hi2c, TLF_BOOT_RUNNING_PROGRAM_STATUS, data_received, sizeof(data_received), ADCS_INCLUDE_CHECKSUM);
 
 	return data_received[4];
 }
 
 
 /**
- * send_I2C_telecommand_wrapper
+ * I2C_telecommand_wrapper
  * REQUIRES:
  *  - hi2c points to valid I2C handle (ex. &hi2c1)
  *  - id is a valid telecommand ID (see Firmware Reference Manual)
@@ -95,6 +94,30 @@ uint8_t I2C_telecommand_wrapper(I2C_HandleTypeDef *hi2c, uint8_t id, uint8_t* da
 
     return TC_err_flag;
 }
+
+/**
+ * I2C_telemetry_wrapper
+ * REQUIRES:
+ *  - hi2c points to valid I2C handle (ex. &hi2c1)
+ *  - id is a valid telemetry request ID (see Firmware Reference Manual)
+ *  - data points to array of uint8_t with length at least data_length (should contain the correct number of bytes for the given telemetry request ID)
+ *  - include_checksum is either ADCS_INCLUDE_CHECKSUM or ADCS_NO_CHECKSUM
+ * PROMISES:
+ * 	- Return value is 1 if checksum value doesn't match, 0 for any other successful transmission (including with no checksum)
+ * 	- data array filled with result of transmission
+ */
+uint8_t I2C_telemetry_wrapper(I2C_HandleTypeDef *hi2c, uint8_t id, uint8_t* data, uint32_t data_length, uint8_t include_checksum) {
+    // Send telemetry request
+	uint8_t TC_err_flag = send_I2C_telemetry_request(hi2c, id, data, data_length, include_checksum);
+
+	while (include_checksum & rv == 0x04) {
+		// if the checksum doesn't check out, keep resending the request
+		TC_err_flag = send_I2C_telemetry_request(hi2c, id, data, data_length, include_checksum);
+	}
+
+    return TC_err_flag;
+}
+
 
 /**
  * send_I2C_telecommand
