@@ -117,6 +117,7 @@ void ADCS_move_to_memory(uint8_t* data, uint32_t data_length) {
  */
 void I2C_telecommand_wrapper(I2C_HandleTypeDef *hi2c, uint8_t id, uint8_t* data, uint32_t data_length, uint8_t include_checksum) {
     uint8_t TC_err_flag;
+    uint8_t tc_ack[4];
 
     do {
 		// Send telecommand
@@ -124,14 +125,13 @@ void I2C_telecommand_wrapper(I2C_HandleTypeDef *hi2c, uint8_t id, uint8_t* data,
 
 		// Poll Acknowledge Telemetry Format until the Processed flag equals 1.
 		uint8_t processed = 0;
-		uint8_t tc_ack[4];
 		while (!processed) {
 			send_I2C_telemetry_request(hi2c, TLF_TC_ACK, tc_ack, 4, include_checksum);
 			processed = tc_ack[1] & 1;
 		}
 
 		// Confirm telecommand validity by checking the TC Error flag of the last read TC Acknowledge Telemetry Format.
-		uint8_t TC_err_flag = tc_ack[2];
+		TC_err_flag = tc_ack[2];
 
     } while (TC_err_flag == 0x04);  // if the checksum doesn't check out, keep resending the request
 
