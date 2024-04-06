@@ -102,25 +102,36 @@
 #define ADCS_INCLUDE_CHECKSUM 1
 #define ADCS_NO_CHECKSUM 0
 
+// Storage functions
+uint8_t ADCS_output[80]; // 80-bit statically allocated buffer to store outputs from the ADCS commands
+void ADCS_move_to_memory(uint8_t* data, uint32_t data_length); // function to store things to ADCS_output
+
 // TC/TLM functions (basic communication)
-uint8_t I2C_telecommand_wrapper(I2C_HandleTypeDef *hi2c, uint8_t id, uint8_t* data, uint32_t data_length, uint8_t include_checksum);
+void I2C_telecommand_wrapper(I2C_HandleTypeDef *hi2c, uint8_t id, uint8_t* data, uint32_t data_length, uint8_t include_checksum);
+void I2C_telemetry_wrapper(I2C_HandleTypeDef *hi2c, uint8_t id, uint8_t* data, uint32_t data_length, uint8_t include_checksum);
 void send_I2C_telecommand(I2C_HandleTypeDef *hi2c, uint8_t id, uint8_t* data, uint32_t data_length, uint8_t include_checksum);
 uint8_t send_I2C_telemetry_request (I2C_HandleTypeDef *hi2c, uint8_t id, uint8_t* data, uint32_t data_length, uint8_t include_checksum);
-uint8_t send_UART_telecommand(UART_HandleTypeDef *huart, uint8_t id, uint8_t* data, uint32_t data_length);
 
 // CRC functions
 void COMMS_Crc8Init();
 uint8_t COMMS_Crc8Checksum(uint8_t* buffer, uint16_t len);
 
 // UART debug functions
+uint8_t send_UART_telecommand(UART_HandleTypeDef *huart, uint8_t id, uint8_t* data, uint32_t data_length);
 void PRINT_STRING_UART(UART_HandleTypeDef *huart, void *string);
 void PRINT_NEW_LINE(UART_HandleTypeDef *huart);
 
 // ADCS functions
-uint8_t ADCS_Reset(I2C_HandleTypeDef *hi2c);
-uint8_t ADCS_Check_Identification(I2C_HandleTypeDef *hi2c);
-uint32_t ADCS_Get_Time(I2C_HandleTypeDef *hi2c);
-uint8_t ADCS_Program_Status(I2C_HandleTypeDef *hi2c);
-uint8_t ADCS_Communication_Status(I2C_HandleTypeDef *hi2c);
+void ADCS_Reset(I2C_HandleTypeDef *hi2c);
+void ADCS_Identification(I2C_HandleTypeDef *hi2c);
+void ADCS_Program_Status(I2C_HandleTypeDef *hi2c);
+void ADCS_Communication_Status(I2C_HandleTypeDef *hi2c);
+void ADCS_Deploy_Magnetometer(I2C_HandleTypeDef *hi2c);
+void ADCS_Disable(I2C_HandleTypeDef *hi2c);
+void ADCS_Enable_On(I2C_HandleTypeDef *hi2c);
+void ADCS_Enable_Triggered(I2C_HandleTypeDef *hi2c);
+void ADCS_Clear_Errors(I2C_HandleTypeDef *hi2c);
+void ADCS_Attitude_Control_Mode(I2C_HandleTypeDef *hi2c, uint8_t mode);
+void ADCS_Attitude_Estimation_Mode(I2C_HandleTypeDef *hi2c, uint8_t mode);
 
 #endif /* INC_ADCS_TYPES_H_ */
