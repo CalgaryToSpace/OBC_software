@@ -83,6 +83,13 @@
 #define TC_SAVE_CONFIG 63
 #define TC_SAVE_ORBIT_PARAMS 64
 
+// Bootloader Telecommand IDs - Section 6.2.1 Table 60 of Firmware Manua
+#define TC_BL_CLEAR_ERRORS 7
+#define TC_BL_SET_INDEX 100
+#define	TC_BL_RUN_PROGRAM 101
+#define TC_BL_READ_INFO 102
+#define TC_BL_COPY_TO_FLASH 103
+
 // Telecommand Error Flags - Section 5.2.2 Figure 6 of Firmware Manual
 #define TC_ERROR_NONE 0
 #define TC_ERROR_INVALID_ID 1
@@ -102,9 +109,8 @@
 #define ADCS_INCLUDE_CHECKSUM 1
 #define ADCS_NO_CHECKSUM 0
 
-// Storage functions
+// Storage
 uint8_t ADCS_output[80]; // 80-bit statically allocated buffer to store outputs from the ADCS commands
-void ADCS_move_to_memory(uint8_t* data, uint32_t data_length); // function to store things to ADCS_output
 
 // TC/TLM functions (basic communication)
 void I2C_telecommand_wrapper(I2C_HandleTypeDef *hi2c, uint8_t id, uint8_t* data, uint32_t data_length, uint8_t include_checksum);
@@ -132,6 +138,16 @@ void ADCS_Enable_On(I2C_HandleTypeDef *hi2c);
 void ADCS_Enable_Triggered(I2C_HandleTypeDef *hi2c);
 void ADCS_Clear_Errors(I2C_HandleTypeDef *hi2c);
 void ADCS_Attitude_Control_Mode(I2C_HandleTypeDef *hi2c, uint8_t mode);
+void ADCS_Enable_Manual_Control(I2C_HandleTypeDef *hi2c);
+void ADCS_Enable_Detumbling_Control(I2C_HandleTypeDef *hi2c);
+void ADCS_Stop_Reaction_Wheels(I2C_HandleTypeDef *hi2c);
 void ADCS_Attitude_Estimation_Mode(I2C_HandleTypeDef *hi2c, uint8_t mode);
+void ADCS_TC_Ack(I2C_HandleTypeDef *hi2c);
+void ADCS_Run_Once(I2C_HandleTypeDef *hi2c);
+void ADCS_Use_Main_Magnetorquer(I2C_HandleTypeDef *hi2c);
+void ADCS_Use_Redundant_Magnetorquer(I2C_HandleTypeDef *hi2c);
+void ADCS_Use_Main_Magnetorquer_With_Alternate_Microcontroller(I2C_HandleTypeDef *hi2c);
+void ADCS_Set_Magnetorquer_Output(I2C_HandleTypeDef *hi2c, uint16_t x_duty, uint16_t y_duty, uint16_t z_duty);
+void ADCS_Set_Wheel_Speed(I2C_HandleTypeDef *hi2c, uint16_t x_speed, uint16_t y_speed, uint16_t z_speed);
 
 #endif /* INC_ADCS_TYPES_H_ */

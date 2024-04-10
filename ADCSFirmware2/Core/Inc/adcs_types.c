@@ -14,29 +14,13 @@ void ADCS_Reset(I2C_HandleTypeDef *hi2c) {
 }
 
 void ADCS_Identification(I2C_HandleTypeDef *hi2c) {
-	// returns : node type, interface version, major and minor firmware version, seconds since startup (2 bytes), ms since startup (2 bytes)
-
-	uint8_t data_received[8];
-	I2C_telemetry_wrapper(hi2c, TLF_IDENTIFICATION, data_received, sizeof(data_received), ADCS_INCLUDE_CHECKSUM);
-
-	// expected results of ID: node type, interface version, major and minor firmware version
-	uint8_t data_expected[8] = {10, 7, 7, 12};
-
-	uint8_t diff_locations;
-	for (uint8_t i; i < 4; i++) {
-		diff_locations |= (data_expected[i] != data_received[i]) << (3 - i);
-	} return diff_locations;
-
-
-	return adcs_time;
+	I2C_telemetry_wrapper(hi2c, TLF_IDENTIFICATION, ADCS_output, 8, ADCS_INCLUDE_CHECKSUM);
 }
 
 void ADCS_Program_Status(I2C_HandleTypeDef *hi2c) {
 	// checks whether the bootloader or ADCS is running
 	// returns 0x01 for ADCS, 0x02 for bootloader
-	uint8_t data_received[6];
-	I2C_telemetry_wrapper(hi2c, TLF_BOOT_RUNNING_PROGRAM_STATUS, data_received, sizeof(data_received), ADCS_INCLUDE_CHECKSUM);
-	ADCS_move_to_memory(data_received, sizeof(data_received));
+	I2C_telemetry_wrapper(hi2c, TLF_BOOT_RUNNING_PROGRAM_STATUS, ADCS_output, 6, ADCS_INCLUDE_CHECKSUM);
 }
 
 void ADCS_Communication_Status(I2C_HandleTypeDef *hi2c) {
@@ -45,10 +29,7 @@ void ADCS_Communication_Status(I2C_HandleTypeDef *hi2c) {
 	// bit 3 is 1 if the number of data clocked out was more than the telemetry package
 	// bit 4 is 1 if the telecommand sent exceeded the buffer size
 	// other bits are for UART and CAN; ignore them
-
-	uint8_t data_received[6];
-	I2C_telemetry_wrapper(hi2c, TLF_BOOT_RUNNING_PROGRAM_STATUS, data_received, sizeof(data_received), ADCS_INCLUDE_CHECKSUM);
-	ADCS_move_to_memory(data_received, sizeof(data_received));
+	I2C_telemetry_wrapper(hi2c, TLF_BOOT_RUNNING_PROGRAM_STATUS, ADCS_output, 6, ADCS_INCLUDE_CHECKSUM);
 }
 
 void ADCS_Deploy_Magnetometer(I2C_HandleTypeDef *hi2c) {
@@ -77,7 +58,7 @@ void ADCS_Enable_Triggered(I2C_HandleTypeDef *hi2c) {
 
 void ADCS_Clear_Errors(I2C_HandleTypeDef *hi2c) {
 	// Clears error flags
-	// NOTE: THERE IS ANOTHER CLEAR ERROR FLAG TC FOR THE BOOTLODER THAT IS NEEDED
+	// NOTE: THERE IS ANOTHER, SEPARATE CLEAR ERROR FLAG TC FOR THE BOOTLODER (TC_BL_CLEAR_ERRORS)
 	uint8_t data_send[1] = {0b11000000};
 	I2C_telecommand_wrapper(hi2c, TC_CLEAR_ERRORS, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
 }
@@ -89,6 +70,20 @@ void ADCS_Attitude_Control_Mode(I2C_HandleTypeDef *hi2c, uint8_t mode) {
 	I2C_telecommand_wrapper(hi2c, TC_SET_ATTITUDE_CONTROL_MODE, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
 }
 
+void ADCS_Enable_Manual_Control(I2C_HandleTypeDef *hi2c) {
+	// allows to run ADCS_Set_Magnetorquer_Output and ADCS_Set_Wheel_Speed
+	ADCS_Attitude_Control_Mode(hi2c, 0);
+}
+
+void ADCS_Enable_Detumbling_Control(I2C_HandleTypeDef *hi2c) {
+	ADCS_Attitude_Control_Mode(hi2c, 1);
+}
+
+void ADCS_Stop_Reaction_Wheels(I2C_HandleTypeDef *hi2c) {
+	ADCS_Attitude_Control_Mode(hi2c, 12);
+}
+
+
 void ADCS_Attitude_Estimation_Mode(I2C_HandleTypeDef *hi2c, uint8_t mode) {
 	// Sets the ADCS attitude estimation mode
 	// Possible values for mode given in Section 6.3 Table 80 of Firmware Reference Manual (ranges from 0 to 7)
@@ -96,12 +91,49 @@ void ADCS_Attitude_Estimation_Mode(I2C_HandleTypeDef *hi2c, uint8_t mode) {
 	I2C_telecommand_wrapper(hi2c, TC_SET_ATTITUDE_ESTIMATION_MODE, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
 }
 
-
-void ADCS_move_to_memory(uint8_t* data, uint32_t data_length) {
-	for (int i = 0; i < data_length; i++) {
-			ADCS_output[i] = data[i];
-		}
+void ADCS_TC_Ack(I2C_HandleTypeDef *hi2c) {
+	I2C_telemetry_wrapper(hi2c, TLF_TC_ACK, ADCS_output, 4, ADCS_INCLUDE_CHECKSUM);
 }
+
+void ADCS_Run_Once(I2C_HandleTypeDef *hi2c) {
+	// requires ADCS_Enable_Triggered to have run first
+	// (if ADCS_Enable_On has run instead, then this is unnecessary)
+	uint8_t data_send[0];
+	I2C_telecommand_wrapper(hi2c, TC_TRIGGER_ADCS_LOOP, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
+}
+
+void ADCS_Use_Main_Magnetorquer(I2C_HandleTypeDef *hi2c) {
+	uint8_t data_send[1] = {0};
+	I2C_telecommand_wrapper(hi2c, TC_SET_MODE_OF_MAGNETOMETER_OPERATION, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
+}
+
+void ADCS_Use_Redundant_Magnetorquer(I2C_HandleTypeDef *hi2c) {
+	uint8_t data_send[1] = {1};
+	I2C_telecommand_wrapper(hi2c, TC_SET_MODE_OF_MAGNETOMETER_OPERATION, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
+}
+
+void ADCS_Use_Main_Magnetorquer_With_Alternate_Microcontroller(I2C_HandleTypeDef *hi2c) {
+	uint8_t data_send[1] = {2};
+	I2C_telecommand_wrapper(hi2c, TC_SET_MODE_OF_MAGNETOMETER_OPERATION, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
+}
+
+void ADCS_Set_Magnetorquer_Output(I2C_HandleTypeDef *hi2c, uint16_t x_duty, uint16_t y_duty, uint16_t z_duty) {
+	// only valid after ADCS_Enable_Manual_Control is run
+	// for the duty equations, raw parameter value is obtained using the formula: (raw parameter) = (formatted value)*1000.0
+	// duty >> 8 gives upper byte, duty & 0x00FF gives lower byte
+	uint8_t data_send[6] = {x_duty & 0x00FF, x_duty >> 8, y_duty & 0x00FF, y_duty >> 8, z_duty & 0x00FF, z_duty >> 8};
+	I2C_telecommand_wrapper(hi2c, TC_SET_MAGNETORQUER_OUTPUT, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
+}
+
+void ADCS_Set_Wheel_Speed(I2C_HandleTypeDef *hi2c, uint16_t x_speed, uint16_t y_speed, uint16_t z_speed) {
+	// only valid after ADCS_Enable_Manual_Control is run
+	// for the duty equations, raw parameter value is in rpm
+	// duty >> 8 gives upper byte, duty & 0x00FF gives lower byte
+	uint8_t data_send[6] = {x_speed & 0x00FF, x_speed >> 8, y_speed & 0x00FF, y_speed >> 8, z_speed & 0x00FF, z_speed >> 8};
+	I2C_telecommand_wrapper(hi2c, TC_SET_WHEEL_SPEED, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
+}
+
+
 
 
 /**
@@ -117,7 +149,6 @@ void ADCS_move_to_memory(uint8_t* data, uint32_t data_length) {
  */
 void I2C_telecommand_wrapper(I2C_HandleTypeDef *hi2c, uint8_t id, uint8_t* data, uint32_t data_length, uint8_t include_checksum) {
     uint8_t TC_err_flag;
-    uint8_t tc_ack[4];
 
     do {
 		// Send telecommand
@@ -126,16 +157,15 @@ void I2C_telecommand_wrapper(I2C_HandleTypeDef *hi2c, uint8_t id, uint8_t* data,
 		// Poll Acknowledge Telemetry Format until the Processed flag equals 1.
 		uint8_t processed = 0;
 		while (!processed) {
-			send_I2C_telemetry_request(hi2c, TLF_TC_ACK, tc_ack, 4, include_checksum);
-			processed = tc_ack[1] & 1;
+			ADCS_TC_Ack(hi2c);
+			processed = ADCS_output[1] & 1;
 		}
 
 		// Confirm telecommand validity by checking the TC Error flag of the last read TC Acknowledge Telemetry Format.
-		TC_err_flag = tc_ack[2];
+		TC_err_flag = ADCS_output[2];
 
     } while (TC_err_flag == 0x04);  // if the checksum doesn't check out, keep resending the request
 
-    ADCS_move_to_memory(tc_ack, sizeof(tc_ack));  // memory contains the data from the acknowledge
 }
 
 /**
