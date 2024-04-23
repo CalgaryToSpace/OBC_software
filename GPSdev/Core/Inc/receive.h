@@ -2,6 +2,8 @@
  * receive.ch
  *  Created on: Jul 4, 2022
  *      Author: mswel
+ *  Updated on 2024-04-23
+ *  Author: Matjaz Cigler
  */
 
 #ifndef INC_RECEIVE_H_
@@ -11,6 +13,7 @@
 #include "main.h"
 #include <string.h>
 #include "stm32l4xx_hal.h"
+#include "gps_types.h"
 
 extern UART_HandleTypeDef hlpuart1;
 extern UART_HandleTypeDef huart3;
@@ -29,7 +32,10 @@ enum Info{
 	ReceiverSWVersion = 10
 };
 
-void receive_log();
+void receive_log(int wait);
+
+void pack_header(const uint8_t rx_buff[], header_status **result_dest);
+void pack_gps_bestxyz(const uint8_t rx_buff[], gps_bestxyz_status **result_dest, uint8_t H);
 
 char** gpsParseReceive(char* received);
 

@@ -1,4 +1,13 @@
-
+/*
+ * gps_types.h
+ *
+ *
+ *  Created on: Jul 7, 2022
+ *  Updated: 2023-11-21
+ *      Author: mswel, Matjaz Cigler
+ *  Updated on 2024-04-23
+ *  Author: Matjaz Cigler
+ */
 #ifndef __INCLUDE_GUARD__GPS_TYPES_H__
 #define __INCLUDE_GUARD__GPS_TYPES_H__
 
@@ -19,7 +28,7 @@ typedef enum {
 } GPS_TIME_STATUS_enum_t; //Table 13: GPS Reference Time Status
 
 // Messgae ID: 241, 00x00F1: BESTXYZ
-typedef struct {
+typedef struct __attribute__((__packed__)) {
 	uint8_t sync_1; // 0xAA Uchar offset: 0
 	uint8_t sync_2; // 0x44 Uchar offset: 1
 	uint8_t sync_3; //0x12 Uchar offset: 2
@@ -36,6 +45,12 @@ typedef struct {
 	uint32_t rcvr_status; //receiver status, Ulong, offset: 20, Table 199
 	uint16_t reserved; //reserved for internal use, Ushort, offset: 24
 	uint16_t rcvr_version; //0-65535, receiver software build number, Ushort, offset: 25
+
+
+} header_status;
+
+// Messgae ID: 241, 00x00F1: BESTXYZ
+typedef struct {
 	uint32_t psol_status; //P-sol status, Enum, see table 92 offset: H
 	uint32_t pos_type; //Position type, Enum, see table 93 offset: H+4
 	int64_t p_x; //Position coord X (m), Double, offset: H+8
@@ -58,7 +73,6 @@ typedef struct {
 	int32_t sol_age; //Solution age in seconds, Float, offset: H+100
 	uint8_t num_svs; //Number of satellites tracked, Uchar offset: H+104
 	uint8_t num_soln_svs; //Number of satellites used in solution, Uchar offset: H+105
-	uint8_t num_soln_svs;     // Number of satellites used in solution, Uchar offset: H+105
 	uint8_t num_ggL1;         // Number of satellites with L1/E1/B1 signals used in solution, Uchar offset: H+106
 	uint8_t solnMultiSVs;     // Number of satellites with multi-frequency signals used in solution, Uchar offset: H+107
 	int8_t reserved2;            // Reserved, Char, offset: H+108
@@ -67,7 +81,7 @@ typedef struct {
 	uint8_t gps_glonass_mask; // GPS and GLONASS signals used mask, Hex, offset: H+111
 	uint8_t crc[4];             // 32-bit CRC, Hex 4 , offset: H+112
 
-} gps_bestxyz_status;
+}  __attribute__((__packed__)) gps_bestxyz_status;
 
 
 #endif /* __INCLUDE_GUARD__GPS_TYPES_H__ */

@@ -4,6 +4,8 @@
  *  Created on: Jul 25, 2022
  *  Revided on : Decmeber 20, 2023 by MC
  *      Author: mswel, MC
+ * Updated on 2024-04-23
+ *  Author: Matjaz Cigler
  */
 
 #include "gpsCommands.h"

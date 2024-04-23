@@ -3,6 +3,8 @@
  *
  *  Created on: Jul 25, 2022
  *      Author: mswel
+ *  Updated on 2024-04-23
+ *  Author: Matjaz Cigler
  */
 
 #ifndef INC_GPSCOMMANDS_H_

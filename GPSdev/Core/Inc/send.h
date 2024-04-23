@@ -3,12 +3,13 @@
  *
  *  Created on: Jul 7, 2022
  *      Author: mswel
+ *  Updated on 2024-04-23
+ *  Author: Matjaz Cigler
  */
 
 #ifndef INC_SEND_H_
 #define INC_SEND_H_
 
-#include "main.h"
 #include <string.h>
 #include "stm32l4xx_hal.h"
 
