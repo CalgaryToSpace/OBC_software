@@ -42,12 +42,12 @@ void LFS_Config() {
 	// block device configuration
 	cfg.read_size = 512;
 	cfg.prog_size = 512;
-	cfg.block_size = 8192;
-	cfg.block_count = 8192;
-	cfg.block_cycles = 500; // ASK ABOUT THIS (HOW FREQUENT ARE WE USING THE MODULE)
-	cfg.cache_size = 512; // DO WE NEED CACHE SIZE (NOT SURE IF THIS IS NEEDED VALUE)
-	cfg.lookahead_size = 512;
-//	cfg.compact_thresh = 0; // Defaults to ~88% block_size when zero (lfs.h, line 232)
+	cfg.block_size = 262144; // Should we Change to 262144? YES
+	cfg.block_count = 256; // Should we Change to 256? YES
+	cfg.block_cycles = 100; // ASK ABOUT THIS (HOW FREQUENT ARE WE USING THE MODULE)
+	cfg.cache_size = 512;
+	cfg.lookahead_size = 16;
+	cfg.compact_thresh = -1; // Defaults to ~88% block_size when zero (lfs.h, line 232)
 
 	cfg.read_buffer = lfs_read_buf;
 	cfg.prog_buffer = lfs_prog_buf;

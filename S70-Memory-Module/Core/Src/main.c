@@ -137,44 +137,50 @@ int main(void) {
 //		INT_TO_STRING(result, &result_read);
 //		PRINT_STRING_UART("Formatting Error", 0);
 //		PRINT_STRING_UART(&result_read, 1);
+//		return -1;
 //	}
 
-	// Use FORCE_MOUNT to FORMAT the Memory if needed
-	result = MOUNT();
-	if (result < 0) {
-		INT_TO_STRING(result, &result_read);
-		PRINT_STRING_UART("Mounting Error", 0);
-		PRINT_STRING_UART(&result_read, 1);
+	for (int i = 0; i < 1; i++) {
+		// Use FORCE_MOUNT to FORMAT the Memory if needed
+		result = MOUNT();
+		if (result < 0) {
+			INT_TO_STRING(result, &result_read);
+			PRINT_STRING_UART("Mounting Error", 0);
+			PRINT_STRING_UART(&result_read, 1);
+			break;
+		}
+
+		char read_buffer[32];
+		char write_buffer[32];
+
+		result = READ_FILE("test", read_buffer, sizeof(read_buffer));
+		if (result < 0) {
+			INT_TO_STRING(result, &result_read);
+			PRINT_STRING_UART("Reading Error", 0);
+			PRINT_STRING_UART(&result_read, 1);
+			break;
+		}
+
+		PRINT_STRING_UART("Read Value:", 0);
+		PRINT_STRING_UART(read_buffer, 1);
+
+		boot_count = STRING_TO_INT(read_buffer);
+		boot_count += 1;
+
+		INT_TO_STRING(boot_count, write_buffer);
+
+		result = WRITE_FILE("test", write_buffer, sizeof(write_buffer));
+		if (result < 0) {
+			INT_TO_STRING(result, &result_read);
+			PRINT_STRING_UART("Writing Error", 0);
+			PRINT_STRING_UART(&result_read, 1);
+			break;
+		}
+
+		memset(read_buffer, 0, strlen((char*) read_buffer));
+
+		UNMOUNT();
 	}
-
-	char read_buffer[32];
-	char write_buffer[32];
-
-	result = READ_FILE("test", read_buffer, sizeof(read_buffer));
-	if (result < 0) {
-		INT_TO_STRING(result, &result_read);
-		PRINT_STRING_UART("Reading Error", 0);
-		PRINT_STRING_UART(&result_read, 1);
-	}
-
-	PRINT_STRING_UART("Read Value:", 0);
-	PRINT_STRING_UART(read_buffer, 1);
-
-	boot_count = STRING_TO_INT(read_buffer);
-	boot_count += 1;
-
-	INT_TO_STRING(boot_count, write_buffer);
-
-	result = WRITE_FILE("test", write_buffer, sizeof(write_buffer));
-	if (result < 0) {
-		INT_TO_STRING(result, &result_read);
-		PRINT_STRING_UART("Writing Error", 0);
-		PRINT_STRING_UART(&result_read, 1);
-	}
-
-	memset(read_buffer, 0, strlen((char*) read_buffer));
-
-	UNMOUNT();
 
 	//Turn off LED1 to indicate Program End
 	HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_RESET);
