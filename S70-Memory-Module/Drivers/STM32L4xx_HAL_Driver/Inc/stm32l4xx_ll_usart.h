@@ -31,7 +31,7 @@ extern "C" {
   * @{
   */
 
-#if defined(USART1) || defined(USART2) || defined(USART3) || defined(UART4) || defined(UART5)
+#if defined (USART1) || defined (USART2) || defined (USART3) || defined (UART4) || defined (UART5)
 
 /** @defgroup USART_LL USART
   * @{
@@ -65,12 +65,6 @@ static const uint32_t USART_PRESCALER_TAB[] =
 #endif /* USART_PRESC_PRESCALER */
 
 /* Private constants ---------------------------------------------------------*/
-/** @defgroup USART_LL_Private_Constants USART Private Constants
-  * @{
-  */
-/**
-  * @}
-  */
 /* Private macros ------------------------------------------------------------*/
 #if defined(USE_FULL_LL_DRIVER)
 /** @defgroup USART_LL_Private_Macros USART Private Macros
@@ -1666,7 +1660,7 @@ __STATIC_INLINE void LL_USART_SetAutoBaudRateMode(USART_TypeDef *USARTx, uint32_
   *         @arg @ref LL_USART_AUTOBAUD_DETECT_ON_7F_FRAME
   *         @arg @ref LL_USART_AUTOBAUD_DETECT_ON_55_FRAME
   */
-__STATIC_INLINE uint32_t LL_USART_GetAutoBaudRateMode(const USART_TypeDef *USARTx)
+__STATIC_INLINE uint32_t LL_USART_GetAutoBaudRateMode(USART_TypeDef *USARTx)
 {
   return (uint32_t)(READ_BIT(USARTx->CR2, USART_CR2_ABRMODE));
 }
@@ -3122,7 +3116,8 @@ __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_IDLE(const USART_TypeDef *USARTx)
 }
 
 #if defined(USART_CR1_FIFOEN)
-#define LL_USART_IsActiveFlag_RXNE  LL_USART_IsActiveFlag_RXNE_RXFNE /* Redefinition for legacy purpose */
+/* Legacy define */
+#define LL_USART_IsActiveFlag_RXNE  LL_USART_IsActiveFlag_RXNE_RXFNE
 
 /**
   * @brief  Check if the USART Read Data Register or USART RX FIFO Not Empty Flag is set or not
@@ -3162,7 +3157,8 @@ __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_TC(const USART_TypeDef *USARTx)
 }
 
 #if defined(USART_CR1_FIFOEN)
-#define LL_USART_IsActiveFlag_TXE  LL_USART_IsActiveFlag_TXE_TXFNF /* Redefinition for legacy purpose */
+/* Legacy define */
+#define LL_USART_IsActiveFlag_TXE  LL_USART_IsActiveFlag_TXE_TXFNF
 
 /**
   * @brief  Check if the USART Transmit Data Register Empty or USART TX FIFO Not Full Flag is set or not
@@ -3647,7 +3643,8 @@ __STATIC_INLINE void LL_USART_EnableIT_IDLE(USART_TypeDef *USARTx)
 }
 
 #if defined(USART_CR1_FIFOEN)
-#define LL_USART_EnableIT_RXNE  LL_USART_EnableIT_RXNE_RXFNE /* Redefinition for legacy purpose */
+/* Legacy define */
+#define LL_USART_EnableIT_RXNE  LL_USART_EnableIT_RXNE_RXFNE
 
 /**
   * @brief  Enable RX Not Empty and RX FIFO Not Empty Interrupt
@@ -3687,7 +3684,8 @@ __STATIC_INLINE void LL_USART_EnableIT_TC(USART_TypeDef *USARTx)
 }
 
 #if defined(USART_CR1_FIFOEN)
-#define LL_USART_EnableIT_TXE  LL_USART_EnableIT_TXE_TXFNF /* Redefinition for legacy purpose */
+/* Legacy define */
+#define LL_USART_EnableIT_TXE  LL_USART_EnableIT_TXE_TXFNF
 
 /**
   * @brief  Enable TX Empty and TX FIFO Not Full Interrupt
@@ -3899,7 +3897,8 @@ __STATIC_INLINE void LL_USART_DisableIT_IDLE(USART_TypeDef *USARTx)
 }
 
 #if defined(USART_CR1_FIFOEN)
-#define LL_USART_DisableIT_RXNE  LL_USART_DisableIT_RXNE_RXFNE /* Redefinition for legacy purpose */
+/* Legacy define */
+#define LL_USART_DisableIT_RXNE  LL_USART_DisableIT_RXNE_RXFNE
 
 /**
   * @brief  Disable RX Not Empty and RX FIFO Not Empty Interrupt
@@ -3939,7 +3938,8 @@ __STATIC_INLINE void LL_USART_DisableIT_TC(USART_TypeDef *USARTx)
 }
 
 #if defined(USART_CR1_FIFOEN)
-#define LL_USART_DisableIT_TXE  LL_USART_DisableIT_TXE_TXFNF /* Redefinition for legacy purpose */
+/* Legacy define */
+#define LL_USART_DisableIT_TXE  LL_USART_DisableIT_TXE_TXFNF
 
 /**
   * @brief  Disable TX Empty and TX FIFO Not Full Interrupt
@@ -4153,7 +4153,8 @@ __STATIC_INLINE uint32_t LL_USART_IsEnabledIT_IDLE(const USART_TypeDef *USARTx)
 }
 
 #if defined(USART_CR1_FIFOEN)
-#define LL_USART_IsEnabledIT_RXNE  LL_USART_IsEnabledIT_RXNE_RXFNE /* Redefinition for legacy purpose */
+/* Legacy define */
+#define LL_USART_IsEnabledIT_RXNE  LL_USART_IsEnabledIT_RXNE_RXFNE
 
 /**
   * @brief  Check if the USART RX Not Empty and USART RX FIFO Not Empty Interrupt is enabled or disabled.
@@ -4193,7 +4194,8 @@ __STATIC_INLINE uint32_t LL_USART_IsEnabledIT_TC(const USART_TypeDef *USARTx)
 }
 
 #if defined(USART_CR1_FIFOEN)
-#define LL_USART_IsEnabledIT_TXE  LL_USART_IsEnabledIT_TXE_TXFNF /* Redefinition for legacy purpose */
+/* Legacy define */
+#define LL_USART_IsEnabledIT_TXE  LL_USART_IsEnabledIT_TXE_TXFNF
 
 /**
   * @brief  Check if the USART TX Empty and USART TX FIFO Not Full Interrupt is enabled or disabled
