@@ -7,6 +7,7 @@
 
 #include "main.h"
 #include <string.h>
+#include <stdbool.h>
 
 #ifndef INC_ADCS_TYPES_H_
 #define INC_ADCS_TYPES_H_
@@ -90,27 +91,102 @@
 #define TC_BL_READ_INFO 102
 #define TC_BL_COPY_TO_FLASH 103
 
-// Telecommand Error Flags - Section 5.2.2 Figure 6 of Firmware Manual
-#define TC_ERROR_NONE 0
-#define TC_ERROR_INVALID_ID 1
-#define TC_ERROR_WRONG_LENGTH 2
-#define TC_ERROR_INVALID_PARAMS 3
-#define TC_ERROR_CRC 4
+/* Enumerated Values */
 
-// ADCS Run Modes - Section 5.3.1 Table 75 of Firmware Manual
-#define ADCS_RUN_MODE_OFF 0x00
-#define ADCS_RUN_MODE_ENABLED 0x01
-#define ADCS_RUN_MODE_TRIGGERED 0x02
-#define ADCS_RUN_MODE_SIMULATION 0x03
+// Telecommand Error Flags - Section 5.2.2 Figure 6 of Firmware Manual
+typedef enum TC_Error_Flag {
+	TC_Error_None,
+	TC_Error_Invalid_ID,
+	TC_Error_Wrong_Length,
+	TC_Error_Invalid_Params,
+	TC_Error_CRC
+} TC_Error_Flag;
+
+ // ADCS Run Modes - Section 5.3.1 Table 75 of Firmware Manual
+typedef enum ADCS_Run_Mode {
+	ADCS_Run_Mode_Off,
+	ADCS_Run_Mode_Enabled,
+	ADCS_Run_Mode_Triggered,
+	ADCS_Run_Mode_Simulation
+} ADCS_Run_Mode;
+
+// ADCS Reset Causes - Section 6.1.2 Table 28 of Firmware Manual
+typedef enum ADCS_Reset_Cause {
+    ADCS_Power_On_Reset,
+    ADCS_Brown_Out_Detected_On_Regulated_Power,
+    ADCS_Brown_Out_Detected_On_Unregulated_Power,
+    ADCS_External_Watchdog_Reset,
+    ADCS_External_Reset,
+    ADCS_Watchdog_Reset,
+    ADCS_Lockup_System_Reset,
+    ADCS_Lockup_Reset,
+    ADCS_System_Request_Reset,
+    ADCS_Backup_Brown_Out,
+    ADCS_Backup_Mode_Reset,
+    ADCS_Backup_Mode_Reset_And_Backup_Brown_Out_Vdd_Regulated,
+    ADCS_Backup_Mode_Reset_And_Backup_Brown_Out_Vdd_Regulated_And_Brown_Out_Regulated,
+    ADCS_Backup_Mode_Reset_And_Watchdog_Reset,
+    ADCS_Backup_Brown_Out_Buvin_And_System_Request_Reset,
+    ADCS_Unknown_Reset_Cause
+} ADCS_Reset_Cause;
+
+//ADCS Boot Causes - Section 6.1.2 Table 29 of Firmware Manual
+typedef enum ADCS_Boot_Cause {
+    ADCS_Boot_Cause_Unexpected,
+    ADCS_Boot_Cause_Not_Used_1,
+    ADCS_Boot_Cause_Communications_Timeout,
+    ADCS_Boot_Cause_Commanded,
+    ADCS_Boot_Cause_Not_Used_2,
+    ADCS_Boot_Cause_SRAM_Latchup
+} ADCS_Boot_Cause;
+
+//ADCS Running Programs - Section 6.1.2 Table 30 of Firmware Manual
+typedef enum ADCS_Running_Program {
+    ADCS_Running_ADCS = 1,
+    ADCS_Running_Bootloader = 2
+} ADCS_Running_Program;
+
+/* Structs */
+
+typedef struct ADCS_TC_Ack_Struct {
+	uint8_t last_id;
+	bool processed;
+	enum TC_Error_Flag error_flag;
+	uint8_t error_index;
+} ADCS_TC_Ack_Struct;
+
+typedef struct ADCS_ID_Struct {
+	uint8_t node_type;
+	uint8_t interface_version;
+	uint8_t major_firmware_version;
+	uint8_t minor_firmware_version;
+	uint16_t seconds_since_startup;
+	uint16_t ms_past_second;
+} ADCS_ID_Struct;
+
+typedef struct ADCS_Boot_Running_Status_Struct{
+    ADCS_Reset_Cause reset_cause;
+    ADCS_Boot_Cause boot_cause;
+    uint16_t boot_counter;
+    ADCS_Running_Program boot_program_index;
+    uint8_t major_firmware_version;
+    uint8_t minor_firmware_version;
+} ADCS_Boot_Running_Status_Struct;
+
+typedef struct ADCS_Comms_Status_Struct{
+    uint16_t tc_counter;
+    uint16_t tlm_counter;
+    bool tc_buffer_overrun;
+    bool i2c_tlm_error;
+    bool i2c_tc_error;
+} ADCS_Comms_Status_Struct;
 
 /* Function Definitions */
 
 #define ADCS_I2C_HANDLE &hi2c1
 #define ADCS_INCLUDE_CHECKSUM 1
 #define ADCS_NO_CHECKSUM 0
-
-// Storage
-uint8_t ADCS_output[80]; // 80-bit statically allocated buffer to store outputs from the ADCS commands
+#define WRITE_STRUCT_TO_MEMORY(struct_to_write) // memory module function: write struct to memory
 
 // TC/TLM functions (basic communication)
 void I2C_telecommand_wrapper(I2C_HandleTypeDef *hi2c, uint8_t id, uint8_t* data, uint32_t data_length, uint8_t include_checksum);
@@ -133,16 +209,14 @@ void ADCS_Identification(I2C_HandleTypeDef *hi2c);
 void ADCS_Program_Status(I2C_HandleTypeDef *hi2c);
 void ADCS_Communication_Status(I2C_HandleTypeDef *hi2c);
 void ADCS_Deploy_Magnetometer(I2C_HandleTypeDef *hi2c);
-void ADCS_Disable(I2C_HandleTypeDef *hi2c);
-void ADCS_Enable_On(I2C_HandleTypeDef *hi2c);
-void ADCS_Enable_Triggered(I2C_HandleTypeDef *hi2c);
+void ADCS_Set_Run_Mode(I2C_HandleTypeDef *hi2c, ADCS_Run_Mode mode);
 void ADCS_Clear_Errors(I2C_HandleTypeDef *hi2c);
 void ADCS_Attitude_Control_Mode(I2C_HandleTypeDef *hi2c, uint8_t mode);
 void ADCS_Enable_Manual_Control(I2C_HandleTypeDef *hi2c);
 void ADCS_Enable_Detumbling_Control(I2C_HandleTypeDef *hi2c);
 void ADCS_Stop_Reaction_Wheels(I2C_HandleTypeDef *hi2c);
 void ADCS_Attitude_Estimation_Mode(I2C_HandleTypeDef *hi2c, uint8_t mode);
-void ADCS_TC_Ack(I2C_HandleTypeDef *hi2c);
+ADCS_TC_Ack_Struct ADCS_TC_Ack(I2C_HandleTypeDef *hi2c);
 void ADCS_Run_Once(I2C_HandleTypeDef *hi2c);
 void ADCS_Use_Main_Magnetorquer(I2C_HandleTypeDef *hi2c);
 void ADCS_Use_Redundant_Magnetorquer(I2C_HandleTypeDef *hi2c);

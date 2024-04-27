@@ -7,6 +7,24 @@
 
 #include <adcs_types.h>
 
+ADCS_TC_Ack_Struct ADCS_TC_Ack(I2C_HandleTypeDef *hi2c) {
+	//note return value -- this is a special case of telemetry request for telecommands
+	ADCS_TC_Ack_Struct ack;
+	uint8_t data_received[8]; // define temp buffer
+	uint8_t data_length = 4;
+
+	I2C_telemetry_wrapper(hi2c, TLF_TC_ACK, data_received, data_length, ADCS_INCLUDE_CHECKSUM);
+
+	// map temp buffer to Ack struct
+	ack.last_id = data_received[0];
+	ack.processed = data_received[1];
+	ack.error_flag = data_received[2];
+	ack.error_index = data_received[3];
+
+	WRITE_STRUCT_TO_MEMORY(ack) // memory module function
+	return ack;
+}
+
 void ADCS_Reset(I2C_HandleTypeDef *hi2c) {
 	// returns telecommand error flag
 	uint8_t data_send[1] = {ADCS_MAGIC_NUMBER};
@@ -14,22 +32,59 @@ void ADCS_Reset(I2C_HandleTypeDef *hi2c) {
 }
 
 void ADCS_Identification(I2C_HandleTypeDef *hi2c) {
-	I2C_telemetry_wrapper(hi2c, TLF_IDENTIFICATION, ADCS_output, 8, ADCS_INCLUDE_CHECKSUM);
+	// TODO: Follow this format for all other telemetry requests!
+	ADCS_ID_Struct id;
+	uint8_t data_length = 8;
+	uint8_t data_received[data_length]; // define temp buffer
+
+	I2C_telemetry_wrapper(hi2c, TLF_IDENTIFICATION, data_received, data_length, ADCS_INCLUDE_CHECKSUM); // populate buffer
+
+	// map temp buffer to Identification struct
+	id.node_type = data_received[0];
+	id.interface_version = data_received[1];
+	id.major_firmware_version = data_received[2];
+	id.minor_firmware_version = data_received[3];
+	id.seconds_since_startup = data_received[5] << 8 | data_received[4]; // uint16_t
+	id.ms_past_second = data_received[7] << 8 | data_received[6]; // uint16_t
+
+	WRITE_STRUCT_TO_MEMORY(id) // memory module function
 }
 
 void ADCS_Program_Status(I2C_HandleTypeDef *hi2c) {
-	// checks whether the bootloader or ADCS is running
-	// returns 0x01 for ADCS, 0x02 for bootloader
-	I2C_telemetry_wrapper(hi2c, TLF_BOOT_RUNNING_PROGRAM_STATUS, ADCS_output, 6, ADCS_INCLUDE_CHECKSUM);
+	ADCS_Boot_Running_Status_Struct status;
+	uint8_t data_length = 6;
+	uint8_t data_received[data_length]; // define temp buffer
+
+	I2C_telemetry_wrapper(hi2c, TLF_BOOT_RUNNING_PROGRAM_STATUS, data_received, data_length, ADCS_INCLUDE_CHECKSUM);
+
+	// map to struct
+	status.reset_cause = data_received[0] & 0xF0; // takes upper four bits of byte 0
+	status.boot_cause = data_received[0] & 0x0F; // take upper four bits of byte 0
+	status.boot_counter = data_received[2] << 8 | data_received[1]; // uint16_t
+	status.boot_program_index = data_received[3];
+	status.major_firmware_version = data_received[2]; // uint8_t
+	status.minor_firmware_version = data_received[3]; // uint8_t
+
+	WRITE_STRUCT_TO_MEMORY(status) // memory module function
 }
 
 void ADCS_Communication_Status(I2C_HandleTypeDef *hi2c) {
 	// returns I2C communication status of the ADCS (Table 37)
-	// bit 0 is 1 if TC buffer was overrun while receiving a telecommand
-	// bit 3 is 1 if the number of data clocked out was more than the telemetry package
-	// bit 4 is 1 if the telecommand sent exceeded the buffer size
+	ADCS_Comms_Status_Struct status;
+	uint8_t data_length = 6;
+	uint8_t data_received[data_length]; // define temp buffer
+
+	I2C_telemetry_wrapper(hi2c, TLF_SATSTATE_COMM_STATUS, data_received, data_length, ADCS_INCLUDE_CHECKSUM);
+
+	// map to struct
+	status.tc_counter = data_received[1] << 8 | data_received[0]; // uint16_t
+	status.tlm_counter = data_received[3] << 8 | data_received[2]; // uint16_t
+	status.tc_buffer_overrun = data_received[4] & 0b10000000; // bit 0 is 1 if TC buffer was overrun while receiving a telecommand
+	status.i2c_tlm_error = data_received[4] & 0b00010000; // bit 3 is 1 if the number of data clocked out was more than the telemetry package
+	status.i2c_tc_error = data_received[4] & 0b00001000; // bit 4 is 1 if the telecommand sent exceeded the buffer size
 	// other bits are for UART and CAN; ignore them
-	I2C_telemetry_wrapper(hi2c, TLF_BOOT_RUNNING_PROGRAM_STATUS, ADCS_output, 6, ADCS_INCLUDE_CHECKSUM);
+
+	WRITE_STRUCT_TO_MEMORY(status) // memory module function
 }
 
 void ADCS_Deploy_Magnetometer(I2C_HandleTypeDef *hi2c) {
@@ -38,21 +93,9 @@ void ADCS_Deploy_Magnetometer(I2C_HandleTypeDef *hi2c) {
 	I2C_telecommand_wrapper(hi2c, TC_DEPLOY_MAGNETOMETER_BOOM, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
 }
 
-void ADCS_Disable(I2C_HandleTypeDef *hi2c) {
+void ADCS_Set_Run_Mode(I2C_HandleTypeDef *hi2c, ADCS_Run_Mode mode) {
 	// Disables the ADCS
-	uint8_t data_send[1] = {ADCS_RUN_MODE_OFF};
-	I2C_telecommand_wrapper(hi2c, TC_ADCS_RUN_MODE, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
-}
-
-void ADCS_Enable_On(I2C_HandleTypeDef *hi2c) {
-	// Enables the ADCS in always-on mode
-	uint8_t data_send[1] = {ADCS_RUN_MODE_ENABLED};
-	I2C_telecommand_wrapper(hi2c, TC_ADCS_RUN_MODE, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
-}
-
-void ADCS_Enable_Triggered(I2C_HandleTypeDef *hi2c) {
-	// Enables the ADCS in triggered mode
-	uint8_t data_send[1] = {ADCS_RUN_MODE_TRIGGERED};
+	uint8_t data_send[1] = {mode};
 	I2C_telecommand_wrapper(hi2c, TC_ADCS_RUN_MODE, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
 }
 
@@ -83,16 +126,11 @@ void ADCS_Stop_Reaction_Wheels(I2C_HandleTypeDef *hi2c) {
 	ADCS_Attitude_Control_Mode(hi2c, 12);
 }
 
-
 void ADCS_Attitude_Estimation_Mode(I2C_HandleTypeDef *hi2c, uint8_t mode) {
 	// Sets the ADCS attitude estimation mode
 	// Possible values for mode given in Section 6.3 Table 80 of Firmware Reference Manual (ranges from 0 to 7)
 	uint8_t data_send[1] = {mode};
 	I2C_telecommand_wrapper(hi2c, TC_SET_ATTITUDE_ESTIMATION_MODE, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
-}
-
-void ADCS_TC_Ack(I2C_HandleTypeDef *hi2c) {
-	I2C_telemetry_wrapper(hi2c, TLF_TC_ACK, ADCS_output, 4, ADCS_INCLUDE_CHECKSUM);
 }
 
 void ADCS_Run_Once(I2C_HandleTypeDef *hi2c) {
@@ -136,6 +174,7 @@ void ADCS_Set_Wheel_Speed(I2C_HandleTypeDef *hi2c, uint16_t x_speed, uint16_t y_
 
 
 
+
 /**
  * I2C_telecommand_wrapper
  * REQUIRES:
@@ -148,23 +187,19 @@ void ADCS_Set_Wheel_Speed(I2C_HandleTypeDef *hi2c, uint16_t x_speed, uint16_t y_
  * 	- returns the error flag from the result of the transmission
  */
 void I2C_telecommand_wrapper(I2C_HandleTypeDef *hi2c, uint8_t id, uint8_t* data, uint32_t data_length, uint8_t include_checksum) {
-    uint8_t TC_err_flag;
+	ADCS_TC_Ack_Struct ack;
 
     do {
 		// Send telecommand
 		send_I2C_telecommand(hi2c, id, data, data_length, include_checksum);
 
 		// Poll Acknowledge Telemetry Format until the Processed flag equals 1.
-		uint8_t processed = 0;
-		while (!processed) {
-			ADCS_TC_Ack(hi2c);
-			processed = ADCS_output[1] & 1;
+		while (!ack.processed) {
+			ack = ADCS_TC_Ack(hi2c);
 		}
 
 		// Confirm telecommand validity by checking the TC Error flag of the last read TC Acknowledge Telemetry Format.
-		TC_err_flag = ADCS_output[2];
-
-    } while (TC_err_flag == 0x04);  // if the checksum doesn't check out, keep resending the request
+    } while (ack.error_flag == TC_Error_CRC);  // if the checksum doesn't check out, keep resending the request
 
 }
 
@@ -333,7 +368,7 @@ uint8_t send_UART_telecommand(UART_HandleTypeDef *huart, uint8_t id, uint8_t* da
 			data[i-3] = buf_rec[i];
 		}
 
-		return TC_ERROR_NONE;
+		return 0x00;
 	}
 
 	return buf_rec[3]; // buf_rec[3] contains the TC Error Flag
