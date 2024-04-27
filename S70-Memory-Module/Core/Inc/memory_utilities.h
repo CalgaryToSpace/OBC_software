@@ -13,7 +13,7 @@
 #include "LittleFS/lfs.h"
 #include "LittleFS/lfs_util.h"
 
-void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
+//void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
