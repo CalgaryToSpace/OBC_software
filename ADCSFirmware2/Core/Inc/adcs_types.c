@@ -6,6 +6,13 @@
  */
 
 #include <adcs_types.h>
+#include <adcs_ids.h>
+
+/*
+ * Summary list of required command IDs:
+	Commands (all done): 7 (done), 10 (done), 11 (done), 13 (done), 14 (done), 17 (done), 26 (done), 63 (done)
+	Telemetry: 147 (done), 150 (done), 155, 156, 157, 170, 197, 201, 204, 240 (done)
+ *  */
 
 ADCS_TC_Ack_Struct ADCS_TC_Ack(I2C_HandleTypeDef *hi2c) {
 	//note return value -- this is a special case of telemetry request for telecommands
@@ -106,27 +113,13 @@ void ADCS_Clear_Errors(I2C_HandleTypeDef *hi2c) {
 	I2C_telecommand_wrapper(hi2c, TC_CLEAR_ERRORS, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
 }
 
-void ADCS_Attitude_Control_Mode(I2C_HandleTypeDef *hi2c, uint8_t mode) {
+void ADCS_Attitude_Control_Mode(I2C_HandleTypeDef *hi2c, ADCS_Control_Mode mode, uint16_t timeout) {
 	// Sets the ADCS attitude control mode
-	// Possible values for mode given in Section 6.3 Table 77 of Firmware Reference Manual (ranges from 0 to 15)
-	uint8_t data_send[3] = {mode, 0xFF, 0xFF};
+	uint8_t data_send[3] = {mode, timeout & 0x00FF, timeout >> 8};
 	I2C_telecommand_wrapper(hi2c, TC_SET_ATTITUDE_CONTROL_MODE, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
 }
 
-void ADCS_Enable_Manual_Control(I2C_HandleTypeDef *hi2c) {
-	// allows to run ADCS_Set_Magnetorquer_Output and ADCS_Set_Wheel_Speed
-	ADCS_Attitude_Control_Mode(hi2c, 0);
-}
-
-void ADCS_Enable_Detumbling_Control(I2C_HandleTypeDef *hi2c) {
-	ADCS_Attitude_Control_Mode(hi2c, 1);
-}
-
-void ADCS_Stop_Reaction_Wheels(I2C_HandleTypeDef *hi2c) {
-	ADCS_Attitude_Control_Mode(hi2c, 12);
-}
-
-void ADCS_Attitude_Estimation_Mode(I2C_HandleTypeDef *hi2c, uint8_t mode) {
+void ADCS_Attitude_Estimation_Mode(I2C_HandleTypeDef *hi2c, ADCS_Estimation_Mode mode) {
 	// Sets the ADCS attitude estimation mode
 	// Possible values for mode given in Section 6.3 Table 80 of Firmware Reference Manual (ranges from 0 to 7)
 	uint8_t data_send[1] = {mode};
@@ -159,20 +152,118 @@ void ADCS_Set_Magnetorquer_Output(I2C_HandleTypeDef *hi2c, uint16_t x_duty, uint
 	// only valid after ADCS_Enable_Manual_Control is run
 	// for the duty equations, raw parameter value is obtained using the formula: (raw parameter) = (formatted value)*1000.0
 	// duty >> 8 gives upper byte, duty & 0x00FF gives lower byte
-	uint8_t data_send[6] = {x_duty & 0x00FF, x_duty >> 8, y_duty & 0x00FF, y_duty >> 8, z_duty & 0x00FF, z_duty >> 8};
+	uint8_t data_send[6];
+	// swap low and high bytes and populate data_send
+	switch_order(data_send, x_duty, 0);
+	switch_order(data_send, y_duty, 2);
+	switch_order(data_send, z_duty, 4);
 	I2C_telecommand_wrapper(hi2c, TC_SET_MAGNETORQUER_OUTPUT, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
 }
 
 void ADCS_Set_Wheel_Speed(I2C_HandleTypeDef *hi2c, uint16_t x_speed, uint16_t y_speed, uint16_t z_speed) {
 	// only valid after ADCS_Enable_Manual_Control is run
 	// for the duty equations, raw parameter value is in rpm
-	// duty >> 8 gives upper byte, duty & 0x00FF gives lower byte
-	uint8_t data_send[6] = {x_speed & 0x00FF, x_speed >> 8, y_speed & 0x00FF, y_speed >> 8, z_speed & 0x00FF, z_speed >> 8};
+	uint8_t data_send[6]; // 6-byte data to send
+	// swap low and high bytes and populate data_send
+	switch_order(data_send, x_speed, 0);
+	switch_order(data_send, y_speed, 2);
+	switch_order(data_send, z_speed, 4);
 	I2C_telecommand_wrapper(hi2c, TC_SET_WHEEL_SPEED, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
 }
 
+void ADCS_Set_Power_Control(I2C_HandleTypeDef *hi2c, ADCS_Power_Select cube_control_signal, ADCS_Power_Select cube_control_motor, ADCS_Power_Select cube_sense1,
+        ADCS_Power_Select cube_sense2, ADCS_Power_Select cube_star_power, ADCS_Power_Select cube_wheel1_power,
+        ADCS_Power_Select cube_wheel2_power, ADCS_Power_Select cube_wheel3_power, ADCS_Power_Select motor_power,
+        ADCS_Power_Select gps_power) {
+	uint8_t data_send[3]; // 3-byte data (from manual)
+	data_send[0] = (cube_control_signal << 6) | (cube_control_motor << 4) | (cube_sense1 << 2) | cube_sense2;
+	data_send[1] = (cube_star_power << 6) | (cube_wheel1_power << 4) | (cube_wheel2_power << 2) | cube_wheel3_power;
+	data_send[2] = (motor_power << 6) | (gps_power << 4);
+	I2C_telecommand_wrapper(hi2c, TC_CUBEACP_SET_ADCS_POWER_CONTROL, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
+}
+
+void ADCS_Set_Magnetometer_Config(I2C_HandleTypeDef *hi2c,
+		uint16_t mounting_transform_alpha_angle,
+        uint16_t mounting_transform_beta_angle,
+        uint16_t mounting_transform_gamma_angle,
+        uint16_t channel_1_offset,
+        uint16_t channel_2_offset,
+        uint16_t channel_3_offset,
+        uint16_t sensitivity_matrix_s11,
+        uint16_t sensitivity_matrix_s22,
+        uint16_t sensitivity_matrix_s33,
+        uint16_t sensitivity_matrix_s12,
+        uint16_t sensitivity_matrix_s13,
+        uint16_t sensitivity_matrix_s21,
+        uint16_t sensitivity_matrix_s23,
+        uint16_t sensitivity_matrix_s31,
+        uint16_t sensitivity_matrix_s32) {
+
+	uint8_t data_send[30]; // 30-byte data (from manual)
+
+	// reorder uint8_t bytes to be low-byte then high-byte
+	switch_order(data_send, mounting_transform_alpha_angle, 0);
+	switch_order(data_send, mounting_transform_beta_angle, 2);
+	switch_order(data_send, mounting_transform_gamma_angle, 4);
+	switch_order(data_send, channel_1_offset, 6);
+	switch_order(data_send, channel_2_offset, 8);
+	switch_order(data_send, channel_3_offset, 10);
+	switch_order(data_send, sensitivity_matrix_s11, 12);
+	switch_order(data_send, sensitivity_matrix_s22, 14);
+	switch_order(data_send, sensitivity_matrix_s33, 16);
+	switch_order(data_send, sensitivity_matrix_s12, 18);
+	switch_order(data_send, sensitivity_matrix_s13, 20);
+	switch_order(data_send, sensitivity_matrix_s21, 22);
+	switch_order(data_send, sensitivity_matrix_s23, 24);
+	switch_order(data_send, sensitivity_matrix_s31, 26);
+	switch_order(data_send, sensitivity_matrix_s32, 28);
+
+	I2C_telecommand_wrapper(hi2c, TC_CUBEACP_SET_MAGNETOMETER_CONFIG, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
+
+}
+
+void ADCS_Save_Config(I2C_HandleTypeDef *hi2c) {
+	uint8_t data_send[0]; // 0-byte data (from manual)
+	I2C_telecommand_wrapper(hi2c, TC_SAVE_CONFIG, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
+}
+
+void ADCS_Estimate_Angular_Rates(I2C_HandleTypeDef *hi2c) {
+	// gets estimated angular rates of the ADCS (Table 103)
+	ADCS_Angular_Rates_Struct rates;
+
+	uint8_t data_length = 6;
+	uint8_t data_received[data_length]; // define temp buffer
+
+	I2C_telemetry_wrapper(hi2c, TLF_CUBEACP_ESTIMATED_ANGULAR_RATES, data_received, data_length, ADCS_INCLUDE_CHECKSUM);
+
+	// map to struct
+	// Formatted value is obtained using the formula: (formatted value) [deg/s] = RAWVAL*0.01
+	rates.x_rate = data_received[1] << 8 | data_received[0]; // uint16_t
+	rates.y_rate = data_received[3] << 8 | data_received[2]; // uint16_t
+	rates.z_rate = data_received[5] << 8 | data_received[4]; // uint16_t
+
+	WRITE_STRUCT_TO_MEMORY(rates) // memory module function
+}
 
 
+// TLF_CUBEACP_SATELLITE_POSITION_LLH
+void ADCS_Get_LLH_Position(I2C_HandleTypeDef *hi2c) {
+	// gets ADCS position in WGS-84 coords (Table 106)
+	ADCS_LLH_Position_Struct pos;
+
+	uint8_t data_length = 6;
+	uint8_t data_received[data_length]; // define temp buffer
+
+	I2C_telemetry_wrapper(hi2c, TLF_CUBEACP_SATELLITE_POSITION_LLH, data_received, data_length, ADCS_INCLUDE_CHECKSUM);
+
+	// map to struct
+	// Formatted value is obtained using the formula: (formatted value) [deg] or [km] = RAWVAL*0.01
+	pos.latitude = data_received[1] << 8 | data_received[0]; // uint16_t
+	pos.longitude = data_received[3] << 8 | data_received[2]; // uint16_t
+	pos.altitude = data_received[5] << 8 | data_received[4]; // uint16_t
+
+	WRITE_STRUCT_TO_MEMORY(rates) // memory module function
+}
 
 
 /**
@@ -400,6 +491,12 @@ void COMMS_Crc8Init()
 	}
 }
 
+
+// Swap low and high bytes of uint16 to turn into uint8 and put into specified index of an array
+void switch_order(uint8_t *array, uint16_t value, int index) {
+    array[index] = (uint8_t)(value & 0xFF); // Insert the low byte of the value into the array at the specified index
+    array[index + 1] = (uint8_t)(value >> 8); // Insert the high byte of the value into the array at the next index
+}
 
 
 /***************************************************************************//**

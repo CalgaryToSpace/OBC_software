@@ -21,6 +21,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "adcs_types.h"
+#include "adcs_ids.h"
 
 /* USER CODE END Includes */
 
@@ -146,7 +147,7 @@ int main(void)
 */
   //Test 2: Test the telecommand wrapper function with the CubeComputer
   //TC ID, Processed Flag, Error Status, Error Index
-    uint8_t data_send[1] = {ADCS_RUN_MODE_ENABLED};
+    uint8_t data_send[1] = {ADCS_Run_Mode_Enabled};
     I2C_telecommand_wrapper(ADCS_I2C_HANDLE, TC_ADCS_RUN_MODE, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
 
   /*
