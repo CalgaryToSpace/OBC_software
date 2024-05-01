@@ -137,7 +137,31 @@ int main(void)
   HAL_Delay(1000);
 
   // Turn on LED1 to indicate program starting
-  HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_SET);
+//  HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_SET);
+HAL_GPIO_TogglePin( GPIOE, GPIO_PIN_2);
+  // Create a sample MPI frame
+  MpiFrame_t frame = {
+	  .sync_byte1 = 0xAA,
+	  .sync_byte2 = 0xBB,
+	  .sync_byte3 = 0xCC,
+	  .sync_byte4 = 0xDD,
+	  .frame_counter = 1000,
+	  .board_temperature = 250,
+	  .firmware_version = 2,
+	  .mpi_unit_id = 5,
+	  .detector_status = 0xFFFF,
+	  .inner_dome_voltage_setting = 1500,
+	  .spib_reserved = 0,
+	  .inner_dome_scan_index = 3,
+	  .faceplate_voltage_setting = 2000,
+	  .faceplate_voltage_adc_reading = 1800,
+	  .inner_dome_voltage_adc_reading = 1600,
+	  .pixels = {100, 110, 120, /* ... up to 67 pixels ... */},
+	  .cyclic_redundancy_check = 0x1234
+  };
+
+  writeFrameToMemory(frame);
+
 
   /* USER CODE END 2 */
 
@@ -186,7 +210,8 @@ int main(void)
   }
 
   //Turn off LED1 to indicate Program End
-  HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_RESET);
+  //HAL_GPIO_WritePin(GPLED1_GPIO_Port, GPLED1_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_TogglePin( GPIOE, GPIO_PIN_2);
 
   /* USER CODE END 3 */
 }

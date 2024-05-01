@@ -177,55 +177,53 @@ void writeFrameToMemory(MpiFrame_t frame) {
 
 	// Create a filename for a frame using the frame counter
 	char fileName[32];
-	sprintf(fileName, "Frame-%" PRIu8, frame.frame_counter);
+	sprintf(fileName, "Test");
 
 	// Initialize LittleFS Values, and pass SPI pointer
 	INITIALIZE(&hspi1);
 
-	for (int i = 0; i < 1; i++) {
-		// Use FORCE_MOUNT to FORMAT the Memory if needed
-		result = MOUNT();
-		if (result < 0) {
-			INT_TO_STRING(result, &result_read);
-			PRINT_STRING_UART("Mounting Error", 0);
-			PRINT_STRING_UART(&result_read, 1);
-			break;
-		}
-
-		char read_buffer[32];
-		char write_buffer[32];
-
-		result = READ_FILE("test", read_buffer, sizeof(read_buffer));
-		if (result < 0) {
-			INT_TO_STRING(result, &result_read);
-			PRINT_STRING_UART("Reading Error", 0);
-			PRINT_STRING_UART(&result_read, 1);
-			break;
-		}
-
-		PRINT_STRING_UART("Read Value:", 0);
-		PRINT_STRING_UART(read_buffer, 1);
-
-		boot_count = STRING_TO_INT(read_buffer);
-		boot_count += 1;
-
-		INT_TO_STRING(boot_count, write_buffer);
-
-		//Calling the WRITE function and making sure it's successful
-		if (WRITE_FILE(fileName, (uint8_t*) &frame, sizeof(frame)) < 0) {
-			INT_TO_STRING(result, &result_read);
-			PRINT_STRING_UART("Writing Error", 0);
-			PRINT_STRING_UART(&result_read, 1);
-		}
-		// Successful Write
-		else {
-			PRINT_STRING_UART("Frame written successfully", 1);
-		}
-
-		memset(read_buffer, 0, strlen((char*) read_buffer));
-
-		UNMOUNT();
+	// Use FORCE_MOUNT to FORMAT the Memory if needed
+	result = MOUNT();
+	if (result < 0) {
+		INT_TO_STRING(result, &result_read);
+		PRINT_STRING_UART("Mounting Error", 0);
+		PRINT_STRING_UART(&result_read, 1);
+		return;
 	}
+
+	char read_buffer[32];
+	char write_buffer[32];
+
+	//Calling the WRITE function and making sure it's successful
+	if (WRITE_FILE(fileName, (uint8_t*) &frame, sizeof(frame)) < 0) {
+		INT_TO_STRING(result, &result_read);
+		PRINT_STRING_UART("Writing Error", 0);
+		PRINT_STRING_UART(&result_read, 1);
+	}
+	// Successful Write
+	else {
+		PRINT_STRING_UART("Frame written successfully", 1);
+	}
+
+	result = READ_FILE(fileName, read_buffer, sizeof(read_buffer));
+	if (result < 0) {
+		INT_TO_STRING(result, &result_read);
+		PRINT_STRING_UART("Reading Error", 0);
+		PRINT_STRING_UART(&result_read, 1);
+		return;
+	}
+
+	PRINT_STRING_UART("Read Value:", 0);
+	PRINT_STRING_UART(read_buffer, 1);
+
+	boot_count = STRING_TO_INT(read_buffer);
+	boot_count += 1;
+
+	INT_TO_STRING(boot_count, write_buffer);
+
+	memset(read_buffer, 0, strlen((char*) read_buffer));
+
+	UNMOUNT();
 
 	//Calling the WRITE function and making sure it's successful
 //	if (WRITE(&hspi1, (uint8_t*) &frame) == 0) {
