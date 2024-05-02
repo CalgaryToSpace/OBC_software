@@ -11,7 +11,7 @@
 /*
  * Summary list of required command IDs:
 	Commands (all done): 7 (done), 10 (done), 11 (done), 13 (done), 14 (done), 17 (done), 26 (done), 63 (done)
-	Telemetry: 147 (done), 150 (done), 155, 156, 157, 170, 197, 201, 204, 240 (done)
+	Telemetry: 147 (done), 150 (done), 155, 156, 157, 170, 197 (done), 201, 204, 240 (done)
  *  */
 
 ADCS_TC_Ack_Struct ADCS_TC_Ack(I2C_HandleTypeDef *hi2c) {
@@ -180,6 +180,29 @@ void ADCS_Set_Power_Control(I2C_HandleTypeDef *hi2c, ADCS_Power_Select cube_cont
 	data_send[1] = (cube_star_power << 6) | (cube_wheel1_power << 4) | (cube_wheel2_power << 2) | cube_wheel3_power;
 	data_send[2] = (motor_power << 6) | (gps_power << 4);
 	I2C_telecommand_wrapper(hi2c, TC_CUBEACP_SET_ADCS_POWER_CONTROL, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
+}
+
+void ADCS_Get_Power_Control(I2C_HandleTypeDef *hi2c) {
+	// returns power control status (Table 184)
+	ADCS_Power_Control_Struct power;
+	uint8_t data_length = 3;
+	uint8_t data_received[data_length]; // define temp buffer
+
+	I2C_telemetry_wrapper(hi2c, TLF_CUBEACP_GET_ADCS_POWER_CONTROL, data_received, data_length, ADCS_INCLUDE_CHECKSUM);
+
+	// map to struct; all of these are two-bit enums
+	power.cube_control_signal = (data_received[0] >> 6) & 0x02;
+	power.cube_control_motor = (data_received[0] >> 4) & 0x02;
+	power.cube_sense1 = (data_received[0] >> 2) & 0x02;
+	power.cube_sense2 = (data_received[0]) & 0x02;
+	power.cube_star_power = (data_received[1] >> 6) & 0x02;
+	power.cube_wheel1_power = (data_received[1] >> 4) & 0x02;
+	power.cube_wheel2_power = (data_received[1] >> 2) & 0x02;
+	power.cube_wheel3_power = (data_received[1]) & 0x02;
+	power.motor_power = (data_received[2] >> 6) & 0x02;
+	power.gps_power = (data_received[2] >> 4) & 0x02;
+
+	WRITE_STRUCT_TO_MEMORY(status) // memory module function
 }
 
 void ADCS_Set_Magnetometer_Config(I2C_HandleTypeDef *hi2c,

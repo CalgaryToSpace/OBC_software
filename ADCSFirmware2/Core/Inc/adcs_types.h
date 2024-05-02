@@ -144,7 +144,7 @@ typedef struct ADCS_ID_Struct {
 	uint16_t ms_past_second;
 } ADCS_ID_Struct;
 
-typedef struct ADCS_Boot_Running_Status_Struct{
+typedef struct ADCS_Boot_Running_Status_Struct {
     ADCS_Reset_Cause reset_cause;
     ADCS_Boot_Cause boot_cause;
     uint16_t boot_counter;
@@ -153,7 +153,7 @@ typedef struct ADCS_Boot_Running_Status_Struct{
     uint8_t minor_firmware_version;
 } ADCS_Boot_Running_Status_Struct;
 
-typedef struct ADCS_Comms_Status_Struct{
+typedef struct ADCS_Comms_Status_Struct {
     uint16_t tc_counter;
     uint16_t tlm_counter;
     bool tc_buffer_overrun;
@@ -161,17 +161,30 @@ typedef struct ADCS_Comms_Status_Struct{
     bool i2c_tc_error;
 } ADCS_Comms_Status_Struct;
 
-typedef struct ADCS_Angular_Rates_Struct{
+typedef struct ADCS_Angular_Rates_Struct {
     uint16_t x_rate;
     uint16_t y_rate;
     uint16_t z_rate;
 } ADCS_Angular_Rates_Struct;
 
-typedef struct ADCS_LLH_Position_Struct{
+typedef struct ADCS_LLH_Position_Struct {
     uint16_t latitude;
     uint16_t longitude;
     uint16_t altitude;
 } ADCS_LLH_Position_Struct;
+
+typedef struct ADCS_Power_Control_Struct{
+	ADCS_Power_Select cube_control_signal;
+	ADCS_Power_Select cube_control_motor;
+	ADCS_Power_Select cube_sense1;
+	ADCS_Power_Select cube_sense2;
+	ADCS_Power_Select cube_star_power;
+	ADCS_Power_Select cube_wheel1_power;
+	ADCS_Power_Select cube_wheel2_power;
+	ADCS_Power_Select cube_wheel3_power;
+	ADCS_Power_Select motor_power;
+	ADCS_Power_Select gps_power;
+} ADCS_Power_Control_Struct;
 
 /* Function Definitions */
 
@@ -179,7 +192,7 @@ typedef struct ADCS_LLH_Position_Struct{
 #define ADCS_INCLUDE_CHECKSUM 1
 #define ADCS_NO_CHECKSUM 0
 #define WRITE_STRUCT_TO_MEMORY(struct_to_write) // memory module function: write struct to memory
-void switch_order(uint8_t *array, uint16_t value, int index)
+void switch_order(uint8_t *array, uint16_t value, int index);
 
 // TC/TLM functions (basic communication)
 void I2C_telecommand_wrapper(I2C_HandleTypeDef *hi2c, uint8_t id, uint8_t* data, uint32_t data_length, uint8_t include_checksum);
@@ -220,5 +233,26 @@ void ADCS_Set_Magnetometer_Config(I2C_HandleTypeDef *hi2c, uint16_t mounting_tra
 void ADCS_Save_Config(I2C_HandleTypeDef *hi2c);
 void ADCS_Estimate_Angular_Rates(I2C_HandleTypeDef *hi2c);
 void ADCS_Get_LLH_Position(I2C_HandleTypeDef *hi2c);
+void ADCS_Get_Power_Control(I2C_HandleTypeDef *hi2c);
+void ADCS_Set_Power_Control(I2C_HandleTypeDef *hi2c, ADCS_Power_Select cube_control_signal, ADCS_Power_Select cube_control_motor, ADCS_Power_Select cube_sense1,
+        ADCS_Power_Select cube_sense2, ADCS_Power_Select cube_star_power, ADCS_Power_Select cube_wheel1_power,
+        ADCS_Power_Select cube_wheel2_power, ADCS_Power_Select cube_wheel3_power, ADCS_Power_Select motor_power,
+        ADCS_Power_Select gps_power);
+void ADCS_Set_Magnetometer_Config(I2C_HandleTypeDef *hi2c,
+		uint16_t mounting_transform_alpha_angle,
+        uint16_t mounting_transform_beta_angle,
+        uint16_t mounting_transform_gamma_angle,
+        uint16_t channel_1_offset,
+        uint16_t channel_2_offset,
+        uint16_t channel_3_offset,
+        uint16_t sensitivity_matrix_s11,
+        uint16_t sensitivity_matrix_s22,
+        uint16_t sensitivity_matrix_s33,
+        uint16_t sensitivity_matrix_s12,
+        uint16_t sensitivity_matrix_s13,
+        uint16_t sensitivity_matrix_s21,
+        uint16_t sensitivity_matrix_s23,
+        uint16_t sensitivity_matrix_s31,
+        uint16_t sensitivity_matrix_s32);
 
 #endif /* INC_ADCS_TYPES_H_ */
