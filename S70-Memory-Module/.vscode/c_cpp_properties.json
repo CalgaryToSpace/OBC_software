@@ -5,6 +5,7 @@
       "includePath": [
         "Core/Inc",
         "Core/Inc/debug_tools",
+        "Core/Inc/littlefs",
         "Core/Inc/rtos_tasks",
         "Drivers/CMSIS/Device/ST/STM32L4xx/Include",
         "Drivers/CMSIS/Include",

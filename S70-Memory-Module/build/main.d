@@ -42,7 +42,9 @@ build/main.o: Core/Src/main.c Core/Inc/main.h \
  Middlewares/Third_Party/FreeRTOS/Source/include/list.h \
  Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
  Core/Inc/debug_tools/debug_i2c.h Core/Inc/debug_tools/debug_uart.h \
- Core/Inc/rtos_tasks/rtos_tasks.h
+ Core/Inc/rtos_tasks/rtos_tasks.h Core/Inc/memory_utilities.h \
+ Core/Inc/main.h Core/Inc/littlefs/lfs.h Core/Inc/littlefs/lfs_util.h \
+ Core/Inc/littlefs/lfs_util.h
 Core/Inc/main.h:
 Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h:
 Core/Inc/stm32l4xx_hal_conf.h:
@@ -91,3 +93,8 @@ Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h:
 Core/Inc/debug_tools/debug_i2c.h:
 Core/Inc/debug_tools/debug_uart.h:
 Core/Inc/rtos_tasks/rtos_tasks.h:
+Core/Inc/memory_utilities.h:
+Core/Inc/main.h:
+Core/Inc/littlefs/lfs.h:
+Core/Inc/littlefs/lfs_util.h:
+Core/Inc/littlefs/lfs_util.h:

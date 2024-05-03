@@ -1,0 +1,2653 @@
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"memory_utilities.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "Core/Src/memory_utilities.c"
+  20              		.section	.text.block_device_sync,"ax",%progbits
+  21              		.align	1
+  22              		.global	block_device_sync
+  23              		.syntax unified
+  24              		.thumb
+  25              		.thumb_func
+  27              	block_device_sync:
+  28              	.LVL0:
+  29              	.LFB153:
+   1:Core/Src/memory_utilities.c **** /**
+   2:Core/Src/memory_utilities.c ****  * memory_utilities.c
+   3:Core/Src/memory_utilities.c ****  *
+   4:Core/Src/memory_utilities.c ****  * Created on: May 2, 2024
+   5:Core/Src/memory_utilities.c ****  *     Author: Saksham Puri
+   6:Core/Src/memory_utilities.c ****  */
+   7:Core/Src/memory_utilities.c **** 
+   8:Core/Src/memory_utilities.c **** /*-----------------------------INCLUDES-----------------------------*/
+   9:Core/Src/memory_utilities.c **** #include "memory_utilities.h"
+  10:Core/Src/memory_utilities.c **** #include "debug_uart.h"
+  11:Core/Src/memory_utilities.c **** /*-----------------------------VARIABLES-----------------------------*/
+  12:Core/Src/memory_utilities.c **** 
+  13:Core/Src/memory_utilities.c **** // Memory Clear Flag for WRITE function to know when to clear flag
+  14:Core/Src/memory_utilities.c **** uint8_t clearFlag = 1;
+  15:Core/Src/memory_utilities.c **** 
+  16:Core/Src/memory_utilities.c **** uint8_t LFS_initialized = 0;
+  17:Core/Src/memory_utilities.c **** uint8_t mounted = 0;
+  18:Core/Src/memory_utilities.c **** 
+  19:Core/Src/memory_utilities.c **** // LittleFS variables
+  20:Core/Src/memory_utilities.c **** lfs_t lfs;
+  21:Core/Src/memory_utilities.c **** lfs_file_t file;
+  22:Core/Src/memory_utilities.c **** struct lfs_config cfg;
+  23:Core/Src/memory_utilities.c **** 
+  24:Core/Src/memory_utilities.c **** // LittleFS Buffers for reading and writing
+  25:Core/Src/memory_utilities.c **** uint8_t lfs_read_buf[512];
+  26:Core/Src/memory_utilities.c **** uint8_t lfs_prog_buf[512];
+  27:Core/Src/memory_utilities.c **** 
+  28:Core/Src/memory_utilities.c **** SPI_HandleTypeDef *hspi_ptr;
+  29:Core/Src/memory_utilities.c **** 
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 2
+
+
+  30:Core/Src/memory_utilities.c **** // -----------------------------SETUP FUNCTIONS-----------------------------
+  31:Core/Src/memory_utilities.c **** 
+  32:Core/Src/memory_utilities.c **** /**
+  33:Core/Src/memory_utilities.c ****  * @brief Initialize LittleFS configurations
+  34:Core/Src/memory_utilities.c ****  * @param None
+  35:Core/Src/memory_utilities.c ****  * @retval None
+  36:Core/Src/memory_utilities.c ****  */
+  37:Core/Src/memory_utilities.c **** void LFS_Config()
+  38:Core/Src/memory_utilities.c **** {
+  39:Core/Src/memory_utilities.c ****     // block device operations
+  40:Core/Src/memory_utilities.c ****     cfg.read = block_device_read;
+  41:Core/Src/memory_utilities.c ****     cfg.prog = block_device_prog;
+  42:Core/Src/memory_utilities.c ****     cfg.erase = block_device_erase;
+  43:Core/Src/memory_utilities.c ****     cfg.sync = block_device_sync;
+  44:Core/Src/memory_utilities.c **** 
+  45:Core/Src/memory_utilities.c ****     // block device configuration
+  46:Core/Src/memory_utilities.c ****     cfg.read_size = 512;
+  47:Core/Src/memory_utilities.c ****     cfg.prog_size = 512;
+  48:Core/Src/memory_utilities.c ****     cfg.block_size = 262144;
+  49:Core/Src/memory_utilities.c ****     cfg.block_count = 256;
+  50:Core/Src/memory_utilities.c ****     cfg.block_cycles = 100; // ASK ABOUT THIS (HOW FREQUENT ARE WE USING THE MODULE)
+  51:Core/Src/memory_utilities.c ****     cfg.cache_size = 512;
+  52:Core/Src/memory_utilities.c ****     cfg.lookahead_size = 16;
+  53:Core/Src/memory_utilities.c ****     cfg.compact_thresh = -1; // Defaults to ~88% block_size when zero (lfs.h, line 232)
+  54:Core/Src/memory_utilities.c **** 
+  55:Core/Src/memory_utilities.c ****     cfg.read_buffer = lfs_read_buf;
+  56:Core/Src/memory_utilities.c ****     cfg.prog_buffer = lfs_prog_buf;
+  57:Core/Src/memory_utilities.c **** }
+  58:Core/Src/memory_utilities.c **** 
+  59:Core/Src/memory_utilities.c **** int block_device_read(const struct lfs_config *c, lfs_block_t block,
+  60:Core/Src/memory_utilities.c ****                       lfs_off_t off, void *buffer, lfs_size_t size)
+  61:Core/Src/memory_utilities.c **** {
+  62:Core/Src/memory_utilities.c **** 
+  63:Core/Src/memory_utilities.c ****     return READ_LFS(hspi_ptr, (uint8_t *)buffer, (block * c->block_size + off),
+  64:Core/Src/memory_utilities.c ****                     size);
+  65:Core/Src/memory_utilities.c **** }
+  66:Core/Src/memory_utilities.c **** 
+  67:Core/Src/memory_utilities.c **** int block_device_prog(const struct lfs_config *c, lfs_block_t block,
+  68:Core/Src/memory_utilities.c ****                       lfs_off_t off, const void *buffer, lfs_size_t size)
+  69:Core/Src/memory_utilities.c **** {
+  70:Core/Src/memory_utilities.c ****     return WRITE_LFS(hspi_ptr, (uint8_t *)buffer, (block * c->block_size + off),
+  71:Core/Src/memory_utilities.c ****                      size);
+  72:Core/Src/memory_utilities.c **** }
+  73:Core/Src/memory_utilities.c **** 
+  74:Core/Src/memory_utilities.c **** int block_device_erase(const struct lfs_config *c, lfs_block_t block)
+  75:Core/Src/memory_utilities.c **** {
+  76:Core/Src/memory_utilities.c ****     MEM_CLEAR_LFS(hspi_ptr, block * c->block_size);
+  77:Core/Src/memory_utilities.c ****     //	MEM_CLEAR_LFS(hspi_ptr, block * c->block_size);
+  78:Core/Src/memory_utilities.c ****     return 0;
+  79:Core/Src/memory_utilities.c **** }
+  80:Core/Src/memory_utilities.c **** 
+  81:Core/Src/memory_utilities.c **** int block_device_sync(const struct lfs_config *c)
+  82:Core/Src/memory_utilities.c **** {
+  30              		.loc 1 82 1 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 3
+
+
+  34              		@ link register save eliminated.
+  83:Core/Src/memory_utilities.c ****     return 0;
+  35              		.loc 1 83 5 view .LVU1
+  84:Core/Src/memory_utilities.c **** }
+  36              		.loc 1 84 1 is_stmt 0 view .LVU2
+  37 0000 0020     		movs	r0, #0
+  38              	.LVL1:
+  39              		.loc 1 84 1 view .LVU3
+  40 0002 7047     		bx	lr
+  41              		.cfi_endproc
+  42              	.LFE153:
+  44              		.section	.text.LFS_Config,"ax",%progbits
+  45              		.align	1
+  46              		.global	LFS_Config
+  47              		.syntax unified
+  48              		.thumb
+  49              		.thumb_func
+  51              	LFS_Config:
+  52              	.LFB149:
+  38:Core/Src/memory_utilities.c ****     // block device operations
+  53              		.loc 1 38 1 is_stmt 1 view -0
+  54              		.cfi_startproc
+  55              		@ args = 0, pretend = 0, frame = 0
+  56              		@ frame_needed = 0, uses_anonymous_args = 0
+  57              		@ link register save eliminated.
+  40:Core/Src/memory_utilities.c ****     cfg.prog = block_device_prog;
+  58              		.loc 1 40 5 view .LVU5
+  40:Core/Src/memory_utilities.c ****     cfg.prog = block_device_prog;
+  59              		.loc 1 40 14 is_stmt 0 view .LVU6
+  60 0000 0F4B     		ldr	r3, .L3
+  61 0002 104A     		ldr	r2, .L3+4
+  62 0004 5A60     		str	r2, [r3, #4]
+  41:Core/Src/memory_utilities.c ****     cfg.erase = block_device_erase;
+  63              		.loc 1 41 5 is_stmt 1 view .LVU7
+  41:Core/Src/memory_utilities.c ****     cfg.erase = block_device_erase;
+  64              		.loc 1 41 14 is_stmt 0 view .LVU8
+  65 0006 104A     		ldr	r2, .L3+8
+  66 0008 9A60     		str	r2, [r3, #8]
+  42:Core/Src/memory_utilities.c ****     cfg.sync = block_device_sync;
+  67              		.loc 1 42 5 is_stmt 1 view .LVU9
+  42:Core/Src/memory_utilities.c ****     cfg.sync = block_device_sync;
+  68              		.loc 1 42 15 is_stmt 0 view .LVU10
+  69 000a 104A     		ldr	r2, .L3+12
+  70 000c DA60     		str	r2, [r3, #12]
+  43:Core/Src/memory_utilities.c **** 
+  71              		.loc 1 43 5 is_stmt 1 view .LVU11
+  43:Core/Src/memory_utilities.c **** 
+  72              		.loc 1 43 14 is_stmt 0 view .LVU12
+  73 000e 104A     		ldr	r2, .L3+16
+  74 0010 1A61     		str	r2, [r3, #16]
+  46:Core/Src/memory_utilities.c ****     cfg.prog_size = 512;
+  75              		.loc 1 46 5 is_stmt 1 view .LVU13
+  46:Core/Src/memory_utilities.c ****     cfg.prog_size = 512;
+  76              		.loc 1 46 19 is_stmt 0 view .LVU14
+  77 0012 4FF40072 		mov	r2, #512
+  78 0016 5A61     		str	r2, [r3, #20]
+  47:Core/Src/memory_utilities.c ****     cfg.block_size = 262144;
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 4
+
+
+  79              		.loc 1 47 5 is_stmt 1 view .LVU15
+  47:Core/Src/memory_utilities.c ****     cfg.block_size = 262144;
+  80              		.loc 1 47 19 is_stmt 0 view .LVU16
+  81 0018 9A61     		str	r2, [r3, #24]
+  48:Core/Src/memory_utilities.c ****     cfg.block_count = 256;
+  82              		.loc 1 48 5 is_stmt 1 view .LVU17
+  48:Core/Src/memory_utilities.c ****     cfg.block_count = 256;
+  83              		.loc 1 48 20 is_stmt 0 view .LVU18
+  84 001a 4FF48021 		mov	r1, #262144
+  85 001e D961     		str	r1, [r3, #28]
+  49:Core/Src/memory_utilities.c ****     cfg.block_cycles = 100; // ASK ABOUT THIS (HOW FREQUENT ARE WE USING THE MODULE)
+  86              		.loc 1 49 5 is_stmt 1 view .LVU19
+  49:Core/Src/memory_utilities.c ****     cfg.block_cycles = 100; // ASK ABOUT THIS (HOW FREQUENT ARE WE USING THE MODULE)
+  87              		.loc 1 49 21 is_stmt 0 view .LVU20
+  88 0020 4FF48071 		mov	r1, #256
+  89 0024 1962     		str	r1, [r3, #32]
+  50:Core/Src/memory_utilities.c ****     cfg.cache_size = 512;
+  90              		.loc 1 50 5 is_stmt 1 view .LVU21
+  50:Core/Src/memory_utilities.c ****     cfg.cache_size = 512;
+  91              		.loc 1 50 22 is_stmt 0 view .LVU22
+  92 0026 6421     		movs	r1, #100
+  93 0028 5962     		str	r1, [r3, #36]
+  51:Core/Src/memory_utilities.c ****     cfg.lookahead_size = 16;
+  94              		.loc 1 51 5 is_stmt 1 view .LVU23
+  51:Core/Src/memory_utilities.c ****     cfg.lookahead_size = 16;
+  95              		.loc 1 51 20 is_stmt 0 view .LVU24
+  96 002a 9A62     		str	r2, [r3, #40]
+  52:Core/Src/memory_utilities.c ****     cfg.compact_thresh = -1; // Defaults to ~88% block_size when zero (lfs.h, line 232)
+  97              		.loc 1 52 5 is_stmt 1 view .LVU25
+  52:Core/Src/memory_utilities.c ****     cfg.compact_thresh = -1; // Defaults to ~88% block_size when zero (lfs.h, line 232)
+  98              		.loc 1 52 24 is_stmt 0 view .LVU26
+  99 002c 1022     		movs	r2, #16
+ 100 002e DA62     		str	r2, [r3, #44]
+  53:Core/Src/memory_utilities.c **** 
+ 101              		.loc 1 53 5 is_stmt 1 view .LVU27
+  53:Core/Src/memory_utilities.c **** 
+ 102              		.loc 1 53 24 is_stmt 0 view .LVU28
+ 103 0030 4FF0FF32 		mov	r2, #-1
+ 104 0034 1A63     		str	r2, [r3, #48]
+  55:Core/Src/memory_utilities.c ****     cfg.prog_buffer = lfs_prog_buf;
+ 105              		.loc 1 55 5 is_stmt 1 view .LVU29
+  55:Core/Src/memory_utilities.c ****     cfg.prog_buffer = lfs_prog_buf;
+ 106              		.loc 1 55 21 is_stmt 0 view .LVU30
+ 107 0036 074A     		ldr	r2, .L3+20
+ 108 0038 5A63     		str	r2, [r3, #52]
+  56:Core/Src/memory_utilities.c **** }
+ 109              		.loc 1 56 5 is_stmt 1 view .LVU31
+  56:Core/Src/memory_utilities.c **** }
+ 110              		.loc 1 56 21 is_stmt 0 view .LVU32
+ 111 003a 074A     		ldr	r2, .L3+24
+ 112 003c 9A63     		str	r2, [r3, #56]
+  57:Core/Src/memory_utilities.c **** 
+ 113              		.loc 1 57 1 view .LVU33
+ 114 003e 7047     		bx	lr
+ 115              	.L4:
+ 116              		.align	2
+ 117              	.L3:
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 5
+
+
+ 118 0040 00000000 		.word	cfg
+ 119 0044 00000000 		.word	block_device_read
+ 120 0048 00000000 		.word	block_device_prog
+ 121 004c 00000000 		.word	block_device_erase
+ 122 0050 00000000 		.word	block_device_sync
+ 123 0054 00000000 		.word	lfs_read_buf
+ 124 0058 00000000 		.word	lfs_prog_buf
+ 125              		.cfi_endproc
+ 126              	.LFE149:
+ 128              		.section	.text.PULL_CS,"ax",%progbits
+ 129              		.align	1
+ 130              		.global	PULL_CS
+ 131              		.syntax unified
+ 132              		.thumb
+ 133              		.thumb_func
+ 135              	PULL_CS:
+ 136              	.LFB154:
+  85:Core/Src/memory_utilities.c **** 
+  86:Core/Src/memory_utilities.c **** // -----------------------------FUNCTIONS-----------------------------
+  87:Core/Src/memory_utilities.c **** 
+  88:Core/Src/memory_utilities.c **** /*
+  89:Core/Src/memory_utilities.c ****  * Chip Select set to LOW
+  90:Core/Src/memory_utilities.c ****  */
+  91:Core/Src/memory_utilities.c **** void PULL_CS()
+  92:Core/Src/memory_utilities.c **** {
+ 137              		.loc 1 92 1 is_stmt 1 view -0
+ 138              		.cfi_startproc
+ 139              		@ args = 0, pretend = 0, frame = 0
+ 140              		@ frame_needed = 0, uses_anonymous_args = 0
+ 141 0000 08B5     		push	{r3, lr}
+ 142              		.cfi_def_cfa_offset 8
+ 143              		.cfi_offset 3, -8
+ 144              		.cfi_offset 14, -4
+  93:Core/Src/memory_utilities.c ****     HAL_GPIO_WritePin(PIN_SCI_NCS_FLASH_0_GPIO_Port, PIN_SCI_NCS_FLASH_0_Pin, GPIO_PIN_RESET); // L
+ 145              		.loc 1 93 5 view .LVU35
+ 146 0002 0022     		movs	r2, #0
+ 147 0004 8021     		movs	r1, #128
+ 148 0006 0248     		ldr	r0, .L7
+ 149 0008 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 150              	.LVL2:
+  94:Core/Src/memory_utilities.c **** }
+ 151              		.loc 1 94 1 is_stmt 0 view .LVU36
+ 152 000c 08BD     		pop	{r3, pc}
+ 153              	.L8:
+ 154 000e 00BF     		.align	2
+ 155              	.L7:
+ 156 0010 00100048 		.word	1207963648
+ 157              		.cfi_endproc
+ 158              	.LFE154:
+ 160              		.section	.text.SET_CS,"ax",%progbits
+ 161              		.align	1
+ 162              		.global	SET_CS
+ 163              		.syntax unified
+ 164              		.thumb
+ 165              		.thumb_func
+ 167              	SET_CS:
+ 168              	.LFB155:
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 6
+
+
+  95:Core/Src/memory_utilities.c **** 
+  96:Core/Src/memory_utilities.c **** /*
+  97:Core/Src/memory_utilities.c ****  * Chip Select set to HIGH
+  98:Core/Src/memory_utilities.c ****  * This is the default state of the CS
+  99:Core/Src/memory_utilities.c ****  */
+ 100:Core/Src/memory_utilities.c **** void SET_CS()
+ 101:Core/Src/memory_utilities.c **** {
+ 169              		.loc 1 101 1 is_stmt 1 view -0
+ 170              		.cfi_startproc
+ 171              		@ args = 0, pretend = 0, frame = 0
+ 172              		@ frame_needed = 0, uses_anonymous_args = 0
+ 173 0000 08B5     		push	{r3, lr}
+ 174              		.cfi_def_cfa_offset 8
+ 175              		.cfi_offset 3, -8
+ 176              		.cfi_offset 14, -4
+ 102:Core/Src/memory_utilities.c ****     HAL_GPIO_WritePin(PIN_SCI_NCS_FLASH_0_GPIO_Port, PIN_SCI_NCS_FLASH_0_Pin, GPIO_PIN_SET);
+ 177              		.loc 1 102 5 view .LVU38
+ 178 0002 0122     		movs	r2, #1
+ 179 0004 8021     		movs	r1, #128
+ 180 0006 0248     		ldr	r0, .L11
+ 181 0008 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 182              	.LVL3:
+ 103:Core/Src/memory_utilities.c **** }
+ 183              		.loc 1 103 1 is_stmt 0 view .LVU39
+ 184 000c 08BD     		pop	{r3, pc}
+ 185              	.L12:
+ 186 000e 00BF     		.align	2
+ 187              	.L11:
+ 188 0010 00100048 		.word	1207963648
+ 189              		.cfi_endproc
+ 190              	.LFE155:
+ 192              		.section	.text.READ_STATUS_REGISTER,"ax",%progbits
+ 193              		.align	1
+ 194              		.global	READ_STATUS_REGISTER
+ 195              		.syntax unified
+ 196              		.thumb
+ 197              		.thumb_func
+ 199              	READ_STATUS_REGISTER:
+ 200              	.LVL4:
+ 201              	.LFB156:
+ 104:Core/Src/memory_utilities.c **** 
+ 105:Core/Src/memory_utilities.c **** /*
+ 106:Core/Src/memory_utilities.c ****  * @param Takes any type of array/pointer, always converts to uint8_t pointer
+ 107:Core/Src/memory_utilities.c ****  * @return Nothing, Reads Status Register, stores value in param
+ 108:Core/Src/memory_utilities.c ****  * Sets Decoder Inputs BeforeHand
+ 109:Core/Src/memory_utilities.c ****  * Pull All Decoder Inputs High After
+ 110:Core/Src/memory_utilities.c ****  *
+ 111:Core/Src/memory_utilities.c ****  */
+ 112:Core/Src/memory_utilities.c **** void READ_STATUS_REGISTER(SPI_HandleTypeDef *hspi1, uint8_t *rxBuf)
+ 113:Core/Src/memory_utilities.c **** {
+ 202              		.loc 1 113 1 is_stmt 1 view -0
+ 203              		.cfi_startproc
+ 204              		@ args = 0, pretend = 0, frame = 0
+ 205              		@ frame_needed = 0, uses_anonymous_args = 0
+ 206              		.loc 1 113 1 is_stmt 0 view .LVU41
+ 207 0000 38B5     		push	{r3, r4, r5, lr}
+ 208              		.cfi_def_cfa_offset 16
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 7
+
+
+ 209              		.cfi_offset 3, -16
+ 210              		.cfi_offset 4, -12
+ 211              		.cfi_offset 5, -8
+ 212              		.cfi_offset 14, -4
+ 213 0002 0446     		mov	r4, r0
+ 214 0004 0D46     		mov	r5, r1
+ 114:Core/Src/memory_utilities.c ****     PULL_CS();
+ 215              		.loc 1 114 5 is_stmt 1 view .LVU42
+ 216 0006 FFF7FEFF 		bl	PULL_CS
+ 217              	.LVL5:
+ 115:Core/Src/memory_utilities.c ****     HAL_SPI_Transmit(hspi1, (uint8_t *)&FLASH_STATREG1, 1, 100);
+ 218              		.loc 1 115 5 view .LVU43
+ 219 000a 6423     		movs	r3, #100
+ 220 000c 0122     		movs	r2, #1
+ 221 000e 0649     		ldr	r1, .L15
+ 222 0010 2046     		mov	r0, r4
+ 223 0012 FFF7FEFF 		bl	HAL_SPI_Transmit
+ 224              	.LVL6:
+ 116:Core/Src/memory_utilities.c ****     HAL_SPI_Receive(hspi1, (uint8_t *)rxBuf, 1, 100);
+ 225              		.loc 1 116 5 view .LVU44
+ 226 0016 6423     		movs	r3, #100
+ 227 0018 0122     		movs	r2, #1
+ 228 001a 2946     		mov	r1, r5
+ 229 001c 2046     		mov	r0, r4
+ 230 001e FFF7FEFF 		bl	HAL_SPI_Receive
+ 231              	.LVL7:
+ 117:Core/Src/memory_utilities.c ****     SET_CS();
+ 232              		.loc 1 117 5 view .LVU45
+ 233 0022 FFF7FEFF 		bl	SET_CS
+ 234              	.LVL8:
+ 118:Core/Src/memory_utilities.c **** }
+ 235              		.loc 1 118 1 is_stmt 0 view .LVU46
+ 236 0026 38BD     		pop	{r3, r4, r5, pc}
+ 237              	.LVL9:
+ 238              	.L16:
+ 239              		.loc 1 118 1 view .LVU47
+ 240              		.align	2
+ 241              	.L15:
+ 242 0028 00000000 		.word	FLASH_STATREG1
+ 243              		.cfi_endproc
+ 244              	.LFE156:
+ 246              		.section	.rodata.ENABLE_WREN.str1.4,"aMS",%progbits,1
+ 247              		.align	2
+ 248              	.LC0:
+ 249 0000 54696D65 		.ascii	"Timeout when enabling WREN\000"
+ 249      6F757420 
+ 249      7768656E 
+ 249      20656E61 
+ 249      626C696E 
+ 250              		.section	.text.ENABLE_WREN,"ax",%progbits
+ 251              		.align	1
+ 252              		.global	ENABLE_WREN
+ 253              		.syntax unified
+ 254              		.thumb
+ 255              		.thumb_func
+ 257              	ENABLE_WREN:
+ 258              	.LVL10:
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 8
+
+
+ 259              	.LFB157:
+ 119:Core/Src/memory_utilities.c **** 
+ 120:Core/Src/memory_utilities.c **** /*
+ 121:Core/Src/memory_utilities.c ****  * Just Transmit WREN Command
+ 122:Core/Src/memory_utilities.c ****  * Sets Decoder Inputs beforehand
+ 123:Core/Src/memory_utilities.c ****  * Pull all Decoder Inputs High After
+ 124:Core/Src/memory_utilities.c ****  */
+ 125:Core/Src/memory_utilities.c **** void ENABLE_WREN(SPI_HandleTypeDef *hspi1)
+ 126:Core/Src/memory_utilities.c **** {
+ 260              		.loc 1 126 1 is_stmt 1 view -0
+ 261              		.cfi_startproc
+ 262              		@ args = 0, pretend = 0, frame = 8
+ 263              		@ frame_needed = 0, uses_anonymous_args = 0
+ 264              		.loc 1 126 1 is_stmt 0 view .LVU49
+ 265 0000 10B5     		push	{r4, lr}
+ 266              		.cfi_def_cfa_offset 8
+ 267              		.cfi_offset 4, -8
+ 268              		.cfi_offset 14, -4
+ 269 0002 82B0     		sub	sp, sp, #8
+ 270              		.cfi_def_cfa_offset 16
+ 271 0004 0446     		mov	r4, r0
+ 127:Core/Src/memory_utilities.c ****     uint8_t statusRegBuffer[1] = {0};
+ 272              		.loc 1 127 5 is_stmt 1 view .LVU50
+ 273              		.loc 1 127 13 is_stmt 0 view .LVU51
+ 274 0006 0023     		movs	r3, #0
+ 275 0008 8DF80430 		strb	r3, [sp, #4]
+ 128:Core/Src/memory_utilities.c ****     READ_STATUS_REGISTER(hspi1, statusRegBuffer);
+ 276              		.loc 1 128 5 is_stmt 1 view .LVU52
+ 277 000c 01A9     		add	r1, sp, #4
+ 278 000e FFF7FEFF 		bl	READ_STATUS_REGISTER
+ 279              	.LVL11:
+ 129:Core/Src/memory_utilities.c **** 
+ 130:Core/Src/memory_utilities.c ****     PULL_CS();
+ 280              		.loc 1 130 5 view .LVU53
+ 281 0012 FFF7FEFF 		bl	PULL_CS
+ 282              	.LVL12:
+ 131:Core/Src/memory_utilities.c ****     if (HAL_SPI_Transmit(hspi1, (uint8_t *)&FLASH_WREN, 1, HAL_MAX_DELAY) != HAL_OK)
+ 283              		.loc 1 131 5 view .LVU54
+ 284              		.loc 1 131 9 is_stmt 0 view .LVU55
+ 285 0016 4FF0FF33 		mov	r3, #-1
+ 286 001a 0122     		movs	r2, #1
+ 287 001c 0C49     		ldr	r1, .L23
+ 288 001e 2046     		mov	r0, r4
+ 289 0020 FFF7FEFF 		bl	HAL_SPI_Transmit
+ 290              	.LVL13:
+ 291              		.loc 1 131 8 discriminator 1 view .LVU56
+ 292 0024 18B9     		cbnz	r0, .L22
+ 293              	.L18:
+ 132:Core/Src/memory_utilities.c ****     {
+ 133:Core/Src/memory_utilities.c ****         debug_uart_print_str_new_line("Timeout when enabling WREN");
+ 134:Core/Src/memory_utilities.c ****     }
+ 135:Core/Src/memory_utilities.c ****     SET_CS();
+ 294              		.loc 1 135 5 is_stmt 1 view .LVU57
+ 295 0026 FFF7FEFF 		bl	SET_CS
+ 296              	.LVL14:
+ 136:Core/Src/memory_utilities.c **** 
+ 137:Core/Src/memory_utilities.c ****     uint8_t wip = 1;
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 9
+
+
+ 297              		.loc 1 137 5 view .LVU58
+ 138:Core/Src/memory_utilities.c ****     while (wip)
+ 298              		.loc 1 138 5 view .LVU59
+ 137:Core/Src/memory_utilities.c ****     while (wip)
+ 299              		.loc 1 137 13 is_stmt 0 view .LVU60
+ 300 002a 0123     		movs	r3, #1
+ 301              		.loc 1 138 11 view .LVU61
+ 302 002c 0BE0     		b	.L19
+ 303              	.LVL15:
+ 304              	.L22:
+ 133:Core/Src/memory_utilities.c ****     }
+ 305              		.loc 1 133 9 is_stmt 1 view .LVU62
+ 306 002e 0948     		ldr	r0, .L23+4
+ 307 0030 FFF7FEFF 		bl	debug_uart_print_str_new_line
+ 308              	.LVL16:
+ 309 0034 F7E7     		b	.L18
+ 310              	.LVL17:
+ 311              	.L20:
+ 139:Core/Src/memory_utilities.c ****     {
+ 140:Core/Src/memory_utilities.c ****         READ_STATUS_REGISTER(hspi1, statusRegBuffer);
+ 312              		.loc 1 140 9 view .LVU63
+ 313 0036 01A9     		add	r1, sp, #4
+ 314 0038 2046     		mov	r0, r4
+ 315 003a FFF7FEFF 		bl	READ_STATUS_REGISTER
+ 316              	.LVL18:
+ 141:Core/Src/memory_utilities.c ****         wip = statusRegBuffer[0] & 1;
+ 317              		.loc 1 141 9 view .LVU64
+ 318              		.loc 1 141 30 is_stmt 0 view .LVU65
+ 319 003e 9DF80430 		ldrb	r3, [sp, #4]	@ zero_extendqisi2
+ 320              		.loc 1 141 13 view .LVU66
+ 321 0042 03F00103 		and	r3, r3, #1
+ 322              	.LVL19:
+ 323              	.L19:
+ 138:Core/Src/memory_utilities.c ****     {
+ 324              		.loc 1 138 12 is_stmt 1 view .LVU67
+ 325 0046 002B     		cmp	r3, #0
+ 326 0048 F5D1     		bne	.L20
+ 142:Core/Src/memory_utilities.c ****     }
+ 143:Core/Src/memory_utilities.c **** }
+ 327              		.loc 1 143 1 is_stmt 0 view .LVU68
+ 328 004a 02B0     		add	sp, sp, #8
+ 329              		.cfi_def_cfa_offset 8
+ 330              		@ sp needed
+ 331 004c 10BD     		pop	{r4, pc}
+ 332              	.LVL20:
+ 333              	.L24:
+ 334              		.loc 1 143 1 view .LVU69
+ 335 004e 00BF     		.align	2
+ 336              	.L23:
+ 337 0050 00000000 		.word	FLASH_WREN
+ 338 0054 00000000 		.word	.LC0
+ 339              		.cfi_endproc
+ 340              	.LFE157:
+ 342              		.section	.text.ENABLE_WRDI,"ax",%progbits
+ 343              		.align	1
+ 344              		.global	ENABLE_WRDI
+ 345              		.syntax unified
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 10
+
+
+ 346              		.thumb
+ 347              		.thumb_func
+ 349              	ENABLE_WRDI:
+ 350              	.LVL21:
+ 351              	.LFB158:
+ 144:Core/Src/memory_utilities.c **** 
+ 145:Core/Src/memory_utilities.c **** /*
+ 146:Core/Src/memory_utilities.c ****  * Just Transmit WRDI Command
+ 147:Core/Src/memory_utilities.c ****  * As noted  in Section 9.3.9 of the Manual,
+ 148:Core/Src/memory_utilities.c ****  * ALL Chip Selects must be pulled high in order for this command
+ 149:Core/Src/memory_utilities.c ****  * to go through
+ 150:Core/Src/memory_utilities.c ****  */
+ 151:Core/Src/memory_utilities.c **** void ENABLE_WRDI(SPI_HandleTypeDef *hspi1)
+ 152:Core/Src/memory_utilities.c **** {
+ 352              		.loc 1 152 1 is_stmt 1 view -0
+ 353              		.cfi_startproc
+ 354              		@ args = 0, pretend = 0, frame = 8
+ 355              		@ frame_needed = 0, uses_anonymous_args = 0
+ 356              		.loc 1 152 1 is_stmt 0 view .LVU71
+ 357 0000 10B5     		push	{r4, lr}
+ 358              		.cfi_def_cfa_offset 8
+ 359              		.cfi_offset 4, -8
+ 360              		.cfi_offset 14, -4
+ 361 0002 82B0     		sub	sp, sp, #8
+ 362              		.cfi_def_cfa_offset 16
+ 363 0004 0446     		mov	r4, r0
+ 153:Core/Src/memory_utilities.c ****     SET_CS();
+ 364              		.loc 1 153 5 is_stmt 1 view .LVU72
+ 365 0006 FFF7FEFF 		bl	SET_CS
+ 366              	.LVL22:
+ 154:Core/Src/memory_utilities.c ****     HAL_SPI_Transmit(hspi1, (uint8_t *)&FLASH_WRDI, 1, 100);
+ 367              		.loc 1 154 5 view .LVU73
+ 368 000a 6423     		movs	r3, #100
+ 369 000c 0122     		movs	r2, #1
+ 370 000e 0A49     		ldr	r1, .L29
+ 371 0010 2046     		mov	r0, r4
+ 372 0012 FFF7FEFF 		bl	HAL_SPI_Transmit
+ 373              	.LVL23:
+ 155:Core/Src/memory_utilities.c **** 
+ 156:Core/Src/memory_utilities.c ****     uint8_t statusRegBuffer[1] = {0};
+ 374              		.loc 1 156 5 view .LVU74
+ 375              		.loc 1 156 13 is_stmt 0 view .LVU75
+ 376 0016 0023     		movs	r3, #0
+ 377 0018 8DF80430 		strb	r3, [sp, #4]
+ 157:Core/Src/memory_utilities.c **** 
+ 158:Core/Src/memory_utilities.c ****     // Stay in the While loop until writing isn't done
+ 159:Core/Src/memory_utilities.c ****     uint8_t wel = 1;
+ 378              		.loc 1 159 5 is_stmt 1 view .LVU76
+ 379              	.LVL24:
+ 160:Core/Src/memory_utilities.c ****     while (wel)
+ 380              		.loc 1 160 5 view .LVU77
+ 159:Core/Src/memory_utilities.c ****     while (wel)
+ 381              		.loc 1 159 13 is_stmt 0 view .LVU78
+ 382 001c 0123     		movs	r3, #1
+ 383              		.loc 1 160 11 view .LVU79
+ 384 001e 07E0     		b	.L26
+ 385              	.LVL25:
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 11
+
+
+ 386              	.L27:
+ 161:Core/Src/memory_utilities.c ****     {
+ 162:Core/Src/memory_utilities.c ****         READ_STATUS_REGISTER(hspi1, statusRegBuffer);
+ 387              		.loc 1 162 9 is_stmt 1 view .LVU80
+ 388 0020 01A9     		add	r1, sp, #4
+ 389 0022 2046     		mov	r0, r4
+ 390 0024 FFF7FEFF 		bl	READ_STATUS_REGISTER
+ 391              	.LVL26:
+ 163:Core/Src/memory_utilities.c ****         wel = statusRegBuffer[0] & 2;
+ 392              		.loc 1 163 9 view .LVU81
+ 393              		.loc 1 163 30 is_stmt 0 view .LVU82
+ 394 0028 9DF80430 		ldrb	r3, [sp, #4]	@ zero_extendqisi2
+ 395              		.loc 1 163 13 view .LVU83
+ 396 002c 03F00203 		and	r3, r3, #2
+ 397              	.LVL27:
+ 398              	.L26:
+ 160:Core/Src/memory_utilities.c ****     {
+ 399              		.loc 1 160 12 is_stmt 1 view .LVU84
+ 400 0030 002B     		cmp	r3, #0
+ 401 0032 F5D1     		bne	.L27
+ 164:Core/Src/memory_utilities.c ****     }
+ 165:Core/Src/memory_utilities.c **** }
+ 402              		.loc 1 165 1 is_stmt 0 view .LVU85
+ 403 0034 02B0     		add	sp, sp, #8
+ 404              		.cfi_def_cfa_offset 8
+ 405              		@ sp needed
+ 406 0036 10BD     		pop	{r4, pc}
+ 407              	.LVL28:
+ 408              	.L30:
+ 409              		.loc 1 165 1 view .LVU86
+ 410              		.align	2
+ 411              	.L29:
+ 412 0038 00000000 		.word	FLASH_WRDI
+ 413              		.cfi_endproc
+ 414              	.LFE158:
+ 416              		.section	.rodata.MEM_CLEAR_LFS.str1.4,"aMS",%progbits,1
+ 417              		.align	2
+ 418              	.LC1:
+ 419 0000 4572726F 		.ascii	"Error during Erasing\000"
+ 419      72206475 
+ 419      72696E67 
+ 419      20457261 
+ 419      73696E67 
+ 420              		.section	.text.MEM_CLEAR_LFS,"ax",%progbits
+ 421              		.align	1
+ 422              		.global	MEM_CLEAR_LFS
+ 423              		.syntax unified
+ 424              		.thumb
+ 425              		.thumb_func
+ 427              	MEM_CLEAR_LFS:
+ 428              	.LVL29:
+ 429              	.LFB159:
+ 166:Core/Src/memory_utilities.c **** 
+ 167:Core/Src/memory_utilities.c **** /*
+ 168:Core/Src/memory_utilities.c ****  * @param Takes a void pointer which is converted to uint8_t used as an address
+ 169:Core/Src/memory_utilities.c ****  * The function takes an address and clears the memory in that address
+ 170:Core/Src/memory_utilities.c ****  * We wait until the clearing is done and then end the function
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 12
+
+
+ 171:Core/Src/memory_utilities.c ****  */
+ 172:Core/Src/memory_utilities.c **** void MEM_CLEAR_LFS(SPI_HandleTypeDef *ptr_hspi1, lfs_block_t block)
+ 173:Core/Src/memory_utilities.c **** {
+ 430              		.loc 1 173 1 is_stmt 1 view -0
+ 431              		.cfi_startproc
+ 432              		@ args = 0, pretend = 0, frame = 8
+ 433              		@ frame_needed = 0, uses_anonymous_args = 0
+ 434              		.loc 1 173 1 is_stmt 0 view .LVU88
+ 435 0000 30B5     		push	{r4, r5, lr}
+ 436              		.cfi_def_cfa_offset 12
+ 437              		.cfi_offset 4, -12
+ 438              		.cfi_offset 5, -8
+ 439              		.cfi_offset 14, -4
+ 440 0002 83B0     		sub	sp, sp, #12
+ 441              		.cfi_def_cfa_offset 24
+ 442 0004 0546     		mov	r5, r0
+ 174:Core/Src/memory_utilities.c ****     uint8_t addr[3] =
+ 443              		.loc 1 174 5 is_stmt 1 view .LVU89
+ 175:Core/Src/memory_utilities.c ****         {(block >> 16) & 0xFF, (block >> 8) & 0xFF, block & 0xFF};
+ 444              		.loc 1 175 17 is_stmt 0 view .LVU90
+ 445 0006 0B0C     		lsrs	r3, r1, #16
+ 174:Core/Src/memory_utilities.c ****     uint8_t addr[3] =
+ 446              		.loc 1 174 13 view .LVU91
+ 447 0008 8DF80430 		strb	r3, [sp, #4]
+ 448              		.loc 1 175 39 view .LVU92
+ 449 000c 0B0A     		lsrs	r3, r1, #8
+ 174:Core/Src/memory_utilities.c ****     uint8_t addr[3] =
+ 450              		.loc 1 174 13 view .LVU93
+ 451 000e 8DF80530 		strb	r3, [sp, #5]
+ 452 0012 8DF80610 		strb	r1, [sp, #6]
+ 176:Core/Src/memory_utilities.c ****     ENABLE_WREN(ptr_hspi1);
+ 453              		.loc 1 176 5 is_stmt 1 view .LVU94
+ 454 0016 FFF7FEFF 		bl	ENABLE_WREN
+ 455              	.LVL30:
+ 177:Core/Src/memory_utilities.c **** 
+ 178:Core/Src/memory_utilities.c ****     PULL_CS();
+ 456              		.loc 1 178 5 view .LVU95
+ 457 001a FFF7FEFF 		bl	PULL_CS
+ 458              	.LVL31:
+ 179:Core/Src/memory_utilities.c ****     HAL_SPI_Transmit(ptr_hspi1, (uint8_t *)&FLASH_SECTOR_ERASE, 1, 100);
+ 459              		.loc 1 179 5 view .LVU96
+ 460 001e 6423     		movs	r3, #100
+ 461 0020 0122     		movs	r2, #1
+ 462 0022 1149     		ldr	r1, .L37
+ 463 0024 2846     		mov	r0, r5
+ 464 0026 FFF7FEFF 		bl	HAL_SPI_Transmit
+ 465              	.LVL32:
+ 180:Core/Src/memory_utilities.c ****     HAL_SPI_Transmit(ptr_hspi1, (uint8_t *)addr, 3, 100);
+ 466              		.loc 1 180 5 view .LVU97
+ 467 002a 6423     		movs	r3, #100
+ 468 002c 0322     		movs	r2, #3
+ 469 002e 01A9     		add	r1, sp, #4
+ 470 0030 2846     		mov	r0, r5
+ 471 0032 FFF7FEFF 		bl	HAL_SPI_Transmit
+ 472              	.LVL33:
+ 181:Core/Src/memory_utilities.c ****     SET_CS();
+ 473              		.loc 1 181 5 view .LVU98
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 13
+
+
+ 474 0036 FFF7FEFF 		bl	SET_CS
+ 475              	.LVL34:
+ 182:Core/Src/memory_utilities.c **** 
+ 183:Core/Src/memory_utilities.c ****     uint8_t statusRegBuffer[1] = {0};
+ 476              		.loc 1 183 5 view .LVU99
+ 477              		.loc 1 183 13 is_stmt 0 view .LVU100
+ 478 003a 0023     		movs	r3, #0
+ 479 003c 8DF80030 		strb	r3, [sp]
+ 184:Core/Src/memory_utilities.c **** 
+ 185:Core/Src/memory_utilities.c ****     // Stay in the While loop until writing isn't done
+ 186:Core/Src/memory_utilities.c ****     uint8_t wip = 1;
+ 480              		.loc 1 186 5 is_stmt 1 view .LVU101
+ 481              	.LVL35:
+ 187:Core/Src/memory_utilities.c ****     uint8_t err = 0;
+ 482              		.loc 1 187 5 view .LVU102
+ 188:Core/Src/memory_utilities.c ****     while (wip)
+ 483              		.loc 1 188 5 view .LVU103
+ 186:Core/Src/memory_utilities.c ****     uint8_t err = 0;
+ 484              		.loc 1 186 13 is_stmt 0 view .LVU104
+ 485 0040 0124     		movs	r4, #1
+ 486              	.LVL36:
+ 487              	.L32:
+ 488              		.loc 1 188 12 is_stmt 1 view .LVU105
+ 489 0042 7CB1     		cbz	r4, .L36
+ 189:Core/Src/memory_utilities.c ****     {
+ 190:Core/Src/memory_utilities.c ****         READ_STATUS_REGISTER(ptr_hspi1, statusRegBuffer);
+ 490              		.loc 1 190 9 view .LVU106
+ 491 0044 6946     		mov	r1, sp
+ 492 0046 2846     		mov	r0, r5
+ 493 0048 FFF7FEFF 		bl	READ_STATUS_REGISTER
+ 494              	.LVL37:
+ 191:Core/Src/memory_utilities.c ****         wip = statusRegBuffer[0] & 1;
+ 495              		.loc 1 191 9 view .LVU107
+ 496              		.loc 1 191 30 is_stmt 0 view .LVU108
+ 497 004c 9DF80030 		ldrb	r3, [sp]	@ zero_extendqisi2
+ 498              		.loc 1 191 13 view .LVU109
+ 499 0050 03F00104 		and	r4, r3, #1
+ 500              	.LVL38:
+ 192:Core/Src/memory_utilities.c ****         err = statusRegBuffer[0] & 0b01000000;
+ 501              		.loc 1 192 9 is_stmt 1 view .LVU110
+ 502              		.loc 1 192 13 is_stmt 0 view .LVU111
+ 503 0054 03F04003 		and	r3, r3, #64
+ 504              	.LVL39:
+ 193:Core/Src/memory_utilities.c ****         if (err == 1)
+ 505              		.loc 1 193 9 is_stmt 1 view .LVU112
+ 506              		.loc 1 193 12 is_stmt 0 view .LVU113
+ 507 0058 012B     		cmp	r3, #1
+ 508 005a F2D1     		bne	.L32
+ 194:Core/Src/memory_utilities.c ****         {
+ 195:Core/Src/memory_utilities.c ****             debug_uart_print_str_new_line("Error during Erasing");
+ 509              		.loc 1 195 13 is_stmt 1 view .LVU114
+ 510 005c 0348     		ldr	r0, .L37+4
+ 511 005e FFF7FEFF 		bl	debug_uart_print_str_new_line
+ 512              	.LVL40:
+ 513              		.loc 1 195 13 is_stmt 0 view .LVU115
+ 514 0062 EEE7     		b	.L32
+ 515              	.LVL41:
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 14
+
+
+ 516              	.L36:
+ 196:Core/Src/memory_utilities.c ****         }
+ 197:Core/Src/memory_utilities.c ****     }
+ 198:Core/Src/memory_utilities.c **** }
+ 517              		.loc 1 198 1 view .LVU116
+ 518 0064 03B0     		add	sp, sp, #12
+ 519              		.cfi_def_cfa_offset 12
+ 520              		@ sp needed
+ 521 0066 30BD     		pop	{r4, r5, pc}
+ 522              	.LVL42:
+ 523              	.L38:
+ 524              		.loc 1 198 1 view .LVU117
+ 525              		.align	2
+ 526              	.L37:
+ 527 0068 00000000 		.word	FLASH_SECTOR_ERASE
+ 528 006c 00000000 		.word	.LC1
+ 529              		.cfi_endproc
+ 530              	.LFE159:
+ 532              		.section	.text.block_device_erase,"ax",%progbits
+ 533              		.align	1
+ 534              		.global	block_device_erase
+ 535              		.syntax unified
+ 536              		.thumb
+ 537              		.thumb_func
+ 539              	block_device_erase:
+ 540              	.LVL43:
+ 541              	.LFB152:
+  75:Core/Src/memory_utilities.c ****     MEM_CLEAR_LFS(hspi_ptr, block * c->block_size);
+ 542              		.loc 1 75 1 is_stmt 1 view -0
+ 543              		.cfi_startproc
+ 544              		@ args = 0, pretend = 0, frame = 0
+ 545              		@ frame_needed = 0, uses_anonymous_args = 0
+  75:Core/Src/memory_utilities.c ****     MEM_CLEAR_LFS(hspi_ptr, block * c->block_size);
+ 546              		.loc 1 75 1 is_stmt 0 view .LVU119
+ 547 0000 08B5     		push	{r3, lr}
+ 548              		.cfi_def_cfa_offset 8
+ 549              		.cfi_offset 3, -8
+ 550              		.cfi_offset 14, -4
+  76:Core/Src/memory_utilities.c ****     //	MEM_CLEAR_LFS(hspi_ptr, block * c->block_size);
+ 551              		.loc 1 76 5 is_stmt 1 view .LVU120
+  76:Core/Src/memory_utilities.c ****     //	MEM_CLEAR_LFS(hspi_ptr, block * c->block_size);
+ 552              		.loc 1 76 38 is_stmt 0 view .LVU121
+ 553 0002 C369     		ldr	r3, [r0, #28]
+  76:Core/Src/memory_utilities.c ****     //	MEM_CLEAR_LFS(hspi_ptr, block * c->block_size);
+ 554              		.loc 1 76 5 view .LVU122
+ 555 0004 03FB01F1 		mul	r1, r3, r1
+ 556              	.LVL44:
+  76:Core/Src/memory_utilities.c ****     //	MEM_CLEAR_LFS(hspi_ptr, block * c->block_size);
+ 557              		.loc 1 76 5 view .LVU123
+ 558 0008 024B     		ldr	r3, .L41
+ 559 000a 1868     		ldr	r0, [r3]
+ 560              	.LVL45:
+  76:Core/Src/memory_utilities.c ****     //	MEM_CLEAR_LFS(hspi_ptr, block * c->block_size);
+ 561              		.loc 1 76 5 view .LVU124
+ 562 000c FFF7FEFF 		bl	MEM_CLEAR_LFS
+ 563              	.LVL46:
+  78:Core/Src/memory_utilities.c **** }
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 15
+
+
+ 564              		.loc 1 78 5 is_stmt 1 view .LVU125
+  79:Core/Src/memory_utilities.c **** 
+ 565              		.loc 1 79 1 is_stmt 0 view .LVU126
+ 566 0010 0020     		movs	r0, #0
+ 567 0012 08BD     		pop	{r3, pc}
+ 568              	.L42:
+ 569              		.align	2
+ 570              	.L41:
+ 571 0014 00000000 		.word	hspi_ptr
+ 572              		.cfi_endproc
+ 573              	.LFE152:
+ 575              		.section	.text.WRITE_LFS,"ax",%progbits
+ 576              		.align	1
+ 577              		.global	WRITE_LFS
+ 578              		.syntax unified
+ 579              		.thumb
+ 580              		.thumb_func
+ 582              	WRITE_LFS:
+ 583              	.LVL47:
+ 584              	.LFB160:
+ 199:Core/Src/memory_utilities.c **** 
+ 200:Core/Src/memory_utilities.c **** /**
+ 201:Core/Src/memory_utilities.c ****  * This function writes data into memory using ADDRESS from LittleFS
+ 202:Core/Src/memory_utilities.c ****  * and stays in the function until the writing is done.
+ 203:Core/Src/memory_utilities.c ****  * Precondition of running WREN command is done within the function
+ 204:Core/Src/memory_utilities.c ****  *
+ 205:Core/Src/memory_utilities.c ****  * @param - SPI_HandleTypeDef hspi1 holds SPI protocol data for communication
+ 206:Core/Src/memory_utilities.c ****  * 			void * packetBuffer holds the buffer to write to memory
+ 207:Core/Src/memory_utilities.c ****  *
+ 208:Core/Src/memory_utilities.c ****  * @return - 0 if written successfully
+ 209:Core/Src/memory_utilities.c ****  * 			 -1 if an error occurred during writing to memory
+ 210:Core/Src/memory_utilities.c ****  */
+ 211:Core/Src/memory_utilities.c **** uint8_t WRITE_LFS(SPI_HandleTypeDef *hspi1, uint8_t *packetBuffer,
+ 212:Core/Src/memory_utilities.c ****                   lfs_block_t block, lfs_size_t size)
+ 213:Core/Src/memory_utilities.c **** {
+ 585              		.loc 1 213 1 is_stmt 1 view -0
+ 586              		.cfi_startproc
+ 587              		@ args = 0, pretend = 0, frame = 8
+ 588              		@ frame_needed = 0, uses_anonymous_args = 0
+ 589              		.loc 1 213 1 is_stmt 0 view .LVU128
+ 590 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 591              		.cfi_def_cfa_offset 20
+ 592              		.cfi_offset 4, -20
+ 593              		.cfi_offset 5, -16
+ 594              		.cfi_offset 6, -12
+ 595              		.cfi_offset 7, -8
+ 596              		.cfi_offset 14, -4
+ 597 0002 83B0     		sub	sp, sp, #12
+ 598              		.cfi_def_cfa_offset 32
+ 599 0004 0546     		mov	r5, r0
+ 600 0006 0E46     		mov	r6, r1
+ 601 0008 1F46     		mov	r7, r3
+ 214:Core/Src/memory_utilities.c ****     uint8_t addr[3] =
+ 602              		.loc 1 214 5 is_stmt 1 view .LVU129
+ 215:Core/Src/memory_utilities.c ****         {(block >> 16) & 0xFF, (block >> 8) & 0xFF, block & 0xFF};
+ 603              		.loc 1 215 17 is_stmt 0 view .LVU130
+ 604 000a 130C     		lsrs	r3, r2, #16
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 16
+
+
+ 605              	.LVL48:
+ 214:Core/Src/memory_utilities.c ****     uint8_t addr[3] =
+ 606              		.loc 1 214 13 view .LVU131
+ 607 000c 8DF80430 		strb	r3, [sp, #4]
+ 608              		.loc 1 215 39 view .LVU132
+ 609 0010 130A     		lsrs	r3, r2, #8
+ 214:Core/Src/memory_utilities.c ****     uint8_t addr[3] =
+ 610              		.loc 1 214 13 view .LVU133
+ 611 0012 8DF80530 		strb	r3, [sp, #5]
+ 612 0016 8DF80620 		strb	r2, [sp, #6]
+ 216:Core/Src/memory_utilities.c **** 
+ 217:Core/Src/memory_utilities.c ****     // Buffer for receiving status register data
+ 218:Core/Src/memory_utilities.c ****     uint8_t statusRegBuffer[1] = {0};
+ 613              		.loc 1 218 5 is_stmt 1 view .LVU134
+ 614              		.loc 1 218 13 is_stmt 0 view .LVU135
+ 615 001a 0024     		movs	r4, #0
+ 616 001c 8DF80040 		strb	r4, [sp]
+ 219:Core/Src/memory_utilities.c **** 
+ 220:Core/Src/memory_utilities.c ****     // Enable WREN Command, so that we can write to the memory module
+ 221:Core/Src/memory_utilities.c ****     ENABLE_WREN(hspi1);
+ 617              		.loc 1 221 5 is_stmt 1 view .LVU136
+ 618 0020 FFF7FEFF 		bl	ENABLE_WREN
+ 619              	.LVL49:
+ 222:Core/Src/memory_utilities.c **** 
+ 223:Core/Src/memory_utilities.c ****     // Transmit the Data to the Memory Module
+ 224:Core/Src/memory_utilities.c ****     PULL_CS();
+ 620              		.loc 1 224 5 view .LVU137
+ 621 0024 FFF7FEFF 		bl	PULL_CS
+ 622              	.LVL50:
+ 225:Core/Src/memory_utilities.c ****     HAL_SPI_Transmit(hspi1, (uint8_t *)&FLASH_WRITE, 1, 100);
+ 623              		.loc 1 225 5 view .LVU138
+ 624 0028 6423     		movs	r3, #100
+ 625 002a 0122     		movs	r2, #1
+ 626 002c 1149     		ldr	r1, .L49
+ 627 002e 2846     		mov	r0, r5
+ 628 0030 FFF7FEFF 		bl	HAL_SPI_Transmit
+ 629              	.LVL51:
+ 226:Core/Src/memory_utilities.c ****     HAL_SPI_Transmit(hspi1, (uint8_t *)addr, 3, 100);
+ 630              		.loc 1 226 5 view .LVU139
+ 631 0034 6423     		movs	r3, #100
+ 632 0036 0322     		movs	r2, #3
+ 633 0038 01A9     		add	r1, sp, #4
+ 634 003a 2846     		mov	r0, r5
+ 635 003c FFF7FEFF 		bl	HAL_SPI_Transmit
+ 636              	.LVL52:
+ 227:Core/Src/memory_utilities.c ****     HAL_SPI_Transmit(hspi1, (uint8_t *)packetBuffer, size, 100);
+ 637              		.loc 1 227 5 view .LVU140
+ 638 0040 6423     		movs	r3, #100
+ 639 0042 BAB2     		uxth	r2, r7
+ 640 0044 3146     		mov	r1, r6
+ 641 0046 2846     		mov	r0, r5
+ 642 0048 FFF7FEFF 		bl	HAL_SPI_Transmit
+ 643              	.LVL53:
+ 228:Core/Src/memory_utilities.c ****     SET_CS();
+ 644              		.loc 1 228 5 view .LVU141
+ 645 004c FFF7FEFF 		bl	SET_CS
+ 646              	.LVL54:
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 17
+
+
+ 229:Core/Src/memory_utilities.c **** 
+ 230:Core/Src/memory_utilities.c ****     // Stay in the While loop until writing isn't done
+ 231:Core/Src/memory_utilities.c ****     uint8_t wip = 1;
+ 647              		.loc 1 231 5 view .LVU142
+ 232:Core/Src/memory_utilities.c ****     uint8_t err = 0;
+ 648              		.loc 1 232 5 view .LVU143
+ 233:Core/Src/memory_utilities.c ****     while (wip)
+ 649              		.loc 1 233 5 view .LVU144
+ 232:Core/Src/memory_utilities.c ****     uint8_t err = 0;
+ 650              		.loc 1 232 13 is_stmt 0 view .LVU145
+ 651 0050 2046     		mov	r0, r4
+ 231:Core/Src/memory_utilities.c ****     uint8_t err = 0;
+ 652              		.loc 1 231 13 view .LVU146
+ 653 0052 0123     		movs	r3, #1
+ 654              	.LVL55:
+ 655              	.L44:
+ 656              		.loc 1 233 12 is_stmt 1 view .LVU147
+ 657 0054 63B1     		cbz	r3, .L45
+ 234:Core/Src/memory_utilities.c ****     {
+ 235:Core/Src/memory_utilities.c ****         READ_STATUS_REGISTER(hspi1, statusRegBuffer);
+ 658              		.loc 1 235 9 view .LVU148
+ 659 0056 6946     		mov	r1, sp
+ 660 0058 2846     		mov	r0, r5
+ 661              	.LVL56:
+ 662              		.loc 1 235 9 is_stmt 0 view .LVU149
+ 663 005a FFF7FEFF 		bl	READ_STATUS_REGISTER
+ 664              	.LVL57:
+ 236:Core/Src/memory_utilities.c ****         wip = statusRegBuffer[0] & 1;
+ 665              		.loc 1 236 9 is_stmt 1 view .LVU150
+ 666              		.loc 1 236 30 is_stmt 0 view .LVU151
+ 667 005e 9DF80000 		ldrb	r0, [sp]	@ zero_extendqisi2
+ 668              		.loc 1 236 13 view .LVU152
+ 669 0062 00F00103 		and	r3, r0, #1
+ 670              	.LVL58:
+ 237:Core/Src/memory_utilities.c ****         err = statusRegBuffer[0] & 0b01000000;
+ 671              		.loc 1 237 9 is_stmt 1 view .LVU153
+ 672              		.loc 1 237 13 is_stmt 0 view .LVU154
+ 673 0066 00F04000 		and	r0, r0, #64
+ 674              	.LVL59:
+ 238:Core/Src/memory_utilities.c **** 
+ 239:Core/Src/memory_utilities.c ****         // If error while writing break from loop
+ 240:Core/Src/memory_utilities.c ****         if (err == 1)
+ 675              		.loc 1 240 9 is_stmt 1 view .LVU155
+ 676              		.loc 1 240 12 is_stmt 0 view .LVU156
+ 677 006a 0128     		cmp	r0, #1
+ 678 006c F2D1     		bne	.L44
+ 241:Core/Src/memory_utilities.c ****         {
+ 242:Core/Src/memory_utilities.c ****             err = -1;
+ 679              		.loc 1 242 17 view .LVU157
+ 680 006e FF20     		movs	r0, #255
+ 681              	.LVL60:
+ 682              	.L45:
+ 243:Core/Src/memory_utilities.c ****             break;
+ 244:Core/Src/memory_utilities.c ****         }
+ 245:Core/Src/memory_utilities.c ****     }
+ 246:Core/Src/memory_utilities.c **** 
+ 247:Core/Src/memory_utilities.c ****     // return err value
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 18
+
+
+ 248:Core/Src/memory_utilities.c ****     return err;
+ 683              		.loc 1 248 5 is_stmt 1 view .LVU158
+ 249:Core/Src/memory_utilities.c **** }
+ 684              		.loc 1 249 1 is_stmt 0 view .LVU159
+ 685 0070 03B0     		add	sp, sp, #12
+ 686              		.cfi_def_cfa_offset 20
+ 687              		@ sp needed
+ 688 0072 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 689              	.LVL61:
+ 690              	.L50:
+ 691              		.loc 1 249 1 view .LVU160
+ 692              		.align	2
+ 693              	.L49:
+ 694 0074 00000000 		.word	FLASH_WRITE
+ 695              		.cfi_endproc
+ 696              	.LFE160:
+ 698              		.section	.text.block_device_prog,"ax",%progbits
+ 699              		.align	1
+ 700              		.global	block_device_prog
+ 701              		.syntax unified
+ 702              		.thumb
+ 703              		.thumb_func
+ 705              	block_device_prog:
+ 706              	.LVL62:
+ 707              	.LFB151:
+  69:Core/Src/memory_utilities.c ****     return WRITE_LFS(hspi_ptr, (uint8_t *)buffer, (block * c->block_size + off),
+ 708              		.loc 1 69 1 is_stmt 1 view -0
+ 709              		.cfi_startproc
+ 710              		@ args = 4, pretend = 0, frame = 0
+ 711              		@ frame_needed = 0, uses_anonymous_args = 0
+  69:Core/Src/memory_utilities.c ****     return WRITE_LFS(hspi_ptr, (uint8_t *)buffer, (block * c->block_size + off),
+ 712              		.loc 1 69 1 is_stmt 0 view .LVU162
+ 713 0000 08B5     		push	{r3, lr}
+ 714              		.cfi_def_cfa_offset 8
+ 715              		.cfi_offset 3, -8
+ 716              		.cfi_offset 14, -4
+ 717 0002 8C46     		mov	ip, r1
+ 718 0004 1946     		mov	r1, r3
+ 719              	.LVL63:
+  70:Core/Src/memory_utilities.c ****                      size);
+ 720              		.loc 1 70 5 is_stmt 1 view .LVU163
+  70:Core/Src/memory_utilities.c ****                      size);
+ 721              		.loc 1 70 61 is_stmt 0 view .LVU164
+ 722 0006 C069     		ldr	r0, [r0, #28]
+ 723              	.LVL64:
+  70:Core/Src/memory_utilities.c ****                      size);
+ 724              		.loc 1 70 12 view .LVU165
+ 725 0008 029B     		ldr	r3, [sp, #8]
+ 726              	.LVL65:
+  70:Core/Src/memory_utilities.c ****                      size);
+ 727              		.loc 1 70 12 view .LVU166
+ 728 000a 0CFB0022 		mla	r2, ip, r0, r2
+ 729              	.LVL66:
+  70:Core/Src/memory_utilities.c ****                      size);
+ 730              		.loc 1 70 12 view .LVU167
+ 731 000e 0248     		ldr	r0, .L53
+ 732 0010 0068     		ldr	r0, [r0]
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 19
+
+
+ 733 0012 FFF7FEFF 		bl	WRITE_LFS
+ 734              	.LVL67:
+  72:Core/Src/memory_utilities.c **** 
+ 735              		.loc 1 72 1 view .LVU168
+ 736 0016 08BD     		pop	{r3, pc}
+ 737              	.LVL68:
+ 738              	.L54:
+  72:Core/Src/memory_utilities.c **** 
+ 739              		.loc 1 72 1 view .LVU169
+ 740              		.align	2
+ 741              	.L53:
+ 742 0018 00000000 		.word	hspi_ptr
+ 743              		.cfi_endproc
+ 744              	.LFE151:
+ 746              		.section	.text.READ_LFS,"ax",%progbits
+ 747              		.align	1
+ 748              		.global	READ_LFS
+ 749              		.syntax unified
+ 750              		.thumb
+ 751              		.thumb_func
+ 753              	READ_LFS:
+ 754              	.LVL69:
+ 755              	.LFB161:
+ 250:Core/Src/memory_utilities.c **** 
+ 251:Core/Src/memory_utilities.c **** /**
+ 252:Core/Src/memory_utilities.c ****  * This function reads data from memory using ADDRESS FROM CIRCULAR BUFFER
+ 253:Core/Src/memory_utilities.c ****  * and stays in the function until the reading is done.
+ 254:Core/Src/memory_utilities.c ****  * The Chip Select is done within the function to ensure READ is done
+ 255:Core/Src/memory_utilities.c ****  *
+ 256:Core/Src/memory_utilities.c ****  * @param - SPI_HandleTypeDef hspi1 holds SPI protocol data for communication
+ 257:Core/Src/memory_utilities.c ****  * 			void * spiRxBuffer is the buffer data is going to be put into after reading
+ 258:Core/Src/memory_utilities.c ****  *
+ 259:Core/Src/memory_utilities.c ****  * @return - 0 if read successfully
+ 260:Core/Src/memory_utilities.c ****  * 			 1 if an error occurred during writing to memory
+ 261:Core/Src/memory_utilities.c ****  */
+ 262:Core/Src/memory_utilities.c **** uint8_t READ_LFS(SPI_HandleTypeDef *hspi1, uint8_t *spiRxBuffer,
+ 263:Core/Src/memory_utilities.c ****                  lfs_block_t block, lfs_size_t size)
+ 264:Core/Src/memory_utilities.c **** {
+ 756              		.loc 1 264 1 is_stmt 1 view -0
+ 757              		.cfi_startproc
+ 758              		@ args = 0, pretend = 0, frame = 8
+ 759              		@ frame_needed = 0, uses_anonymous_args = 0
+ 760              		.loc 1 264 1 is_stmt 0 view .LVU171
+ 761 0000 70B5     		push	{r4, r5, r6, lr}
+ 762              		.cfi_def_cfa_offset 16
+ 763              		.cfi_offset 4, -16
+ 764              		.cfi_offset 5, -12
+ 765              		.cfi_offset 6, -8
+ 766              		.cfi_offset 14, -4
+ 767 0002 82B0     		sub	sp, sp, #8
+ 768              		.cfi_def_cfa_offset 24
+ 769 0004 0446     		mov	r4, r0
+ 770 0006 0D46     		mov	r5, r1
+ 771 0008 1E46     		mov	r6, r3
+ 265:Core/Src/memory_utilities.c ****     uint8_t addr[3] =
+ 772              		.loc 1 265 5 is_stmt 1 view .LVU172
+ 266:Core/Src/memory_utilities.c ****         {(block >> 16) & 0xFF, (block >> 8) & 0xFF, block & 0xFF};
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 20
+
+
+ 773              		.loc 1 266 17 is_stmt 0 view .LVU173
+ 774 000a 130C     		lsrs	r3, r2, #16
+ 775              	.LVL70:
+ 265:Core/Src/memory_utilities.c ****     uint8_t addr[3] =
+ 776              		.loc 1 265 13 view .LVU174
+ 777 000c 8DF80430 		strb	r3, [sp, #4]
+ 778              		.loc 1 266 39 view .LVU175
+ 779 0010 130A     		lsrs	r3, r2, #8
+ 265:Core/Src/memory_utilities.c ****     uint8_t addr[3] =
+ 780              		.loc 1 265 13 view .LVU176
+ 781 0012 8DF80530 		strb	r3, [sp, #5]
+ 782 0016 8DF80620 		strb	r2, [sp, #6]
+ 267:Core/Src/memory_utilities.c **** 
+ 268:Core/Src/memory_utilities.c ****     // Set Chip select to LOW and read from the address and store data in given buffer
+ 269:Core/Src/memory_utilities.c ****     PULL_CS();
+ 783              		.loc 1 269 5 is_stmt 1 view .LVU177
+ 784 001a FFF7FEFF 		bl	PULL_CS
+ 785              	.LVL71:
+ 270:Core/Src/memory_utilities.c ****     HAL_SPI_Transmit(hspi1, (uint8_t *)&FLASH_READ, 1, 100);
+ 786              		.loc 1 270 5 view .LVU178
+ 787 001e 6423     		movs	r3, #100
+ 788 0020 0122     		movs	r2, #1
+ 789 0022 0A49     		ldr	r1, .L57
+ 790 0024 2046     		mov	r0, r4
+ 791 0026 FFF7FEFF 		bl	HAL_SPI_Transmit
+ 792              	.LVL72:
+ 271:Core/Src/memory_utilities.c ****     HAL_SPI_Transmit(hspi1, (uint8_t *)addr, 3, 100);
+ 793              		.loc 1 271 5 view .LVU179
+ 794 002a 6423     		movs	r3, #100
+ 795 002c 0322     		movs	r2, #3
+ 796 002e 01A9     		add	r1, sp, #4
+ 797 0030 2046     		mov	r0, r4
+ 798 0032 FFF7FEFF 		bl	HAL_SPI_Transmit
+ 799              	.LVL73:
+ 272:Core/Src/memory_utilities.c ****     HAL_SPI_Receive(hspi1, (uint8_t *)spiRxBuffer, size, 100);
+ 800              		.loc 1 272 5 view .LVU180
+ 801 0036 6423     		movs	r3, #100
+ 802 0038 B2B2     		uxth	r2, r6
+ 803 003a 2946     		mov	r1, r5
+ 804 003c 2046     		mov	r0, r4
+ 805 003e FFF7FEFF 		bl	HAL_SPI_Receive
+ 806              	.LVL74:
+ 273:Core/Src/memory_utilities.c ****     SET_CS();
+ 807              		.loc 1 273 5 view .LVU181
+ 808 0042 FFF7FEFF 		bl	SET_CS
+ 809              	.LVL75:
+ 274:Core/Src/memory_utilities.c **** 
+ 275:Core/Src/memory_utilities.c ****     // Haven't yet implemented a way to check any errors while reading data from memory
+ 276:Core/Src/memory_utilities.c ****     return 0;
+ 810              		.loc 1 276 5 view .LVU182
+ 277:Core/Src/memory_utilities.c **** }
+ 811              		.loc 1 277 1 is_stmt 0 view .LVU183
+ 812 0046 0020     		movs	r0, #0
+ 813 0048 02B0     		add	sp, sp, #8
+ 814              		.cfi_def_cfa_offset 16
+ 815              		@ sp needed
+ 816 004a 70BD     		pop	{r4, r5, r6, pc}
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 21
+
+
+ 817              	.LVL76:
+ 818              	.L58:
+ 819              		.loc 1 277 1 view .LVU184
+ 820              		.align	2
+ 821              	.L57:
+ 822 004c 00000000 		.word	FLASH_READ
+ 823              		.cfi_endproc
+ 824              	.LFE161:
+ 826              		.section	.text.block_device_read,"ax",%progbits
+ 827              		.align	1
+ 828              		.global	block_device_read
+ 829              		.syntax unified
+ 830              		.thumb
+ 831              		.thumb_func
+ 833              	block_device_read:
+ 834              	.LVL77:
+ 835              	.LFB150:
+  61:Core/Src/memory_utilities.c **** 
+ 836              		.loc 1 61 1 is_stmt 1 view -0
+ 837              		.cfi_startproc
+ 838              		@ args = 4, pretend = 0, frame = 0
+ 839              		@ frame_needed = 0, uses_anonymous_args = 0
+  61:Core/Src/memory_utilities.c **** 
+ 840              		.loc 1 61 1 is_stmt 0 view .LVU186
+ 841 0000 08B5     		push	{r3, lr}
+ 842              		.cfi_def_cfa_offset 8
+ 843              		.cfi_offset 3, -8
+ 844              		.cfi_offset 14, -4
+ 845 0002 8C46     		mov	ip, r1
+ 846 0004 1946     		mov	r1, r3
+ 847              	.LVL78:
+  63:Core/Src/memory_utilities.c ****                     size);
+ 848              		.loc 1 63 5 is_stmt 1 view .LVU187
+  63:Core/Src/memory_utilities.c ****                     size);
+ 849              		.loc 1 63 60 is_stmt 0 view .LVU188
+ 850 0006 C069     		ldr	r0, [r0, #28]
+ 851              	.LVL79:
+  63:Core/Src/memory_utilities.c ****                     size);
+ 852              		.loc 1 63 12 view .LVU189
+ 853 0008 029B     		ldr	r3, [sp, #8]
+ 854              	.LVL80:
+  63:Core/Src/memory_utilities.c ****                     size);
+ 855              		.loc 1 63 12 view .LVU190
+ 856 000a 0CFB0022 		mla	r2, ip, r0, r2
+ 857              	.LVL81:
+  63:Core/Src/memory_utilities.c ****                     size);
+ 858              		.loc 1 63 12 view .LVU191
+ 859 000e 0248     		ldr	r0, .L61
+ 860 0010 0068     		ldr	r0, [r0]
+ 861 0012 FFF7FEFF 		bl	READ_LFS
+ 862              	.LVL82:
+  65:Core/Src/memory_utilities.c **** 
+ 863              		.loc 1 65 1 view .LVU192
+ 864 0016 08BD     		pop	{r3, pc}
+ 865              	.LVL83:
+ 866              	.L62:
+  65:Core/Src/memory_utilities.c **** 
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 22
+
+
+ 867              		.loc 1 65 1 view .LVU193
+ 868              		.align	2
+ 869              	.L61:
+ 870 0018 00000000 		.word	hspi_ptr
+ 871              		.cfi_endproc
+ 872              	.LFE150:
+ 874              		.section	.text.INITIALIZE,"ax",%progbits
+ 875              		.align	1
+ 876              		.global	INITIALIZE
+ 877              		.syntax unified
+ 878              		.thumb
+ 879              		.thumb_func
+ 881              	INITIALIZE:
+ 882              	.LVL84:
+ 883              	.LFB162:
+ 278:Core/Src/memory_utilities.c **** 
+ 279:Core/Src/memory_utilities.c **** void INITIALIZE(SPI_HandleTypeDef *ptr)
+ 280:Core/Src/memory_utilities.c **** {
+ 884              		.loc 1 280 1 is_stmt 1 view -0
+ 885              		.cfi_startproc
+ 886              		@ args = 0, pretend = 0, frame = 0
+ 887              		@ frame_needed = 0, uses_anonymous_args = 0
+ 888              		.loc 1 280 1 is_stmt 0 view .LVU195
+ 889 0000 10B5     		push	{r4, lr}
+ 890              		.cfi_def_cfa_offset 8
+ 891              		.cfi_offset 4, -8
+ 892              		.cfi_offset 14, -4
+ 893 0002 0446     		mov	r4, r0
+ 281:Core/Src/memory_utilities.c ****     LFS_Config();
+ 894              		.loc 1 281 5 is_stmt 1 view .LVU196
+ 895 0004 FFF7FEFF 		bl	LFS_Config
+ 896              	.LVL85:
+ 282:Core/Src/memory_utilities.c ****     LFS_initialized = 1;
+ 897              		.loc 1 282 5 view .LVU197
+ 898              		.loc 1 282 21 is_stmt 0 view .LVU198
+ 899 0008 024B     		ldr	r3, .L65
+ 900 000a 0122     		movs	r2, #1
+ 901 000c 1A70     		strb	r2, [r3]
+ 283:Core/Src/memory_utilities.c ****     hspi_ptr = ptr;
+ 902              		.loc 1 283 5 is_stmt 1 view .LVU199
+ 903              		.loc 1 283 14 is_stmt 0 view .LVU200
+ 904 000e 024B     		ldr	r3, .L65+4
+ 905 0010 1C60     		str	r4, [r3]
+ 284:Core/Src/memory_utilities.c **** }
+ 906              		.loc 1 284 1 view .LVU201
+ 907 0012 10BD     		pop	{r4, pc}
+ 908              	.LVL86:
+ 909              	.L66:
+ 910              		.loc 1 284 1 view .LVU202
+ 911              		.align	2
+ 912              	.L65:
+ 913 0014 00000000 		.word	LFS_initialized
+ 914 0018 00000000 		.word	hspi_ptr
+ 915              		.cfi_endproc
+ 916              	.LFE162:
+ 918              		.section	.rodata.MOUNT.str1.4,"aMS",%progbits,1
+ 919              		.align	2
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 23
+
+
+ 920              	.LC2:
+ 921 0000 4D6F756E 		.ascii	"Mounting Unsuccessful\000"
+ 921      74696E67 
+ 921      20556E73 
+ 921      75636365 
+ 921      73736675 
+ 922 0016 0000     		.align	2
+ 923              	.LC3:
+ 924 0018 4D6F756E 		.ascii	"Mounting Successful\000"
+ 924      74696E67 
+ 924      20537563 
+ 924      63657373 
+ 924      66756C00 
+ 925              		.align	2
+ 926              	.LC4:
+ 927 002c 4C697474 		.ascii	"LittleFS not Initialized or already mounted\000"
+ 927      6C654653 
+ 927      206E6F74 
+ 927      20496E69 
+ 927      7469616C 
+ 928              		.section	.text.MOUNT,"ax",%progbits
+ 929              		.align	1
+ 930              		.global	MOUNT
+ 931              		.syntax unified
+ 932              		.thumb
+ 933              		.thumb_func
+ 935              	MOUNT:
+ 936              	.LFB163:
+ 285:Core/Src/memory_utilities.c **** 
+ 286:Core/Src/memory_utilities.c **** int8_t MOUNT()
+ 287:Core/Src/memory_utilities.c **** {
+ 937              		.loc 1 287 1 is_stmt 1 view -0
+ 938              		.cfi_startproc
+ 939              		@ args = 0, pretend = 0, frame = 0
+ 940              		@ frame_needed = 0, uses_anonymous_args = 0
+ 941 0000 10B5     		push	{r4, lr}
+ 942              		.cfi_def_cfa_offset 8
+ 943              		.cfi_offset 4, -8
+ 944              		.cfi_offset 14, -4
+ 288:Core/Src/memory_utilities.c ****     if (LFS_initialized && !mounted)
+ 945              		.loc 1 288 5 view .LVU204
+ 946              		.loc 1 288 9 is_stmt 0 view .LVU205
+ 947 0002 104B     		ldr	r3, .L73
+ 948 0004 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 949              		.loc 1 288 8 view .LVU206
+ 950 0006 B3B1     		cbz	r3, .L68
+ 951              		.loc 1 288 28 discriminator 1 view .LVU207
+ 952 0008 0F4B     		ldr	r3, .L73+4
+ 953 000a 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 954              		.loc 1 288 25 discriminator 1 view .LVU208
+ 955 000c 9BB9     		cbnz	r3, .L68
+ 956              	.LBB2:
+ 289:Core/Src/memory_utilities.c ****     {
+ 290:Core/Src/memory_utilities.c ****         // Check if LittleFS successfully mounted
+ 291:Core/Src/memory_utilities.c ****         int8_t result = lfs_mount(&lfs, &cfg);
+ 957              		.loc 1 291 9 is_stmt 1 view .LVU209
+ 958              		.loc 1 291 25 is_stmt 0 view .LVU210
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 24
+
+
+ 959 000e 0F49     		ldr	r1, .L73+8
+ 960 0010 0F48     		ldr	r0, .L73+12
+ 961 0012 FFF7FEFF 		bl	lfs_mount
+ 962              	.LVL87:
+ 963              		.loc 1 291 16 discriminator 1 view .LVU211
+ 964 0016 44B2     		sxtb	r4, r0
+ 965              	.LVL88:
+ 292:Core/Src/memory_utilities.c ****         if (result < 0)
+ 966              		.loc 1 292 9 is_stmt 1 view .LVU212
+ 967              		.loc 1 292 12 is_stmt 0 view .LVU213
+ 968 0018 002C     		cmp	r4, #0
+ 969 001a 08DB     		blt	.L72
+ 293:Core/Src/memory_utilities.c ****         {
+ 294:Core/Src/memory_utilities.c ****             debug_uart_print_str_new_line("Mounting Unsuccessful");
+ 295:Core/Src/memory_utilities.c ****             return result;
+ 296:Core/Src/memory_utilities.c ****         }
+ 297:Core/Src/memory_utilities.c ****         else
+ 298:Core/Src/memory_utilities.c ****         {
+ 299:Core/Src/memory_utilities.c ****             debug_uart_print_str_new_line("Mounting Successful");
+ 970              		.loc 1 299 13 is_stmt 1 view .LVU214
+ 971 001c 0D48     		ldr	r0, .L73+16
+ 972 001e FFF7FEFF 		bl	debug_uart_print_str_new_line
+ 973              	.LVL89:
+ 300:Core/Src/memory_utilities.c ****             mounted = 1;
+ 974              		.loc 1 300 13 view .LVU215
+ 975              		.loc 1 300 21 is_stmt 0 view .LVU216
+ 976 0022 094B     		ldr	r3, .L73+4
+ 977 0024 0122     		movs	r2, #1
+ 978 0026 1A70     		strb	r2, [r3]
+ 301:Core/Src/memory_utilities.c ****             return 0;
+ 979              		.loc 1 301 13 is_stmt 1 view .LVU217
+ 980              		.loc 1 301 20 is_stmt 0 view .LVU218
+ 981 0028 0024     		movs	r4, #0
+ 982              	.LVL90:
+ 983              	.L70:
+ 984              		.loc 1 301 20 view .LVU219
+ 985              	.LBE2:
+ 302:Core/Src/memory_utilities.c ****         }
+ 303:Core/Src/memory_utilities.c ****     }
+ 304:Core/Src/memory_utilities.c ****     debug_uart_print_str_new_line("LittleFS not Initialized or already mounted");
+ 305:Core/Src/memory_utilities.c ****     return -1;
+ 306:Core/Src/memory_utilities.c **** }
+ 986              		.loc 1 306 1 view .LVU220
+ 987 002a 2046     		mov	r0, r4
+ 988 002c 10BD     		pop	{r4, pc}
+ 989              	.LVL91:
+ 990              	.L72:
+ 991              	.LBB3:
+ 294:Core/Src/memory_utilities.c ****             return result;
+ 992              		.loc 1 294 13 is_stmt 1 view .LVU221
+ 993 002e 0A48     		ldr	r0, .L73+20
+ 994 0030 FFF7FEFF 		bl	debug_uart_print_str_new_line
+ 995              	.LVL92:
+ 295:Core/Src/memory_utilities.c ****         }
+ 996              		.loc 1 295 13 view .LVU222
+ 295:Core/Src/memory_utilities.c ****         }
+ 997              		.loc 1 295 20 is_stmt 0 view .LVU223
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 25
+
+
+ 998 0034 F9E7     		b	.L70
+ 999              	.LVL93:
+ 1000              	.L68:
+ 295:Core/Src/memory_utilities.c ****         }
+ 1001              		.loc 1 295 20 view .LVU224
+ 1002              	.LBE3:
+ 304:Core/Src/memory_utilities.c ****     return -1;
+ 1003              		.loc 1 304 5 is_stmt 1 view .LVU225
+ 1004 0036 0948     		ldr	r0, .L73+24
+ 1005 0038 FFF7FEFF 		bl	debug_uart_print_str_new_line
+ 1006              	.LVL94:
+ 305:Core/Src/memory_utilities.c **** }
+ 1007              		.loc 1 305 5 view .LVU226
+ 305:Core/Src/memory_utilities.c **** }
+ 1008              		.loc 1 305 12 is_stmt 0 view .LVU227
+ 1009 003c 4FF0FF34 		mov	r4, #-1
+ 1010 0040 F3E7     		b	.L70
+ 1011              	.L74:
+ 1012 0042 00BF     		.align	2
+ 1013              	.L73:
+ 1014 0044 00000000 		.word	LFS_initialized
+ 1015 0048 00000000 		.word	mounted
+ 1016 004c 00000000 		.word	cfg
+ 1017 0050 00000000 		.word	lfs
+ 1018 0054 18000000 		.word	.LC3
+ 1019 0058 00000000 		.word	.LC2
+ 1020 005c 2C000000 		.word	.LC4
+ 1021              		.cfi_endproc
+ 1022              	.LFE163:
+ 1024              		.section	.rodata.UNMOUNT.str1.4,"aMS",%progbits,1
+ 1025              		.align	2
+ 1026              	.LC5:
+ 1027 0000 4572726F 		.ascii	"Error Un-mounting!\000"
+ 1027      7220556E 
+ 1027      2D6D6F75 
+ 1027      6E74696E 
+ 1027      672100
+ 1028 0013 00       		.align	2
+ 1029              	.LC6:
+ 1030 0014 53756363 		.ascii	"Successfully Un-mounted LittleFS!\000"
+ 1030      65737366 
+ 1030      756C6C79 
+ 1030      20556E2D 
+ 1030      6D6F756E 
+ 1031 0036 0000     		.align	2
+ 1032              	.LC7:
+ 1033 0038 4C697474 		.ascii	"LittleFS not Initialized or not mounted\000"
+ 1033      6C654653 
+ 1033      206E6F74 
+ 1033      20496E69 
+ 1033      7469616C 
+ 1034              		.section	.text.UNMOUNT,"ax",%progbits
+ 1035              		.align	1
+ 1036              		.global	UNMOUNT
+ 1037              		.syntax unified
+ 1038              		.thumb
+ 1039              		.thumb_func
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 26
+
+
+ 1041              	UNMOUNT:
+ 1042              	.LFB165:
+ 307:Core/Src/memory_utilities.c **** 
+ 308:Core/Src/memory_utilities.c **** int8_t FORCE_MOUNT()
+ 309:Core/Src/memory_utilities.c **** {
+ 310:Core/Src/memory_utilities.c ****     if (LFS_initialized && !mounted)
+ 311:Core/Src/memory_utilities.c ****     {
+ 312:Core/Src/memory_utilities.c ****         // Check if LittleFS successfully mounted
+ 313:Core/Src/memory_utilities.c ****         int8_t result = MOUNT();
+ 314:Core/Src/memory_utilities.c **** 
+ 315:Core/Src/memory_utilities.c ****         // If it doesn't work, try formatting the memory, and mounting again
+ 316:Core/Src/memory_utilities.c ****         if (result < 0)
+ 317:Core/Src/memory_utilities.c ****         {
+ 318:Core/Src/memory_utilities.c ****             result = FORMAT();
+ 319:Core/Src/memory_utilities.c ****             if (result < 0)
+ 320:Core/Src/memory_utilities.c ****                 return result;
+ 321:Core/Src/memory_utilities.c **** 
+ 322:Core/Src/memory_utilities.c ****             result = MOUNT();
+ 323:Core/Src/memory_utilities.c ****             if (result < 0)
+ 324:Core/Src/memory_utilities.c ****                 return result;
+ 325:Core/Src/memory_utilities.c ****         }
+ 326:Core/Src/memory_utilities.c ****         return 0;
+ 327:Core/Src/memory_utilities.c ****     }
+ 328:Core/Src/memory_utilities.c ****     debug_uart_print_str_new_line("LittleFS not Initialized or already mounted");
+ 329:Core/Src/memory_utilities.c ****     return -1;
+ 330:Core/Src/memory_utilities.c **** }
+ 331:Core/Src/memory_utilities.c **** 
+ 332:Core/Src/memory_utilities.c **** int8_t UNMOUNT()
+ 333:Core/Src/memory_utilities.c **** {
+ 1043              		.loc 1 333 1 is_stmt 1 view -0
+ 1044              		.cfi_startproc
+ 1045              		@ args = 0, pretend = 0, frame = 0
+ 1046              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1047 0000 10B5     		push	{r4, lr}
+ 1048              		.cfi_def_cfa_offset 8
+ 1049              		.cfi_offset 4, -8
+ 1050              		.cfi_offset 14, -4
+ 334:Core/Src/memory_utilities.c ****     if (LFS_initialized && mounted)
+ 1051              		.loc 1 334 5 view .LVU229
+ 1052              		.loc 1 334 9 is_stmt 0 view .LVU230
+ 1053 0002 0F4B     		ldr	r3, .L81
+ 1054 0004 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1055              		.loc 1 334 8 view .LVU231
+ 1056 0006 A3B1     		cbz	r3, .L76
+ 1057              		.loc 1 334 25 discriminator 1 view .LVU232
+ 1058 0008 0E4B     		ldr	r3, .L81+4
+ 1059 000a 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1060 000c 8BB1     		cbz	r3, .L76
+ 1061              	.LBB4:
+ 335:Core/Src/memory_utilities.c ****     {
+ 336:Core/Src/memory_utilities.c ****         // Unmount LittleFS to release any resources used by LittleFS
+ 337:Core/Src/memory_utilities.c ****         int8_t result = lfs_unmount(&lfs);
+ 1062              		.loc 1 337 9 is_stmt 1 view .LVU233
+ 1063              		.loc 1 337 25 is_stmt 0 view .LVU234
+ 1064 000e 0E48     		ldr	r0, .L81+8
+ 1065 0010 FFF7FEFF 		bl	lfs_unmount
+ 1066              	.LVL95:
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 27
+
+
+ 1067              		.loc 1 337 16 discriminator 1 view .LVU235
+ 1068 0014 44B2     		sxtb	r4, r0
+ 1069              	.LVL96:
+ 338:Core/Src/memory_utilities.c ****         if (result < 0)
+ 1070              		.loc 1 338 9 is_stmt 1 view .LVU236
+ 1071              		.loc 1 338 12 is_stmt 0 view .LVU237
+ 1072 0016 002C     		cmp	r4, #0
+ 1073 0018 07DB     		blt	.L80
+ 339:Core/Src/memory_utilities.c ****         {
+ 340:Core/Src/memory_utilities.c ****             debug_uart_print_str_new_line("Error Un-mounting!");
+ 341:Core/Src/memory_utilities.c ****             return result;
+ 342:Core/Src/memory_utilities.c ****         }
+ 343:Core/Src/memory_utilities.c ****         else
+ 344:Core/Src/memory_utilities.c ****         {
+ 345:Core/Src/memory_utilities.c ****             debug_uart_print_str_new_line("Successfully Un-mounted LittleFS!");
+ 1074              		.loc 1 345 13 is_stmt 1 view .LVU238
+ 1075 001a 0C48     		ldr	r0, .L81+12
+ 1076 001c FFF7FEFF 		bl	debug_uart_print_str_new_line
+ 1077              	.LVL97:
+ 346:Core/Src/memory_utilities.c ****             mounted = 0;
+ 1078              		.loc 1 346 13 view .LVU239
+ 1079              		.loc 1 346 21 is_stmt 0 view .LVU240
+ 1080 0020 084B     		ldr	r3, .L81+4
+ 1081 0022 0022     		movs	r2, #0
+ 1082 0024 1A70     		strb	r2, [r3]
+ 347:Core/Src/memory_utilities.c ****             return result;
+ 1083              		.loc 1 347 13 is_stmt 1 view .LVU241
+ 1084              	.LVL98:
+ 1085              	.L78:
+ 1086              		.loc 1 347 13 is_stmt 0 view .LVU242
+ 1087              	.LBE4:
+ 348:Core/Src/memory_utilities.c ****         }
+ 349:Core/Src/memory_utilities.c ****     }
+ 350:Core/Src/memory_utilities.c ****     debug_uart_print_str_new_line("LittleFS not Initialized or not mounted");
+ 351:Core/Src/memory_utilities.c ****     return -1;
+ 352:Core/Src/memory_utilities.c **** }
+ 1088              		.loc 1 352 1 view .LVU243
+ 1089 0026 2046     		mov	r0, r4
+ 1090 0028 10BD     		pop	{r4, pc}
+ 1091              	.LVL99:
+ 1092              	.L80:
+ 1093              	.LBB5:
+ 340:Core/Src/memory_utilities.c ****             return result;
+ 1094              		.loc 1 340 13 is_stmt 1 view .LVU244
+ 1095 002a 0948     		ldr	r0, .L81+16
+ 1096 002c FFF7FEFF 		bl	debug_uart_print_str_new_line
+ 1097              	.LVL100:
+ 341:Core/Src/memory_utilities.c ****         }
+ 1098              		.loc 1 341 13 view .LVU245
+ 341:Core/Src/memory_utilities.c ****         }
+ 1099              		.loc 1 341 20 is_stmt 0 view .LVU246
+ 1100 0030 F9E7     		b	.L78
+ 1101              	.LVL101:
+ 1102              	.L76:
+ 341:Core/Src/memory_utilities.c ****         }
+ 1103              		.loc 1 341 20 view .LVU247
+ 1104              	.LBE5:
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 28
+
+
+ 350:Core/Src/memory_utilities.c ****     return -1;
+ 1105              		.loc 1 350 5 is_stmt 1 view .LVU248
+ 1106 0032 0848     		ldr	r0, .L81+20
+ 1107 0034 FFF7FEFF 		bl	debug_uart_print_str_new_line
+ 1108              	.LVL102:
+ 351:Core/Src/memory_utilities.c **** }
+ 1109              		.loc 1 351 5 view .LVU249
+ 351:Core/Src/memory_utilities.c **** }
+ 1110              		.loc 1 351 12 is_stmt 0 view .LVU250
+ 1111 0038 4FF0FF34 		mov	r4, #-1
+ 1112 003c F3E7     		b	.L78
+ 1113              	.L82:
+ 1114 003e 00BF     		.align	2
+ 1115              	.L81:
+ 1116 0040 00000000 		.word	LFS_initialized
+ 1117 0044 00000000 		.word	mounted
+ 1118 0048 00000000 		.word	lfs
+ 1119 004c 14000000 		.word	.LC6
+ 1120 0050 00000000 		.word	.LC5
+ 1121 0054 38000000 		.word	.LC7
+ 1122              		.cfi_endproc
+ 1123              	.LFE165:
+ 1125              		.section	.rodata.FORMAT.str1.4,"aMS",%progbits,1
+ 1126              		.align	2
+ 1127              	.LC8:
+ 1128 0000 4572726F 		.ascii	"Error Formatting!\000"
+ 1128      7220466F 
+ 1128      726D6174 
+ 1128      74696E67 
+ 1128      2100
+ 1129 0012 0000     		.align	2
+ 1130              	.LC9:
+ 1131 0014 466F726D 		.ascii	"Formatting Successful!\000"
+ 1131      61747469 
+ 1131      6E672053 
+ 1131      75636365 
+ 1131      73736675 
+ 1132 002b 00       		.align	2
+ 1133              	.LC10:
+ 1134 002c 4C697474 		.ascii	"LittleFS not Initialized\000"
+ 1134      6C654653 
+ 1134      206E6F74 
+ 1134      20496E69 
+ 1134      7469616C 
+ 1135              		.section	.text.FORMAT,"ax",%progbits
+ 1136              		.align	1
+ 1137              		.global	FORMAT
+ 1138              		.syntax unified
+ 1139              		.thumb
+ 1140              		.thumb_func
+ 1142              	FORMAT:
+ 1143              	.LFB166:
+ 353:Core/Src/memory_utilities.c **** 
+ 354:Core/Src/memory_utilities.c **** int8_t FORMAT()
+ 355:Core/Src/memory_utilities.c **** {
+ 1144              		.loc 1 355 1 is_stmt 1 view -0
+ 1145              		.cfi_startproc
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 29
+
+
+ 1146              		@ args = 0, pretend = 0, frame = 0
+ 1147              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1148 0000 10B5     		push	{r4, lr}
+ 1149              		.cfi_def_cfa_offset 8
+ 1150              		.cfi_offset 4, -8
+ 1151              		.cfi_offset 14, -4
+ 356:Core/Src/memory_utilities.c ****     if (LFS_initialized)
+ 1152              		.loc 1 356 5 view .LVU252
+ 1153              		.loc 1 356 9 is_stmt 0 view .LVU253
+ 1154 0002 0C4B     		ldr	r3, .L89
+ 1155 0004 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1156              		.loc 1 356 8 view .LVU254
+ 1157 0006 7BB1     		cbz	r3, .L84
+ 1158              	.LBB6:
+ 357:Core/Src/memory_utilities.c ****     {
+ 358:Core/Src/memory_utilities.c ****         int8_t result = lfs_format(&lfs, &cfg);
+ 1159              		.loc 1 358 9 is_stmt 1 view .LVU255
+ 1160              		.loc 1 358 25 is_stmt 0 view .LVU256
+ 1161 0008 0B49     		ldr	r1, .L89+4
+ 1162 000a 0C48     		ldr	r0, .L89+8
+ 1163 000c FFF7FEFF 		bl	lfs_format
+ 1164              	.LVL103:
+ 1165              		.loc 1 358 16 discriminator 1 view .LVU257
+ 1166 0010 44B2     		sxtb	r4, r0
+ 1167              	.LVL104:
+ 359:Core/Src/memory_utilities.c ****         if (result < 0)
+ 1168              		.loc 1 359 9 is_stmt 1 view .LVU258
+ 1169              		.loc 1 359 12 is_stmt 0 view .LVU259
+ 1170 0012 002C     		cmp	r4, #0
+ 1171 0014 04DB     		blt	.L88
+ 360:Core/Src/memory_utilities.c ****         {
+ 361:Core/Src/memory_utilities.c ****             debug_uart_print_str_new_line("Error Formatting!");
+ 362:Core/Src/memory_utilities.c ****             return result;
+ 363:Core/Src/memory_utilities.c ****         }
+ 364:Core/Src/memory_utilities.c ****         else
+ 365:Core/Src/memory_utilities.c ****         {
+ 366:Core/Src/memory_utilities.c ****             debug_uart_print_str_new_line("Formatting Successful!");
+ 1172              		.loc 1 366 13 is_stmt 1 view .LVU260
+ 1173 0016 0A48     		ldr	r0, .L89+12
+ 1174 0018 FFF7FEFF 		bl	debug_uart_print_str_new_line
+ 1175              	.LVL105:
+ 367:Core/Src/memory_utilities.c ****             return result;
+ 1176              		.loc 1 367 13 view .LVU261
+ 1177              	.L86:
+ 1178              		.loc 1 367 13 is_stmt 0 view .LVU262
+ 1179              	.LBE6:
+ 368:Core/Src/memory_utilities.c ****         }
+ 369:Core/Src/memory_utilities.c ****     }
+ 370:Core/Src/memory_utilities.c ****     debug_uart_print_str_new_line("LittleFS not Initialized");
+ 371:Core/Src/memory_utilities.c ****     return -1;
+ 372:Core/Src/memory_utilities.c **** }
+ 1180              		.loc 1 372 1 view .LVU263
+ 1181 001c 2046     		mov	r0, r4
+ 1182 001e 10BD     		pop	{r4, pc}
+ 1183              	.LVL106:
+ 1184              	.L88:
+ 1185              	.LBB7:
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 30
+
+
+ 361:Core/Src/memory_utilities.c ****             return result;
+ 1186              		.loc 1 361 13 is_stmt 1 view .LVU264
+ 1187 0020 0848     		ldr	r0, .L89+16
+ 1188 0022 FFF7FEFF 		bl	debug_uart_print_str_new_line
+ 1189              	.LVL107:
+ 362:Core/Src/memory_utilities.c ****         }
+ 1190              		.loc 1 362 13 view .LVU265
+ 362:Core/Src/memory_utilities.c ****         }
+ 1191              		.loc 1 362 20 is_stmt 0 view .LVU266
+ 1192 0026 F9E7     		b	.L86
+ 1193              	.LVL108:
+ 1194              	.L84:
+ 362:Core/Src/memory_utilities.c ****         }
+ 1195              		.loc 1 362 20 view .LVU267
+ 1196              	.LBE7:
+ 370:Core/Src/memory_utilities.c ****     return -1;
+ 1197              		.loc 1 370 5 is_stmt 1 view .LVU268
+ 1198 0028 0748     		ldr	r0, .L89+20
+ 1199 002a FFF7FEFF 		bl	debug_uart_print_str_new_line
+ 1200              	.LVL109:
+ 371:Core/Src/memory_utilities.c **** }
+ 1201              		.loc 1 371 5 view .LVU269
+ 371:Core/Src/memory_utilities.c **** }
+ 1202              		.loc 1 371 12 is_stmt 0 view .LVU270
+ 1203 002e 4FF0FF34 		mov	r4, #-1
+ 1204 0032 F3E7     		b	.L86
+ 1205              	.L90:
+ 1206              		.align	2
+ 1207              	.L89:
+ 1208 0034 00000000 		.word	LFS_initialized
+ 1209 0038 00000000 		.word	cfg
+ 1210 003c 00000000 		.word	lfs
+ 1211 0040 14000000 		.word	.LC9
+ 1212 0044 00000000 		.word	.LC8
+ 1213 0048 2C000000 		.word	.LC10
+ 1214              		.cfi_endproc
+ 1215              	.LFE166:
+ 1217              		.section	.text.FORCE_MOUNT,"ax",%progbits
+ 1218              		.align	1
+ 1219              		.global	FORCE_MOUNT
+ 1220              		.syntax unified
+ 1221              		.thumb
+ 1222              		.thumb_func
+ 1224              	FORCE_MOUNT:
+ 1225              	.LFB164:
+ 309:Core/Src/memory_utilities.c ****     if (LFS_initialized && !mounted)
+ 1226              		.loc 1 309 1 is_stmt 1 view -0
+ 1227              		.cfi_startproc
+ 1228              		@ args = 0, pretend = 0, frame = 0
+ 1229              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1230 0000 08B5     		push	{r3, lr}
+ 1231              		.cfi_def_cfa_offset 8
+ 1232              		.cfi_offset 3, -8
+ 1233              		.cfi_offset 14, -4
+ 310:Core/Src/memory_utilities.c ****     {
+ 1234              		.loc 1 310 5 view .LVU272
+ 310:Core/Src/memory_utilities.c ****     {
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 31
+
+
+ 1235              		.loc 1 310 9 is_stmt 0 view .LVU273
+ 1236 0002 0D4B     		ldr	r3, .L97
+ 1237 0004 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 310:Core/Src/memory_utilities.c ****     {
+ 1238              		.loc 1 310 8 view .LVU274
+ 1239 0006 8BB1     		cbz	r3, .L92
+ 310:Core/Src/memory_utilities.c ****     {
+ 1240              		.loc 1 310 28 discriminator 1 view .LVU275
+ 1241 0008 0C4B     		ldr	r3, .L97+4
+ 1242 000a 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 310:Core/Src/memory_utilities.c ****     {
+ 1243              		.loc 1 310 25 discriminator 1 view .LVU276
+ 1244 000c 73B9     		cbnz	r3, .L92
+ 1245              	.LBB8:
+ 313:Core/Src/memory_utilities.c **** 
+ 1246              		.loc 1 313 9 is_stmt 1 view .LVU277
+ 313:Core/Src/memory_utilities.c **** 
+ 1247              		.loc 1 313 25 is_stmt 0 view .LVU278
+ 1248 000e FFF7FEFF 		bl	MOUNT
+ 1249              	.LVL110:
+ 316:Core/Src/memory_utilities.c ****         {
+ 1250              		.loc 1 316 9 is_stmt 1 view .LVU279
+ 316:Core/Src/memory_utilities.c ****         {
+ 1251              		.loc 1 316 12 is_stmt 0 view .LVU280
+ 1252 0012 0028     		cmp	r0, #0
+ 1253 0014 01DB     		blt	.L96
+ 1254              	.LVL111:
+ 1255              	.L93:
+ 326:Core/Src/memory_utilities.c ****     }
+ 1256              		.loc 1 326 9 is_stmt 1 view .LVU281
+ 326:Core/Src/memory_utilities.c ****     }
+ 1257              		.loc 1 326 16 is_stmt 0 view .LVU282
+ 1258 0016 0020     		movs	r0, #0
+ 1259              	.L94:
+ 1260              	.LBE8:
+ 330:Core/Src/memory_utilities.c **** 
+ 1261              		.loc 1 330 1 view .LVU283
+ 1262 0018 08BD     		pop	{r3, pc}
+ 1263              	.LVL112:
+ 1264              	.L96:
+ 1265              	.LBB9:
+ 318:Core/Src/memory_utilities.c ****             if (result < 0)
+ 1266              		.loc 1 318 13 is_stmt 1 view .LVU284
+ 318:Core/Src/memory_utilities.c ****             if (result < 0)
+ 1267              		.loc 1 318 22 is_stmt 0 view .LVU285
+ 1268 001a FFF7FEFF 		bl	FORMAT
+ 1269              	.LVL113:
+ 319:Core/Src/memory_utilities.c ****                 return result;
+ 1270              		.loc 1 319 13 is_stmt 1 view .LVU286
+ 319:Core/Src/memory_utilities.c ****                 return result;
+ 1271              		.loc 1 319 16 is_stmt 0 view .LVU287
+ 1272 001e 0028     		cmp	r0, #0
+ 319:Core/Src/memory_utilities.c ****                 return result;
+ 1273              		.loc 1 319 16 view .LVU288
+ 1274 0020 FADB     		blt	.L94
+ 322:Core/Src/memory_utilities.c ****             if (result < 0)
+ 1275              		.loc 1 322 13 is_stmt 1 view .LVU289
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 32
+
+
+ 322:Core/Src/memory_utilities.c ****             if (result < 0)
+ 1276              		.loc 1 322 22 is_stmt 0 view .LVU290
+ 1277 0022 FFF7FEFF 		bl	MOUNT
+ 1278              	.LVL114:
+ 323:Core/Src/memory_utilities.c ****                 return result;
+ 1279              		.loc 1 323 13 is_stmt 1 view .LVU291
+ 323:Core/Src/memory_utilities.c ****                 return result;
+ 1280              		.loc 1 323 16 is_stmt 0 view .LVU292
+ 1281 0026 0028     		cmp	r0, #0
+ 323:Core/Src/memory_utilities.c ****                 return result;
+ 1282              		.loc 1 323 16 view .LVU293
+ 1283 0028 F5DA     		bge	.L93
+ 1284 002a F5E7     		b	.L94
+ 1285              	.LVL115:
+ 1286              	.L92:
+ 323:Core/Src/memory_utilities.c ****                 return result;
+ 1287              		.loc 1 323 16 view .LVU294
+ 1288              	.LBE9:
+ 328:Core/Src/memory_utilities.c ****     return -1;
+ 1289              		.loc 1 328 5 is_stmt 1 view .LVU295
+ 1290 002c 0448     		ldr	r0, .L97+8
+ 1291 002e FFF7FEFF 		bl	debug_uart_print_str_new_line
+ 1292              	.LVL116:
+ 329:Core/Src/memory_utilities.c **** }
+ 1293              		.loc 1 329 5 view .LVU296
+ 329:Core/Src/memory_utilities.c **** }
+ 1294              		.loc 1 329 12 is_stmt 0 view .LVU297
+ 1295 0032 4FF0FF30 		mov	r0, #-1
+ 1296 0036 EFE7     		b	.L94
+ 1297              	.L98:
+ 1298              		.align	2
+ 1299              	.L97:
+ 1300 0038 00000000 		.word	LFS_initialized
+ 1301 003c 00000000 		.word	mounted
+ 1302 0040 2C000000 		.word	.LC4
+ 1303              		.cfi_endproc
+ 1304              	.LFE164:
+ 1306              		.section	.text.LIST_DIRECTORY,"ax",%progbits
+ 1307              		.align	1
+ 1308              		.global	LIST_DIRECTORY
+ 1309              		.syntax unified
+ 1310              		.thumb
+ 1311              		.thumb_func
+ 1313              	LIST_DIRECTORY:
+ 1314              	.LFB167:
+ 373:Core/Src/memory_utilities.c **** 
+ 374:Core/Src/memory_utilities.c **** void LIST_DIRECTORY()
+ 375:Core/Src/memory_utilities.c **** {
+ 1315              		.loc 1 375 1 is_stmt 1 view -0
+ 1316              		.cfi_startproc
+ 1317              		@ args = 0, pretend = 0, frame = 0
+ 1318              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1319              		@ link register save eliminated.
+ 376:Core/Src/memory_utilities.c **** }
+ 1320              		.loc 1 376 1 view .LVU299
+ 1321 0000 7047     		bx	lr
+ 1322              		.cfi_endproc
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 33
+
+
+ 1323              	.LFE167:
+ 1325              		.section	.text.REMOVE_FILE,"ax",%progbits
+ 1326              		.align	1
+ 1327              		.global	REMOVE_FILE
+ 1328              		.syntax unified
+ 1329              		.thumb
+ 1330              		.thumb_func
+ 1332              	REMOVE_FILE:
+ 1333              	.LFB168:
+ 377:Core/Src/memory_utilities.c **** 
+ 378:Core/Src/memory_utilities.c **** void REMOVE_FILE()
+ 379:Core/Src/memory_utilities.c **** {
+ 1334              		.loc 1 379 1 view -0
+ 1335              		.cfi_startproc
+ 1336              		@ args = 0, pretend = 0, frame = 0
+ 1337              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1338              		@ link register save eliminated.
+ 380:Core/Src/memory_utilities.c **** }
+ 1339              		.loc 1 380 1 view .LVU301
+ 1340 0000 7047     		bx	lr
+ 1341              		.cfi_endproc
+ 1342              	.LFE168:
+ 1344              		.section	.text.MAKE_DIRECTORY,"ax",%progbits
+ 1345              		.align	1
+ 1346              		.global	MAKE_DIRECTORY
+ 1347              		.syntax unified
+ 1348              		.thumb
+ 1349              		.thumb_func
+ 1351              	MAKE_DIRECTORY:
+ 1352              	.LFB169:
+ 381:Core/Src/memory_utilities.c **** 
+ 382:Core/Src/memory_utilities.c **** void MAKE_DIRECTORY()
+ 383:Core/Src/memory_utilities.c **** {
+ 1353              		.loc 1 383 1 view -0
+ 1354              		.cfi_startproc
+ 1355              		@ args = 0, pretend = 0, frame = 0
+ 1356              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1357              		@ link register save eliminated.
+ 384:Core/Src/memory_utilities.c **** }
+ 1358              		.loc 1 384 1 view .LVU303
+ 1359 0000 7047     		bx	lr
+ 1360              		.cfi_endproc
+ 1361              	.LFE169:
+ 1363              		.section	.text.MOVE_DIRECTORY,"ax",%progbits
+ 1364              		.align	1
+ 1365              		.global	MOVE_DIRECTORY
+ 1366              		.syntax unified
+ 1367              		.thumb
+ 1368              		.thumb_func
+ 1370              	MOVE_DIRECTORY:
+ 1371              	.LFB170:
+ 385:Core/Src/memory_utilities.c **** 
+ 386:Core/Src/memory_utilities.c **** void MOVE_DIRECTORY()
+ 387:Core/Src/memory_utilities.c **** {
+ 1372              		.loc 1 387 1 view -0
+ 1373              		.cfi_startproc
+ 1374              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 34
+
+
+ 1375              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1376              		@ link register save eliminated.
+ 388:Core/Src/memory_utilities.c **** }
+ 1377              		.loc 1 388 1 view .LVU305
+ 1378 0000 7047     		bx	lr
+ 1379              		.cfi_endproc
+ 1380              	.LFE170:
+ 1382              		.section	.rodata.WRITE_FILE.str1.4,"aMS",%progbits,1
+ 1383              		.align	2
+ 1384              	.LC11:
+ 1385 0000 4572726F 		.ascii	"Error Opening / Creating a File!\000"
+ 1385      72204F70 
+ 1385      656E696E 
+ 1385      67202F20 
+ 1385      43726561 
+ 1386 0021 000000   		.align	2
+ 1387              	.LC12:
+ 1388 0024 4F70656E 		.ascii	"Opened / Created a file named: \000"
+ 1388      6564202F 
+ 1388      20437265 
+ 1388      61746564 
+ 1388      20612066 
+ 1389              		.align	2
+ 1390              	.LC13:
+ 1391 0044 4572726F 		.ascii	"Error Writing to File!\000"
+ 1391      72205772 
+ 1391      6974696E 
+ 1391      6720746F 
+ 1391      2046696C 
+ 1392 005b 00       		.align	2
+ 1393              	.LC14:
+ 1394 005c 53756363 		.ascii	"Successfully wrote data to file!\000"
+ 1394      65737366 
+ 1394      756C6C79 
+ 1394      2077726F 
+ 1394      74652064 
+ 1395 007d 000000   		.align	2
+ 1396              	.LC15:
+ 1397 0080 4572726F 		.ascii	"Error Closing the File!\000"
+ 1397      7220436C 
+ 1397      6F73696E 
+ 1397      67207468 
+ 1397      65204669 
+ 1398              		.align	2
+ 1399              	.LC16:
+ 1400 0098 53756363 		.ascii	"Successfully closed the File!\000"
+ 1400      65737366 
+ 1400      756C6C79 
+ 1400      20636C6F 
+ 1400      73656420 
+ 1401              		.section	.text.WRITE_FILE,"ax",%progbits
+ 1402              		.align	1
+ 1403              		.global	WRITE_FILE
+ 1404              		.syntax unified
+ 1405              		.thumb
+ 1406              		.thumb_func
+ 1408              	WRITE_FILE:
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 35
+
+
+ 1409              	.LVL117:
+ 1410              	.LFB171:
+ 389:Core/Src/memory_utilities.c **** 
+ 390:Core/Src/memory_utilities.c **** int8_t WRITE_FILE(char *file_name, void *write_buffer, uint32_t size)
+ 391:Core/Src/memory_utilities.c **** {
+ 1411              		.loc 1 391 1 view -0
+ 1412              		.cfi_startproc
+ 1413              		@ args = 0, pretend = 0, frame = 0
+ 1414              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1415              		.loc 1 391 1 is_stmt 0 view .LVU307
+ 1416 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 1417              		.cfi_def_cfa_offset 24
+ 1418              		.cfi_offset 3, -24
+ 1419              		.cfi_offset 4, -20
+ 1420              		.cfi_offset 5, -16
+ 1421              		.cfi_offset 6, -12
+ 1422              		.cfi_offset 7, -8
+ 1423              		.cfi_offset 14, -4
+ 1424 0002 0546     		mov	r5, r0
+ 1425 0004 0E46     		mov	r6, r1
+ 1426 0006 1746     		mov	r7, r2
+ 392:Core/Src/memory_utilities.c **** 
+ 393:Core/Src/memory_utilities.c ****     int8_t result = lfs_file_open(&lfs, &file, file_name,
+ 1427              		.loc 1 393 5 is_stmt 1 view .LVU308
+ 1428              		.loc 1 393 21 is_stmt 0 view .LVU309
+ 1429 0008 4FF48173 		mov	r3, #258
+ 1430 000c 0246     		mov	r2, r0
+ 1431              	.LVL118:
+ 1432              		.loc 1 393 21 view .LVU310
+ 1433 000e 1849     		ldr	r1, .L112
+ 1434              	.LVL119:
+ 1435              		.loc 1 393 21 view .LVU311
+ 1436 0010 1848     		ldr	r0, .L112+4
+ 1437              	.LVL120:
+ 1438              		.loc 1 393 21 view .LVU312
+ 1439 0012 FFF7FEFF 		bl	lfs_file_open
+ 1440              	.LVL121:
+ 1441              		.loc 1 393 12 discriminator 1 view .LVU313
+ 1442 0016 44B2     		sxtb	r4, r0
+ 1443              	.LVL122:
+ 394:Core/Src/memory_utilities.c ****                                   LFS_O_WRONLY | LFS_O_CREAT);
+ 395:Core/Src/memory_utilities.c ****     if (result < 0)
+ 1444              		.loc 1 395 5 is_stmt 1 view .LVU314
+ 1445              		.loc 1 395 8 is_stmt 0 view .LVU315
+ 1446 0018 002C     		cmp	r4, #0
+ 1447 001a 1DDB     		blt	.L109
+ 396:Core/Src/memory_utilities.c ****     {
+ 397:Core/Src/memory_utilities.c ****         debug_uart_print_str_new_line("Error Opening / Creating a File!");
+ 398:Core/Src/memory_utilities.c ****         return result;
+ 399:Core/Src/memory_utilities.c ****     }
+ 400:Core/Src/memory_utilities.c ****     else
+ 401:Core/Src/memory_utilities.c ****     {
+ 402:Core/Src/memory_utilities.c ****         debug_uart_print_str("Opened / Created a file named: ");
+ 1448              		.loc 1 402 9 is_stmt 1 view .LVU316
+ 1449 001c 1648     		ldr	r0, .L112+8
+ 1450 001e FFF7FEFF 		bl	debug_uart_print_str
+ 1451              	.LVL123:
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 36
+
+
+ 403:Core/Src/memory_utilities.c ****         debug_uart_print_str_new_line(file_name);
+ 1452              		.loc 1 403 9 view .LVU317
+ 1453 0022 2846     		mov	r0, r5
+ 1454 0024 FFF7FEFF 		bl	debug_uart_print_str_new_line
+ 1455              	.LVL124:
+ 404:Core/Src/memory_utilities.c **** 
+ 405:Core/Src/memory_utilities.c ****         // Write defined data to file
+ 406:Core/Src/memory_utilities.c ****         result = lfs_file_write(&lfs, &file, write_buffer, size);
+ 1456              		.loc 1 406 9 view .LVU318
+ 1457              		.loc 1 406 18 is_stmt 0 view .LVU319
+ 1458 0028 3B46     		mov	r3, r7
+ 1459 002a 3246     		mov	r2, r6
+ 1460 002c 1049     		ldr	r1, .L112
+ 1461 002e 1148     		ldr	r0, .L112+4
+ 1462 0030 FFF7FEFF 		bl	lfs_file_write
+ 1463              	.LVL125:
+ 1464              		.loc 1 406 16 discriminator 1 view .LVU320
+ 1465 0034 44B2     		sxtb	r4, r0
+ 1466              	.LVL126:
+ 407:Core/Src/memory_utilities.c ****         if (result < 0)
+ 1467              		.loc 1 407 9 is_stmt 1 view .LVU321
+ 1468              		.loc 1 407 12 is_stmt 0 view .LVU322
+ 1469 0036 002C     		cmp	r4, #0
+ 1470 0038 12DB     		blt	.L110
+ 408:Core/Src/memory_utilities.c ****         {
+ 409:Core/Src/memory_utilities.c ****             debug_uart_print_str_new_line("Error Writing to File!");
+ 410:Core/Src/memory_utilities.c ****             return result;
+ 411:Core/Src/memory_utilities.c ****         }
+ 412:Core/Src/memory_utilities.c ****         else
+ 413:Core/Src/memory_utilities.c ****         {
+ 414:Core/Src/memory_utilities.c ****             debug_uart_print_str_new_line("Successfully wrote data to file!");
+ 1471              		.loc 1 414 13 is_stmt 1 view .LVU323
+ 1472 003a 1048     		ldr	r0, .L112+12
+ 1473 003c FFF7FEFF 		bl	debug_uart_print_str_new_line
+ 1474              	.LVL127:
+ 415:Core/Src/memory_utilities.c **** 
+ 416:Core/Src/memory_utilities.c ****             // Close the File, the storage is not updated until the file is closed successfully
+ 417:Core/Src/memory_utilities.c ****             result = lfs_file_close(&lfs, &file);
+ 1475              		.loc 1 417 13 view .LVU324
+ 1476              		.loc 1 417 22 is_stmt 0 view .LVU325
+ 1477 0040 0B49     		ldr	r1, .L112
+ 1478 0042 0C48     		ldr	r0, .L112+4
+ 1479 0044 FFF7FEFF 		bl	lfs_file_close
+ 1480              	.LVL128:
+ 1481              		.loc 1 417 20 discriminator 1 view .LVU326
+ 1482 0048 44B2     		sxtb	r4, r0
+ 1483              	.LVL129:
+ 418:Core/Src/memory_utilities.c ****             if (result < 0)
+ 1484              		.loc 1 418 13 is_stmt 1 view .LVU327
+ 1485              		.loc 1 418 16 is_stmt 0 view .LVU328
+ 1486 004a 002C     		cmp	r4, #0
+ 1487 004c 0CDB     		blt	.L111
+ 419:Core/Src/memory_utilities.c ****             {
+ 420:Core/Src/memory_utilities.c ****                 debug_uart_print_str_new_line("Error Closing the File!");
+ 421:Core/Src/memory_utilities.c ****                 return result;
+ 422:Core/Src/memory_utilities.c ****             }
+ 423:Core/Src/memory_utilities.c ****             else
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 37
+
+
+ 424:Core/Src/memory_utilities.c ****             {
+ 425:Core/Src/memory_utilities.c ****                 debug_uart_print_str_new_line("Successfully closed the File!");
+ 1488              		.loc 1 425 17 is_stmt 1 view .LVU329
+ 1489 004e 0C48     		ldr	r0, .L112+16
+ 1490 0050 FFF7FEFF 		bl	debug_uart_print_str_new_line
+ 1491              	.LVL130:
+ 426:Core/Src/memory_utilities.c ****                 return result;
+ 1492              		.loc 1 426 17 view .LVU330
+ 1493              	.L105:
+ 427:Core/Src/memory_utilities.c ****             }
+ 428:Core/Src/memory_utilities.c ****         }
+ 429:Core/Src/memory_utilities.c ****     }
+ 430:Core/Src/memory_utilities.c **** }
+ 1494              		.loc 1 430 1 is_stmt 0 view .LVU331
+ 1495 0054 2046     		mov	r0, r4
+ 1496 0056 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 1497              	.LVL131:
+ 1498              	.L109:
+ 397:Core/Src/memory_utilities.c ****         return result;
+ 1499              		.loc 1 397 9 is_stmt 1 view .LVU332
+ 1500 0058 0A48     		ldr	r0, .L112+20
+ 1501 005a FFF7FEFF 		bl	debug_uart_print_str_new_line
+ 1502              	.LVL132:
+ 398:Core/Src/memory_utilities.c ****     }
+ 1503              		.loc 1 398 9 view .LVU333
+ 398:Core/Src/memory_utilities.c ****     }
+ 1504              		.loc 1 398 16 is_stmt 0 view .LVU334
+ 1505 005e F9E7     		b	.L105
+ 1506              	.L110:
+ 409:Core/Src/memory_utilities.c ****             return result;
+ 1507              		.loc 1 409 13 is_stmt 1 view .LVU335
+ 1508 0060 0948     		ldr	r0, .L112+24
+ 1509 0062 FFF7FEFF 		bl	debug_uart_print_str_new_line
+ 1510              	.LVL133:
+ 410:Core/Src/memory_utilities.c ****         }
+ 1511              		.loc 1 410 13 view .LVU336
+ 410:Core/Src/memory_utilities.c ****         }
+ 1512              		.loc 1 410 20 is_stmt 0 view .LVU337
+ 1513 0066 F5E7     		b	.L105
+ 1514              	.L111:
+ 420:Core/Src/memory_utilities.c ****                 return result;
+ 1515              		.loc 1 420 17 is_stmt 1 view .LVU338
+ 1516 0068 0848     		ldr	r0, .L112+28
+ 1517 006a FFF7FEFF 		bl	debug_uart_print_str_new_line
+ 1518              	.LVL134:
+ 421:Core/Src/memory_utilities.c ****             }
+ 1519              		.loc 1 421 17 view .LVU339
+ 421:Core/Src/memory_utilities.c ****             }
+ 1520              		.loc 1 421 24 is_stmt 0 view .LVU340
+ 1521 006e F1E7     		b	.L105
+ 1522              	.L113:
+ 1523              		.align	2
+ 1524              	.L112:
+ 1525 0070 00000000 		.word	file
+ 1526 0074 00000000 		.word	lfs
+ 1527 0078 24000000 		.word	.LC12
+ 1528 007c 5C000000 		.word	.LC14
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 38
+
+
+ 1529 0080 98000000 		.word	.LC16
+ 1530 0084 00000000 		.word	.LC11
+ 1531 0088 44000000 		.word	.LC13
+ 1532 008c 80000000 		.word	.LC15
+ 1533              		.cfi_endproc
+ 1534              	.LFE171:
+ 1536              		.section	.rodata.READ_FILE.str1.4,"aMS",%progbits,1
+ 1537              		.align	2
+ 1538              	.LC17:
+ 1539 0000 4572726F 		.ascii	"Error Reading File!\000"
+ 1539      72205265 
+ 1539      6164696E 
+ 1539      67204669 
+ 1539      6C652100 
+ 1540              		.align	2
+ 1541              	.LC18:
+ 1542 0014 53756363 		.ascii	"Successfully read file!\000"
+ 1542      65737366 
+ 1542      756C6C79 
+ 1542      20726561 
+ 1542      64206669 
+ 1543              		.section	.text.READ_FILE,"ax",%progbits
+ 1544              		.align	1
+ 1545              		.global	READ_FILE
+ 1546              		.syntax unified
+ 1547              		.thumb
+ 1548              		.thumb_func
+ 1550              	READ_FILE:
+ 1551              	.LVL135:
+ 1552              	.LFB172:
+ 431:Core/Src/memory_utilities.c **** 
+ 432:Core/Src/memory_utilities.c **** int8_t READ_FILE(char *file_name, void *read_buffer, uint32_t size)
+ 433:Core/Src/memory_utilities.c **** {
+ 1553              		.loc 1 433 1 is_stmt 1 view -0
+ 1554              		.cfi_startproc
+ 1555              		@ args = 0, pretend = 0, frame = 0
+ 1556              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1557              		.loc 1 433 1 is_stmt 0 view .LVU342
+ 1558 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 1559              		.cfi_def_cfa_offset 24
+ 1560              		.cfi_offset 3, -24
+ 1561              		.cfi_offset 4, -20
+ 1562              		.cfi_offset 5, -16
+ 1563              		.cfi_offset 6, -12
+ 1564              		.cfi_offset 7, -8
+ 1565              		.cfi_offset 14, -4
+ 1566 0002 0546     		mov	r5, r0
+ 1567 0004 0E46     		mov	r6, r1
+ 1568 0006 1746     		mov	r7, r2
+ 434:Core/Src/memory_utilities.c ****     int8_t result = lfs_file_open(&lfs, &file, file_name,
+ 1569              		.loc 1 434 5 is_stmt 1 view .LVU343
+ 1570              		.loc 1 434 21 is_stmt 0 view .LVU344
+ 1571 0008 40F20113 		movw	r3, #257
+ 1572 000c 0246     		mov	r2, r0
+ 1573              	.LVL136:
+ 1574              		.loc 1 434 21 view .LVU345
+ 1575 000e 1849     		ldr	r1, .L123
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 39
+
+
+ 1576              	.LVL137:
+ 1577              		.loc 1 434 21 view .LVU346
+ 1578 0010 1848     		ldr	r0, .L123+4
+ 1579              	.LVL138:
+ 1580              		.loc 1 434 21 view .LVU347
+ 1581 0012 FFF7FEFF 		bl	lfs_file_open
+ 1582              	.LVL139:
+ 1583              		.loc 1 434 12 discriminator 1 view .LVU348
+ 1584 0016 44B2     		sxtb	r4, r0
+ 1585              	.LVL140:
+ 435:Core/Src/memory_utilities.c ****                                   LFS_O_RDONLY | LFS_O_CREAT);
+ 436:Core/Src/memory_utilities.c ****     if (result < 0)
+ 1586              		.loc 1 436 5 is_stmt 1 view .LVU349
+ 1587              		.loc 1 436 8 is_stmt 0 view .LVU350
+ 1588 0018 002C     		cmp	r4, #0
+ 1589 001a 1DDB     		blt	.L120
+ 437:Core/Src/memory_utilities.c ****     {
+ 438:Core/Src/memory_utilities.c ****         debug_uart_print_str_new_line("Error Opening / Creating a File!");
+ 439:Core/Src/memory_utilities.c ****         return result;
+ 440:Core/Src/memory_utilities.c ****     }
+ 441:Core/Src/memory_utilities.c ****     else
+ 442:Core/Src/memory_utilities.c ****     {
+ 443:Core/Src/memory_utilities.c ****         debug_uart_print_str("Opened / Created a file named: ");
+ 1590              		.loc 1 443 9 is_stmt 1 view .LVU351
+ 1591 001c 1648     		ldr	r0, .L123+8
+ 1592 001e FFF7FEFF 		bl	debug_uart_print_str
+ 1593              	.LVL141:
+ 444:Core/Src/memory_utilities.c ****         debug_uart_print_str_new_line(file_name);
+ 1594              		.loc 1 444 9 view .LVU352
+ 1595 0022 2846     		mov	r0, r5
+ 1596 0024 FFF7FEFF 		bl	debug_uart_print_str_new_line
+ 1597              	.LVL142:
+ 445:Core/Src/memory_utilities.c **** 
+ 446:Core/Src/memory_utilities.c ****         // Write defined data to file
+ 447:Core/Src/memory_utilities.c ****         result = lfs_file_read(&lfs, &file, read_buffer, size);
+ 1598              		.loc 1 447 9 view .LVU353
+ 1599              		.loc 1 447 18 is_stmt 0 view .LVU354
+ 1600 0028 3B46     		mov	r3, r7
+ 1601 002a 3246     		mov	r2, r6
+ 1602 002c 1049     		ldr	r1, .L123
+ 1603 002e 1148     		ldr	r0, .L123+4
+ 1604 0030 FFF7FEFF 		bl	lfs_file_read
+ 1605              	.LVL143:
+ 1606              		.loc 1 447 16 discriminator 1 view .LVU355
+ 1607 0034 44B2     		sxtb	r4, r0
+ 1608              	.LVL144:
+ 448:Core/Src/memory_utilities.c ****         if (result < 0)
+ 1609              		.loc 1 448 9 is_stmt 1 view .LVU356
+ 1610              		.loc 1 448 12 is_stmt 0 view .LVU357
+ 1611 0036 002C     		cmp	r4, #0
+ 1612 0038 12DB     		blt	.L121
+ 449:Core/Src/memory_utilities.c ****         {
+ 450:Core/Src/memory_utilities.c ****             debug_uart_print_str_new_line("Error Reading File!");
+ 451:Core/Src/memory_utilities.c ****             return result;
+ 452:Core/Src/memory_utilities.c ****         }
+ 453:Core/Src/memory_utilities.c ****         else
+ 454:Core/Src/memory_utilities.c ****         {
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 40
+
+
+ 455:Core/Src/memory_utilities.c ****             debug_uart_print_str_new_line("Successfully read file!");
+ 1613              		.loc 1 455 13 is_stmt 1 view .LVU358
+ 1614 003a 1048     		ldr	r0, .L123+12
+ 1615 003c FFF7FEFF 		bl	debug_uart_print_str_new_line
+ 1616              	.LVL145:
+ 456:Core/Src/memory_utilities.c **** 
+ 457:Core/Src/memory_utilities.c ****             // Close the File, the storage is not updated until the file is closed successfully
+ 458:Core/Src/memory_utilities.c ****             result = lfs_file_close(&lfs, &file);
+ 1617              		.loc 1 458 13 view .LVU359
+ 1618              		.loc 1 458 22 is_stmt 0 view .LVU360
+ 1619 0040 0B49     		ldr	r1, .L123
+ 1620 0042 0C48     		ldr	r0, .L123+4
+ 1621 0044 FFF7FEFF 		bl	lfs_file_close
+ 1622              	.LVL146:
+ 1623              		.loc 1 458 20 discriminator 1 view .LVU361
+ 1624 0048 44B2     		sxtb	r4, r0
+ 1625              	.LVL147:
+ 459:Core/Src/memory_utilities.c ****             if (result < 0)
+ 1626              		.loc 1 459 13 is_stmt 1 view .LVU362
+ 1627              		.loc 1 459 16 is_stmt 0 view .LVU363
+ 1628 004a 002C     		cmp	r4, #0
+ 1629 004c 0CDB     		blt	.L122
+ 460:Core/Src/memory_utilities.c ****             {
+ 461:Core/Src/memory_utilities.c ****                 debug_uart_print_str_new_line("Error Closing the File!");
+ 462:Core/Src/memory_utilities.c ****                 return result;
+ 463:Core/Src/memory_utilities.c ****             }
+ 464:Core/Src/memory_utilities.c ****             else
+ 465:Core/Src/memory_utilities.c ****             {
+ 466:Core/Src/memory_utilities.c ****                 debug_uart_print_str_new_line("Successfully closed the File!");
+ 1630              		.loc 1 466 17 is_stmt 1 view .LVU364
+ 1631 004e 0C48     		ldr	r0, .L123+16
+ 1632 0050 FFF7FEFF 		bl	debug_uart_print_str_new_line
+ 1633              	.LVL148:
+ 467:Core/Src/memory_utilities.c ****                 return result;
+ 1634              		.loc 1 467 17 view .LVU365
+ 1635              	.L116:
+ 468:Core/Src/memory_utilities.c ****             }
+ 469:Core/Src/memory_utilities.c ****         }
+ 470:Core/Src/memory_utilities.c ****     }
+ 471:Core/Src/memory_utilities.c **** }...
+ 1636              		.loc 1 471 1 is_stmt 0 view .LVU366
+ 1637 0054 2046     		mov	r0, r4
+ 1638 0056 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 1639              	.LVL149:
+ 1640              	.L120:
+ 438:Core/Src/memory_utilities.c ****         debug_uart_print_str_new_line("Error Opening / Creating a File!");
+ 1641              		.loc 1 438 9 is_stmt 1 view .LVU367
+ 1642 0058 0A48     		ldr	r0, .L123+20
+ 1643 005a FFF7FEFF 		bl	debug_uart_print_str_new_line
+ 1644              	.LVL150:
+ 439:Core/Src/memory_utilities.c ****         return result;
+ 1645              		.loc 1 439 9 view .LVU368
+ 439:Core/Src/memory_utilities.c ****         return result;
+ 1646              		.loc 1 439 16 is_stmt 0 view .LVU369
+ 1647 005e F9E7     		b	.L116
+ 1648              	.L121:
+ 450:Core/Src/memory_utilities.c ****             debug_uart_print_str_new_line("Error Reading File!");
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 41
+
+
+ 1649              		.loc 1 450 13 is_stmt 1 view .LVU370
+ 1650 0060 0948     		ldr	r0, .L123+24
+ 1651 0062 FFF7FEFF 		bl	debug_uart_print_str_new_line
+ 1652              	.LVL151:
+ 451:Core/Src/memory_utilities.c ****             return result;
+ 1653              		.loc 1 451 13 view .LVU371
+ 451:Core/Src/memory_utilities.c ****             return result;
+ 1654              		.loc 1 451 20 is_stmt 0 view .LVU372
+ 1655 0066 F5E7     		b	.L116
+ 1656              	.L122:
+ 461:Core/Src/memory_utilities.c ****                 debug_uart_print_str_new_line("Error Closing the File!");
+ 1657              		.loc 1 461 17 is_stmt 1 view .LVU373
+ 1658 0068 0848     		ldr	r0, .L123+28
+ 1659 006a FFF7FEFF 		bl	debug_uart_print_str_new_line
+ 1660              	.LVL152:
+ 462:Core/Src/memory_utilities.c ****                 return result;
+ 1661              		.loc 1 462 17 view .LVU374
+ 462:Core/Src/memory_utilities.c ****                 return result;
+ 1662              		.loc 1 462 24 is_stmt 0 view .LVU375
+ 1663 006e F1E7     		b	.L116
+ 1664              	.L124:
+ 1665              		.align	2
+ 1666              	.L123:
+ 1667 0070 00000000 		.word	file
+ 1668 0074 00000000 		.word	lfs
+ 1669 0078 24000000 		.word	.LC12
+ 1670 007c 14000000 		.word	.LC18
+ 1671 0080 98000000 		.word	.LC16
+ 1672 0084 00000000 		.word	.LC11
+ 1673 0088 00000000 		.word	.LC17
+ 1674 008c 80000000 		.word	.LC15
+ 1675              		.cfi_endproc
+ 1676              	.LFE172:
+ 1678              		.global	hspi_ptr
+ 1679              		.section	.bss.hspi_ptr,"aw",%nobits
+ 1680              		.align	2
+ 1683              	hspi_ptr:
+ 1684 0000 00000000 		.space	4
+ 1685              		.global	lfs_prog_buf
+ 1686              		.section	.bss.lfs_prog_buf,"aw",%nobits
+ 1687              		.align	2
+ 1690              	lfs_prog_buf:
+ 1691 0000 00000000 		.space	512
+ 1691      00000000 
+ 1691      00000000 
+ 1691      00000000 
+ 1691      00000000 
+ 1692              		.global	lfs_read_buf
+ 1693              		.section	.bss.lfs_read_buf,"aw",%nobits
+ 1694              		.align	2
+ 1697              	lfs_read_buf:
+ 1698 0000 00000000 		.space	512
+ 1698      00000000 
+ 1698      00000000 
+ 1698      00000000 
+ 1698      00000000 
+ 1699              		.global	cfg
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 42
+
+
+ 1700              		.section	.bss.cfg,"aw",%nobits
+ 1701              		.align	2
+ 1704              	cfg:
+ 1705 0000 00000000 		.space	84
+ 1705      00000000 
+ 1705      00000000 
+ 1705      00000000 
+ 1705      00000000 
+ 1706              		.global	file
+ 1707              		.section	.bss.file,"aw",%nobits
+ 1708              		.align	2
+ 1711              	file:
+ 1712 0000 00000000 		.space	84
+ 1712      00000000 
+ 1712      00000000 
+ 1712      00000000 
+ 1712      00000000 
+ 1713              		.global	lfs
+ 1714              		.section	.bss.lfs,"aw",%nobits
+ 1715              		.align	2
+ 1718              	lfs:
+ 1719 0000 00000000 		.space	128
+ 1719      00000000 
+ 1719      00000000 
+ 1719      00000000 
+ 1719      00000000 
+ 1720              		.global	mounted
+ 1721              		.section	.bss.mounted,"aw",%nobits
+ 1724              	mounted:
+ 1725 0000 00       		.space	1
+ 1726              		.global	LFS_initialized
+ 1727              		.section	.bss.LFS_initialized,"aw",%nobits
+ 1730              	LFS_initialized:
+ 1731 0000 00       		.space	1
+ 1732              		.global	clearFlag
+ 1733              		.section	.data.clearFlag,"aw"
+ 1736              	clearFlag:
+ 1737 0000 01       		.byte	1
+ 1738              		.section	.rodata.FLASH_SECTOR_ERASE,"a"
+ 1741              	FLASH_SECTOR_ERASE:
+ 1742 0000 D8       		.byte	-40
+ 1743              		.section	.rodata.FLASH_STATREG1,"a"
+ 1746              	FLASH_STATREG1:
+ 1747 0000 05       		.byte	5
+ 1748              		.section	.rodata.FLASH_WRDI,"a"
+ 1751              	FLASH_WRDI:
+ 1752 0000 04       		.byte	4
+ 1753              		.section	.rodata.FLASH_WREN,"a"
+ 1756              	FLASH_WREN:
+ 1757 0000 06       		.byte	6
+ 1758              		.section	.rodata.FLASH_WRITE,"a"
+ 1761              	FLASH_WRITE:
+ 1762 0000 02       		.byte	2
+ 1763              		.section	.rodata.FLASH_READ,"a"
+ 1766              	FLASH_READ:
+ 1767 0000 03       		.byte	3
+ 1768              		.text
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 43
+
+
+ 1769              	.Letext0:
+ 1770              		.file 2 "C:/Users/Saksham Puri/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack
+ 1771              		.file 3 "C:/Users/Saksham Puri/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack
+ 1772              		.file 4 "Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l4r5xx.h"
+ 1773              		.file 5 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_def.h"
+ 1774              		.file 6 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_gpio.h"
+ 1775              		.file 7 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_dma.h"
+ 1776              		.file 8 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_spi.h"
+ 1777              		.file 9 "Core/Inc/littlefs/lfs.h"
+ 1778              		.file 10 "Core/Inc/memory_utilities.h"
+ 1779              		.file 11 "Core/Inc/debug_tools/debug_uart.h"
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 44
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 memory_utilities.c
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:21     .text.block_device_sync:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:27     .text.block_device_sync:00000000 block_device_sync
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:45     .text.LFS_Config:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:51     .text.LFS_Config:00000000 LFS_Config
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:118    .text.LFS_Config:00000040 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1704   .bss.cfg:00000000 cfg
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:833    .text.block_device_read:00000000 block_device_read
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:705    .text.block_device_prog:00000000 block_device_prog
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:539    .text.block_device_erase:00000000 block_device_erase
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1697   .bss.lfs_read_buf:00000000 lfs_read_buf
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1690   .bss.lfs_prog_buf:00000000 lfs_prog_buf
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:129    .text.PULL_CS:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:135    .text.PULL_CS:00000000 PULL_CS
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:156    .text.PULL_CS:00000010 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:161    .text.SET_CS:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:167    .text.SET_CS:00000000 SET_CS
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:188    .text.SET_CS:00000010 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:193    .text.READ_STATUS_REGISTER:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:199    .text.READ_STATUS_REGISTER:00000000 READ_STATUS_REGISTER
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:242    .text.READ_STATUS_REGISTER:00000028 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1746   .rodata.FLASH_STATREG1:00000000 FLASH_STATREG1
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:247    .rodata.ENABLE_WREN.str1.4:00000000 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:251    .text.ENABLE_WREN:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:257    .text.ENABLE_WREN:00000000 ENABLE_WREN
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:337    .text.ENABLE_WREN:00000050 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1756   .rodata.FLASH_WREN:00000000 FLASH_WREN
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:343    .text.ENABLE_WRDI:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:349    .text.ENABLE_WRDI:00000000 ENABLE_WRDI
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:412    .text.ENABLE_WRDI:00000038 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1751   .rodata.FLASH_WRDI:00000000 FLASH_WRDI
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:417    .rodata.MEM_CLEAR_LFS.str1.4:00000000 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:421    .text.MEM_CLEAR_LFS:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:427    .text.MEM_CLEAR_LFS:00000000 MEM_CLEAR_LFS
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:527    .text.MEM_CLEAR_LFS:00000068 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1741   .rodata.FLASH_SECTOR_ERASE:00000000 FLASH_SECTOR_ERASE
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:533    .text.block_device_erase:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:571    .text.block_device_erase:00000014 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1683   .bss.hspi_ptr:00000000 hspi_ptr
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:576    .text.WRITE_LFS:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:582    .text.WRITE_LFS:00000000 WRITE_LFS
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:694    .text.WRITE_LFS:00000074 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1761   .rodata.FLASH_WRITE:00000000 FLASH_WRITE
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:699    .text.block_device_prog:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:742    .text.block_device_prog:00000018 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:747    .text.READ_LFS:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:753    .text.READ_LFS:00000000 READ_LFS
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:822    .text.READ_LFS:0000004c $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1766   .rodata.FLASH_READ:00000000 FLASH_READ
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:827    .text.block_device_read:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:870    .text.block_device_read:00000018 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:875    .text.INITIALIZE:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:881    .text.INITIALIZE:00000000 INITIALIZE
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:913    .text.INITIALIZE:00000014 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1730   .bss.LFS_initialized:00000000 LFS_initialized
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:919    .rodata.MOUNT.str1.4:00000000 $d
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s 			page 45
+
+
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:929    .text.MOUNT:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:935    .text.MOUNT:00000000 MOUNT
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1014   .text.MOUNT:00000044 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1724   .bss.mounted:00000000 mounted
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1718   .bss.lfs:00000000 lfs
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1025   .rodata.UNMOUNT.str1.4:00000000 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1035   .text.UNMOUNT:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1041   .text.UNMOUNT:00000000 UNMOUNT
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1116   .text.UNMOUNT:00000040 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1126   .rodata.FORMAT.str1.4:00000000 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1136   .text.FORMAT:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1142   .text.FORMAT:00000000 FORMAT
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1208   .text.FORMAT:00000034 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1218   .text.FORCE_MOUNT:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1224   .text.FORCE_MOUNT:00000000 FORCE_MOUNT
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1300   .text.FORCE_MOUNT:00000038 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1307   .text.LIST_DIRECTORY:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1313   .text.LIST_DIRECTORY:00000000 LIST_DIRECTORY
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1326   .text.REMOVE_FILE:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1332   .text.REMOVE_FILE:00000000 REMOVE_FILE
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1345   .text.MAKE_DIRECTORY:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1351   .text.MAKE_DIRECTORY:00000000 MAKE_DIRECTORY
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1364   .text.MOVE_DIRECTORY:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1370   .text.MOVE_DIRECTORY:00000000 MOVE_DIRECTORY
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1383   .rodata.WRITE_FILE.str1.4:00000000 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1402   .text.WRITE_FILE:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1408   .text.WRITE_FILE:00000000 WRITE_FILE
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1525   .text.WRITE_FILE:00000070 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1711   .bss.file:00000000 file
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1537   .rodata.READ_FILE.str1.4:00000000 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1544   .text.READ_FILE:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1550   .text.READ_FILE:00000000 READ_FILE
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1667   .text.READ_FILE:00000070 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1680   .bss.hspi_ptr:00000000 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1687   .bss.lfs_prog_buf:00000000 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1694   .bss.lfs_read_buf:00000000 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1701   .bss.cfg:00000000 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1708   .bss.file:00000000 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1715   .bss.lfs:00000000 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1725   .bss.mounted:00000000 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1731   .bss.LFS_initialized:00000000 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccecRWVW.s:1736   .data.clearFlag:00000000 clearFlag
+
+UNDEFINED SYMBOLS
+HAL_GPIO_WritePin
+HAL_SPI_Transmit
+HAL_SPI_Receive
+debug_uart_print_str_new_line
+lfs_mount
+lfs_unmount
+lfs_format
+lfs_file_open
+debug_uart_print_str
+lfs_file_write
+lfs_file_close
+lfs_file_read

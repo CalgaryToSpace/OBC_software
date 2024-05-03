@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
   28:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   * @{
   29:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   */
   30:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 2
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 2
 
 
   31:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** /** @defgroup RCCEx RCCEx
@@ -118,7 +118,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
   85:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** /* Exported functions --------------------------------------------------------*/
   86:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
   87:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** /** @defgroup RCCEx_Exported_Functions RCCEx Exported Functions
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 3
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 3
 
 
   88:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   * @{
@@ -178,7 +178,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  142:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   *            @arg @ref RCC_PERIPHCLK_SAI1  SAI1 peripheral clock (only for devices with SAI1)
  143:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   @if STM32L486xx
  144:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   *            @arg @ref RCC_PERIPHCLK_SAI2  SAI2 peripheral clock (only for devices with SAI2)
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 4
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 4
 
 
  145:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   @endif
@@ -238,7 +238,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  199:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
  200:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   /* Check the parameters */
  201:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   assert_param(IS_RCC_PERIPHCLOCK(PeriphClkInit->PeriphClockSelection));
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 5
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 5
 
 
  202:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
@@ -298,7 +298,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  256:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     else
  257:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     {
  258:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       /* set overall return value */
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 6
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 6
 
 
  259:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       status = ret;
@@ -358,7 +358,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  313:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       status = ret;
  314:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     }
  315:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   }
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 7
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 7
 
 
  316:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** #endif /* SAI2 */
@@ -418,7 +418,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  370:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         /* Wait till LSE is ready */
  371:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         while(READ_BIT(RCC->BDCR, RCC_BDCR_LSERDY) == 0U)
  372:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         {
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 8
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 8
 
 
  373:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           if((HAL_GetTick() - tickstart) > RCC_LSE_TIMEOUT_VALUE)
@@ -478,7 +478,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  427:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   /*-------------------------- USART3 clock source configuration -------------------*/
  428:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   if(((PeriphClkInit->PeriphClockSelection) & RCC_PERIPHCLK_USART3) == RCC_PERIPHCLK_USART3)
  429:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   {
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 9
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 9
 
 
  430:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     /* Check the parameters */
@@ -538,7 +538,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  484:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   /*-------------------------- LPTIM2 clock source configuration -------------------*/
  485:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   if(((PeriphClkInit->PeriphClockSelection) & RCC_PERIPHCLK_LPTIM2) == (RCC_PERIPHCLK_LPTIM2))
  486:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   {
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 10
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 10
 
 
  487:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     assert_param(IS_RCC_LPTIM2CLK(PeriphClkInit->Lptim2ClockSelection));
@@ -598,7 +598,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  541:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   /*-------------------------- USB clock source configuration ----------------------*/
  542:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   if(((PeriphClkInit->PeriphClockSelection) & RCC_PERIPHCLK_USB) == (RCC_PERIPHCLK_USB))
  543:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   {
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 11
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 11
 
 
  544:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     assert_param(IS_RCC_USBCLKSOURCE(PeriphClkInit->UsbClockSelection));
@@ -658,7 +658,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  598:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       {
  599:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         /* set overall return value */
  600:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         status = ret;
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 12
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 12
 
 
  601:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       }
@@ -718,7 +718,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  655:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       ret = RCCEx_PLLSAI1_Config(&(PeriphClkInit->PLLSAI1), DIVIDER_R_UPDATE);
  656:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
  657:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       if(ret != HAL_OK)
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 13
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 13
 
 
  658:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       {
@@ -778,7 +778,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  712:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   if(((PeriphClkInit->PeriphClockSelection) & RCC_PERIPHCLK_DFSDM1AUDIO) == RCC_PERIPHCLK_DFSDM1AUD
  713:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   {
  714:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     /* Check the parameters */
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 14
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 14
 
 
  715:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     assert_param(IS_RCC_DFSDM1AUDIOCLKSOURCE(PeriphClkInit->Dfsdm1AudioClockSelection));
@@ -838,7 +838,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  769:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   /*-------------------------- DSI clock source configuration ---------------------*/
  770:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   if(((PeriphClkInit->PeriphClockSelection) & RCC_PERIPHCLK_DSI) == RCC_PERIPHCLK_DSI)
  771:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   {
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 15
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 15
 
 
  772:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     /* Check the parameters */
@@ -898,7 +898,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  826:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   /* Set all possible values for the extended clock type parameter------------*/
  827:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
  828:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** #if defined(STM32L412xx) || defined(STM32L422xx)
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 16
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 16
 
 
  829:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
@@ -958,7 +958,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  883:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
  884:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** #elif defined(STM32L475xx) || defined(STM32L476xx) || defined(STM32L485xx) || defined(STM32L486xx)
  885:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 17
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 17
 
 
  886:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   PeriphClkInit->PeriphClockSelection = RCC_PERIPHCLK_USART1  | RCC_PERIPHCLK_USART2 | RCC_PERIPHCL
@@ -1018,7 +1018,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  940:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
  941:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** #endif /* RCC_PLLSAI1_SUPPORT */
  942:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 18
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 18
 
 
  943:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** #if defined(RCC_PLLSAI2_SUPPORT)
@@ -1078,7 +1078,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  997:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   /* Get the I2C4 clock source -----------------------------------------------*/
  998:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   PeriphClkInit->I2c4ClockSelection    = __HAL_RCC_GET_I2C4_SOURCE();
  999:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** #endif /* I2C4 */
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 19
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 19
 
 
 1000:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
@@ -1138,7 +1138,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 1054:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   /* Get the LTDC clock source -----------------------------------------------*/
 1055:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   PeriphClkInit->LtdcClockSelection = __HAL_RCC_GET_LTDC_SOURCE();
 1056:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** #endif /* LTDC */
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 20
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 20
 
 
 1057:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
@@ -1198,7 +1198,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 1111:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   *            @arg @ref RCC_PERIPHCLK_SDMMC1  SDMMC1 peripheral clock
 1112:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   @if STM32L443xx
 1113:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   *            @arg @ref RCC_PERIPHCLK_SWPMI1  SWPMI1 peripheral clock (only for devices with SWPMI
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 21
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 21
 
 
 1114:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   @endif
@@ -1258,7 +1258,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 1168:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     case RCC_RTCCLKSOURCE_LSE:
 1169:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       /* Check if LSE is ready */
 1170:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       if(HAL_IS_BIT_SET(RCC->BDCR, RCC_BDCR_LSERDY))
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 22
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 22
 
 
 1171:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       {
@@ -1318,7 +1318,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 1225:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         pllvco = HSI_VALUE;
 1226:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       }
 1227:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       else
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 23
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 23
 
 
 1228:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       {
@@ -1378,7 +1378,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 1282:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         switch(srcclk)
 1283:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         {
 1284:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         case RCC_CCIPR_CLK48SEL:   /* MSI ? */
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 24
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 24
 
 
 1285:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           if(HAL_IS_BIT_SET(RCC->CR, RCC_CR_MSIRDY))
@@ -1438,7 +1438,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 1339:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
 1340:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** #if defined(SDMMC1) && defined(RCC_CCIPR2_SDMMCSEL)
 1341:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 25
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 25
 
 
 1342:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     case RCC_PERIPHCLK_SDMMC1:
@@ -1498,7 +1498,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 1396:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         case RCC_CCIPR_CLK48SEL_0:  /* PLLSAI1 ? */
 1397:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           if(HAL_IS_BIT_SET(RCC->CR, RCC_CR_PLLSAI1RDY))
 1398:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           {
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 26
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 26
 
 
 1399:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****             if(HAL_IS_BIT_SET(RCC->PLLSAI1CFGR, RCC_PLLSAI1CFGR_PLLSAI1QEN))
@@ -1558,7 +1558,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 1453:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
 1454:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         break;
 1455:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       }
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 27
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 27
 
 
 1456:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
@@ -1618,7 +1618,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 1510:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           break;
 1511:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         case RCC_USART3CLKSOURCE_LSE:
 1512:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           if(HAL_IS_BIT_SET(RCC->BDCR, RCC_BDCR_LSERDY))
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 28
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 28
 
 
 1513:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           {
@@ -1678,7 +1678,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 1567:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       {
 1568:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         /* Get the current UART5 source */
 1569:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         srcclk = __HAL_RCC_GET_UART5_SOURCE();
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 29
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 29
 
 
 1570:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
@@ -1738,7 +1738,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 1624:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           }
 1625:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           break;
 1626:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         default:
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 30
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 30
 
 
 1627:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           /* No clock source, frequency default init at 0 */
@@ -1798,7 +1798,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 1681:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           break;
 1682:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         }
 1683:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 31
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 31
 
 
 1684:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         break;
@@ -1858,7 +1858,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 1738:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
 1739:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** #endif /* STM32L4R5xx || STM32L4R7xx || STM32L4R9xx || STM32L4S5xx || STM32L4S7xx || STM32L4S9xx */
 1740:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 32
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 32
 
 
 1741:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** #endif /* DFSDM1_Filter0 */
@@ -1918,7 +1918,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 1795:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
 1796:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         break;
 1797:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       }
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 33
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 33
 
 
 1798:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
@@ -1978,7 +1978,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 1852:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         }
 1853:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
 1854:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         break;
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 34
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 34
 
 
 1855:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       }
@@ -2038,7 +2038,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 1909:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         switch(srcclk)
 1910:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         {
 1911:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         case RCC_LPTIM2CLKSOURCE_PCLK1:
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 35
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 35
 
 
 1912:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           frequency = HAL_RCC_GetPCLK1Freq();
@@ -2098,7 +2098,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 1966:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           break;
 1967:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         default:
 1968:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           /* No clock source, frequency default init at 0 */
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 36
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 36
 
 
 1969:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           break;
@@ -2158,7 +2158,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 2023:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
 2024:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   return(frequency);
 2025:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** }
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 37
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 37
 
 
 2026:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
@@ -2218,7 +2218,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 2080:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       break;
 2081:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     }
 2082:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   }
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 38
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 38
 
 
 2083:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
@@ -2278,7 +2278,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 2137:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     {
 2138:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       status = HAL_TIMEOUT;
 2139:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       break;
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 39
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 39
 
 
 2140:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     }
@@ -2338,7 +2338,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 2194:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   /* Wait till PLLSAI2 is ready to be updated */
 2195:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   while(READ_BIT(RCC->CR, RCC_CR_PLLSAI2RDY) != 0U)
 2196:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   {
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 40
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 40
 
 
 2197:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     if((HAL_GetTick() - tickstart) > PLLSAI2_TIMEOUT_VALUE)
@@ -2398,7 +2398,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 2251:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** {
 2252:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   uint32_t tickstart;
 2253:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   HAL_StatusTypeDef status = HAL_OK;
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 41
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 41
 
 
 2254:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
@@ -2458,7 +2458,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 2308:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   * @note   After Standby its frequency can be selected between 4 possible values (1, 2, 4 or 8 MHz
 2309:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   * @param  MSIRange  MSI range
 2310:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   *         This parameter can be one of the following values:
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 42
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 42
 
 
 2311:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   *            @arg @ref RCC_MSIRANGE_4  Range 4 around 1 MHz
@@ -2518,7 +2518,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 2365:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** }
 2366:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
 2367:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** /**
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 43
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 43
 
 
 2368:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   * @brief Handle the RCC LSE Clock Security System interrupt request.
@@ -2578,7 +2578,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 2422:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   /* Update LSCOSEL clock source in Backup Domain control register */
 2423:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   if(__HAL_RCC_PWR_IS_CLK_DISABLED())
 2424:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   {
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 44
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 44
 
 
 2425:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     __HAL_RCC_PWR_CLK_ENABLE();
@@ -2638,7 +2638,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 2479:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   }
 2480:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** }
 2481:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 45
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 45
 
 
 2482:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** /**
@@ -2698,7 +2698,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 2536:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       (#) In System clock config, HSI48 needs to be enabled
 2537:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
 2538:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       (#) Enable CRS clock in IP MSP init which will use CRS functions
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 46
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 46
 
 
 2539:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
@@ -2758,7 +2758,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 2593:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   * @retval None
 2594:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   */
 2595:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** void HAL_RCCEx_CRSConfig(RCC_CRSInitTypeDef *pInit)
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 47
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 47
 
 
 2596:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** {
@@ -2818,7 +2818,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 2650:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   /* Check the parameter */
 2651:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   assert_param(pSynchroInfo != (void *)NULL);
 2652:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 48
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 48
 
 
 2653:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   /* Get the reload value */
@@ -2878,7 +2878,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 2707:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     }
 2708:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
 2709:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     /* Check CRS SYNCWARN flag  */
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 49
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 49
 
 
 2710:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     if(__HAL_RCC_CRS_GET_FLAG(RCC_CRS_FLAG_SYNCWARN))
@@ -2938,7 +2938,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 2764:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** void HAL_RCCEx_CRS_IRQHandler(void)
 2765:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** {
 2766:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   uint32_t crserror = RCC_CRS_NONE;
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 50
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 50
 
 
 2767:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   /* Get current IT flags and IT sources values */
@@ -2998,7 +2998,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 2821:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     }
 2822:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   }
 2823:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** }
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 51
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 51
 
 
 2824:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
@@ -3058,7 +3058,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 2878:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   * @}
 2879:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   */
 2880:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 52
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 52
 
 
 2881:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** #endif /* CRS */
@@ -3118,7 +3118,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 2935:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     {
 2936:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     case RCC_PLLSOURCE_MSI:
 2937:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       if(HAL_IS_BIT_CLR(RCC->CR, RCC_CR_MSIRDY))
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 53
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 53
 
 
 2938:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       {
@@ -3178,7 +3178,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 2992:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     if(status == HAL_OK)
 2993:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     {
 2994:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       if(Divider == DIVIDER_P_UPDATE)
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 54
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 54
 
 
 2995:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       {
@@ -3238,7 +3238,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 3049:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       {
 3050:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         assert_param(IS_RCC_PLLSAI1R_VALUE(PllSai1->PLLSAI1R));
 3051:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** #if defined(RCC_PLLSAI1M_DIV_1_16_SUPPORT)
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 55
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 55
 
 
 3052:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         /* Configure the PLLSAI1 Division factor M, R and Multiplication factor N*/
@@ -3298,7 +3298,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 3106:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   * @retval HAL status
 3107:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   */
 3108:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** static HAL_StatusTypeDef RCCEx_PLLSAI2_Config(RCC_PLLSAI2InitTypeDef *PllSai2, uint32_t Divider)
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 56
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 56
 
 
 3109:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** {
@@ -3358,7 +3358,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 3163:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       status = HAL_ERROR;
 3164:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       break;
 3165:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     }
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 57
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 57
 
 
 3166:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
@@ -3418,7 +3418,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 3220:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         /* Configure the PLLSAI2 Division factor P and Multiplication factor N*/
 3221:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** #if defined(RCC_PLLSAI2P_DIV_2_31_SUPPORT)
 3222:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         MODIFY_REG(RCC->PLLSAI2CFGR,
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 58
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 58
 
 
 3223:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****                    RCC_PLLSAI2CFGR_PLLSAI2N | RCC_PLLSAI2CFGR_PLLSAI2PDIV,
@@ -3478,7 +3478,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 3277:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       /* Get Start Tick*/
 3278:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       tickstart = HAL_GetTick();
 3279:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 59
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 59
 
 
 3280:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       /* Wait till PLLSAI2 is ready */
@@ -3538,7 +3538,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 3321:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     }
 3322:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     /* Else, PLL clock output to check below */
 3323:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   }
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 60
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 60
 
 
 3324:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** #if defined(SAI2)
@@ -3598,7 +3598,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 3361:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           else
 3362:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           {
 3363:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****             pllp = 7U;
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 61
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 61
 
 
 3364:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           }
@@ -3658,7 +3658,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 3384:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         pllp = READ_BIT(RCC->PLLSAI1CFGR, RCC_PLLSAI1CFGR_PLLSAI1PDIV) >> RCC_PLLSAI1CFGR_PLLSAI1PD
   92              		.loc 1 3384 9 is_stmt 1 view .LVU29
   93              		.loc 1 3384 16 is_stmt 0 view .LVU30
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 62
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 62
 
 
   94 0046 1B69     		ldr	r3, [r3, #16]
@@ -3718,7 +3718,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 3318:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     {
  132              		.loc 1 3318 5 is_stmt 1 view .LVU46
 3318:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     {
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 63
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 63
 
 
  133              		.loc 1 3318 7 is_stmt 0 view .LVU47
@@ -3778,7 +3778,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  173 0098 2BD0     		beq	.L1
 3349:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         /* f(PLLSAI3CLK) = f(VCO input) * PLLN / PLLP */
  174              		.loc 1 3349 9 is_stmt 1 view .LVU62
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 64
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 64
 
 
 3349:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         /* f(PLLSAI3CLK) = f(VCO input) * PLLN / PLLP */
@@ -3838,7 +3838,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  212              	.LVL23:
 3366:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       }
  213              		.loc 1 3366 9 is_stmt 1 view .LVU80
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 65
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 65
 
 
 3366:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       }
@@ -3898,7 +3898,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 3422:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         if(pllp == 0U)
 3423:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         {
 3424:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           if(READ_BIT(RCC->PLLCFGR, RCC_PLLCFGR_PLLP) != 0U)
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 66
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 66
 
 
 3425:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           {
@@ -3958,7 +3958,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 3479:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       }
 3480:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       else
 3481:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       {
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 67
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 67
 
 
 3482:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         /* No clock source, frequency default init at 0 */
@@ -4018,7 +4018,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 3527:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   }
 3528:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
 3529:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 68
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 68
 
 
 3530:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   return frequency;
@@ -4078,7 +4078,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  287              		.loc 1 3496 16 view .LVU107
  288 0110 B1FBF3F1 		udiv	r1, r1, r3
  289              	.LVL32:
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 69
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 69
 
 
 3502:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** #if defined(RCC_PLLSAI2P_DIV_2_31_SUPPORT)
@@ -4138,7 +4138,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 3514:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           }
  328              		.loc 1 3514 18 view .LVU124
  329 0134 0723     		movs	r3, #7
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 70
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 70
 
 
  330 0136 F8E7     		b	.L13
@@ -4198,7 +4198,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  376              		.loc 1 3121 3 view .LVU134
 3121:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   {
  377              		.loc 1 3121 6 is_stmt 0 view .LVU135
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 71
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 71
 
 
  378 0006 554B     		ldr	r3, .L55
@@ -4258,7 +4258,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  419 003a 40F08C80 		bne	.L46
 3142:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       {
  420              		.loc 1 3142 7 is_stmt 1 view .LVU149
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 72
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 72
 
 
 3142:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       {
@@ -4318,7 +4318,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  462 006a 3C4B     		ldr	r3, .L55
  463 006c 1B68     		ldr	r3, [r3]
 3188:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     {
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 73
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 73
 
 
  464              		.loc 1 3188 48 view .LVU163
@@ -4378,7 +4378,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  506 00a8 1368     		ldr	r3, [r2]
  507 00aa 43F08053 		orr	r3, r3, #268435456
  508 00ae 1360     		str	r3, [r2]
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 74
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 74
 
 
 3278:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
@@ -4438,7 +4438,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  549              	.L31:
 3148:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       {
  550              		.loc 1 3148 7 view .LVU190
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 75
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 75
 
 
 3148:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       {
@@ -4498,7 +4498,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  592 0112 A168     		ldr	r1, [r4, #8]
  593 0114 6369     		ldr	r3, [r4, #20]
  594 0116 5B08     		lsrs	r3, r3, #1
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 76
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 76
 
 
  595 0118 013B     		subs	r3, r3, #1
@@ -4558,7 +4558,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  646              		.thumb_func
  648              	RCCEx_PLLSAI1_Config:
  649              	.LVL61:
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 77
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 77
 
 
  650              	.LFB160:
@@ -4618,7 +4618,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  689 001c 02D0     		beq	.L83
 2928:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     }
  690              		.loc 1 2928 14 view .LVU223
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 78
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 78
 
 
  691 001e 0125     		movs	r5, #1
@@ -4678,7 +4678,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  733 0052 CB60     		str	r3, [r1, #12]
  734 0054 0025     		movs	r5, #0
  735              	.L63:
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 79
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 79
 
 
  736              	.LVL67:
@@ -4738,7 +4738,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  775              	.L66:
  776              	.LVL72:
 2992:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     {
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 80
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 80
 
 
  777              		.loc 1 2992 5 is_stmt 1 view .LVU251
@@ -4798,7 +4798,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  819 00ba 13F0006F 		tst	r3, #134217728
  820 00be 05D1     		bne	.L72
 3076:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         {
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 81
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 81
 
 
  821              		.loc 1 3076 9 is_stmt 1 view .LVU264
@@ -4858,7 +4858,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  862 00ee 12F4003F 		tst	r2, #131072
  863 00f2 A9D1     		bne	.L64
 2951:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         {
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 82
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 82
 
 
  864              		.loc 1 2951 9 is_stmt 1 view .LVU278
@@ -4918,7 +4918,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  909 0138 2369     		ldr	r3, [r4, #16]
  910 013a 5B08     		lsrs	r3, r3, #1
  911 013c 013B     		subs	r3, r3, #1
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 83
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 83
 
 
  912 013e 5B05     		lsls	r3, r3, #21
@@ -4978,7 +4978,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  964 0006 0446     		mov	r4, r0
  196:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   HAL_StatusTypeDef ret = HAL_OK;      /* Intermediate status */
  965              		.loc 1 196 3 is_stmt 1 view .LVU292
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 84
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 84
 
 
  197:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   HAL_StatusTypeDef status = HAL_OK;   /* Final status */
@@ -5038,7 +5038,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  1005              	.L90:
  1006 0030 602B     		cmp	r3, #96
  1007 0032 1ED0     		beq	.L137
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 85
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 85
 
 
  1008 0034 802B     		cmp	r3, #128
@@ -5098,7 +5098,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  1050              		.loc 1 251 7 is_stmt 0 view .LVU319
  1051 006a 002E     		cmp	r6, #0
  1052 006c EDD0     		beq	.L93
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 86
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 86
 
 
  259:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     }
@@ -5158,7 +5158,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  1094 00a2 0646     		mov	r6, r0
  1095              	.LVL94:
  291:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 87
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 87
 
 
  1096              		.loc 1 291 7 is_stmt 1 view .LVU333
@@ -5218,7 +5218,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  1139 00d8 C2F89C30 		str	r3, [r2, #156]
  1140 00dc 06E0     		b	.L95
  1141              	.L98:
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 88
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 88
 
 
  283:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       /* SAI2 clock source config set later after clock selection check */
@@ -5278,7 +5278,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  1181 0106 9A65     		str	r2, [r3, #88]
  329:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       pwrclkchanged = SET;
  1182              		.loc 1 329 7 view .LVU360
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 89
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 89
 
 
  1183 0108 9B6D     		ldr	r3, [r3, #88]
@@ -5338,7 +5338,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  1222              		.loc 1 341 9 discriminator 1 view .LVU375
  1223 0136 0228     		cmp	r0, #2
  1224 0138 F5D9     		bls	.L103
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 90
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 90
 
 
  343:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         break;
@@ -5398,7 +5398,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  1264 0172 C2F89010 		str	r1, [r2, #144]
  361:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       }
  1265              		.loc 1 361 9 view .LVU391
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 91
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 91
 
 
  361:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       }
@@ -5458,7 +5458,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  371:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         {
  1307              		.loc 1 371 52 view .LVU405
  1308 01ae 13F0020F 		tst	r3, #2
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 92
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 92
 
 
  1309 01b2 E5D1     		bne	.L108
@@ -5518,7 +5518,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  409:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
  1350              		.loc 1 409 5 is_stmt 1 view .LVU419
  412:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   }
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 93
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 93
 
 
  1351              		.loc 1 412 5 view .LVU420
@@ -5578,7 +5578,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  1392              		.loc 1 442 5 view .LVU433
  1393 022a 13F0080F 		tst	r3, #8
  1394 022e 08D0     		beq	.L114
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 94
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 94
 
 
  445:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
@@ -5638,7 +5638,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  1435              		.loc 1 478 21 is_stmt 0 view .LVU447
  1436 0276 2368     		ldr	r3, [r4]
  478:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   {
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 95
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 95
 
 
  1437              		.loc 1 478 5 view .LVU448
@@ -5698,7 +5698,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  504:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   {
  1479              		.loc 1 504 3 view .LVU461
  504:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   {
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 96
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 96
 
 
  1480              		.loc 1 504 21 is_stmt 0 view .LVU462
@@ -5758,7 +5758,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  1521 030c 0B43     		orrs	r3, r3, r1
  1522 030e C2F89C30 		str	r3, [r2, #156]
  1523              	.L122:
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 97
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 97
 
 
  542:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   {
@@ -5818,7 +5818,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  578:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
  1562              		.loc 1 578 5 discriminator 2 view .LVU492
  1563 0350 5A4A     		ldr	r2, .L167
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 98
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 98
 
 
  1564 0352 D2F89C30 		ldr	r3, [r2, #156]
@@ -5878,7 +5878,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  1603 0398 E16F     		ldr	r1, [r4, #124]
  1604 039a 0B43     		orrs	r3, r3, r1
  1605 039c C2F88830 		str	r3, [r2, #136]
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 99
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 99
 
 
  617:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     {
@@ -5938,7 +5938,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  701:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   {
  1644              		.loc 1 701 5 view .LVU524
  1645 03d6 13F4803F 		tst	r3, #65536
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 100
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 100
 
 
  1646 03da 09D0     		beq	.L133
@@ -5998,7 +5998,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  1686              		.loc 1 804 21 is_stmt 0 view .LVU538
  1687 0428 D4F88C30 		ldr	r3, [r4, #140]
  804:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     {
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 101
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 101
 
 
  1688              		.loc 1 804 7 view .LVU539
@@ -6058,7 +6058,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  560:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         {
  1733              		.loc 1 560 9 is_stmt 1 view .LVU549
  560:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         {
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 102
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 102
 
 
  1734              		.loc 1 560 11 is_stmt 0 view .LVU550
@@ -6118,7 +6118,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  600:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       }
  1778              		.loc 1 600 16 view .LVU561
  1779 049e 72E7     		b	.L125
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 103
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 103
 
 
  1780              	.LVL138:
@@ -6178,7 +6178,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  660:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       }
  1822              		.loc 1 660 16 view .LVU574
  1823 04ce 81E7     		b	.L132
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 104
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 104
 
 
  1824              	.LVL144:
@@ -6238,7 +6238,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  932:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** #else
  1868              		.loc 1 932 35 view .LVU587
  1869 0016 8260     		str	r2, [r0, #8]
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 105
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 105
 
 
  936:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   PeriphClkInit->PLLSAI1.PLLSAI1P = ((READ_BIT(RCC->PLLSAI1CFGR, RCC_PLLSAI1CFGR_PLLSAI1P) >> RCC_P
@@ -6298,7 +6298,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  939:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
  1905              		.loc 1 939 125 view .LVU607
  1906 0040 0132     		adds	r2, r2, #1
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 106
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 106
 
 
  939:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
@@ -6358,7 +6358,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  956:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** #endif /* RCC_PLLSAI2Q_DIV_SUPPORT */
  1942              		.loc 1 956 3 is_stmt 1 view .LVU627
  956:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** #endif /* RCC_PLLSAI2Q_DIV_SUPPORT */
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 107
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 107
 
 
  1943              		.loc 1 956 39 is_stmt 0 view .LVU628
@@ -6418,7 +6418,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  1979 0098 02F03002 		and	r2, r2, #48
  969:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** #endif /* USART3 */
  1980              		.loc 1 969 40 view .LVU647
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 108
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 108
 
 
  1981 009c 4264     		str	r2, [r0, #68]
@@ -6478,7 +6478,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  2017 00d8 C265     		str	r2, [r0, #92]
  998:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** #endif /* I2C4 */
  2018              		.loc 1 998 3 is_stmt 1 view .LVU666
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 109
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 109
 
 
  998:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** #endif /* I2C4 */
@@ -6538,7 +6538,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 1022:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** #endif /* USB_OTG_FS || USB */
  2055              		.loc 1 1022 40 is_stmt 0 view .LVU685
  2056 0118 D3F88820 		ldr	r2, [r3, #136]
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 110
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 110
 
 
  2057 011c 02F04062 		and	r2, r2, #201326592
@@ -6598,7 +6598,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 1049:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** #endif /* STM32L4R5xx || STM32L4R7xx || STM32L4R9xx || STM32L4S5xx || STM32L4S7xx || STM32L4S9xx */
  2095              		.loc 1 1049 45 view .LVU702
  2096 0164 C0F88820 		str	r2, [r0, #136]
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 111
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 111
 
 
 1065:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** #endif /* OCTOSPI1 || OCTOSPI2 */
@@ -6658,7 +6658,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  2141              		.loc 1 1161 3 view .LVU714
 1161:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   {
  2142              		.loc 1 1161 5 is_stmt 0 view .LVU715
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 112
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 112
 
 
  2143 0002 B0F5003F 		cmp	r0, #131072
@@ -6718,7 +6718,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  2183              	.LVL150:
 1215:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       }
  2184              		.loc 1 1215 16 discriminator 4 view .LVU730
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 113
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 113
 
 
  2185 003c 42E0     		b	.L181
@@ -6778,7 +6778,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  2226 007c 00F05484 		beq	.L174
 1187:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         }
  2227              		.loc 1 1187 21 view .LVU744
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 114
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 114
 
 
  2228 0080 4FF4FA40 		mov	r0, #32000
@@ -6838,7 +6838,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  2269              		.loc 1 1233 7 is_stmt 1 view .LVU757
 1233:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       {
  2270              		.loc 1 1233 10 is_stmt 0 view .LVU758
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 115
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 115
 
 
  2271 00b4 6D4B     		ldr	r3, .L347
@@ -6898,7 +6898,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  2319 0106 2104     		.2byte	(.L289-.L188)/2
  2320 0108 2104     		.2byte	(.L289-.L188)/2
  2321 010a 2104     		.2byte	(.L289-.L188)/2
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 116
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 116
 
 
  2322 010c 2104     		.2byte	(.L289-.L188)/2
@@ -6958,7 +6958,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  2367              		.loc 1 1248 5 is_stmt 0 view .LVU773
  2368 015e 0020     		movs	r0, #0
  2369              	.LVL173:
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 117
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 117
 
 
 1248:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     {
@@ -7018,7 +7018,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  2411 01a2 C1E3     		b	.L174
  2412              	.LVL180:
  2413              	.L185:
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 118
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 118
 
 
 1248:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     {
@@ -7078,7 +7078,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  2456 01e6 40F09382 		bne	.L256
 1696:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         }
  2457              		.loc 1 1696 11 is_stmt 1 view .LVU799
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 119
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 119
 
 
 1696:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         }
@@ -7138,7 +7138,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  2500              	.LVL193:
  2501              	.L333:
 1248:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     {
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 120
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 120
 
 
  2502              		.loc 1 1248 5 is_stmt 0 view .LVU812
@@ -7198,7 +7198,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  2543 0262 4FF40060 		mov	r0, #2048
  2544              	.LVL201:
 1253:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       break;
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 121
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 121
 
 
  2545              		.loc 1 1253 19 view .LVU826
@@ -7258,7 +7258,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 1308:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****             {
  2588              		.loc 1 1308 15 view .LVU838
  2589 02aa 10F48010 		ands	r0, r0, #1048576
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 122
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 122
 
 
  2590 02ae 00F03B83 		beq	.L174
@@ -7318,7 +7318,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  2627              		.loc 1 1320 25 view .LVU855
  2628 02da 0020     		movs	r0, #0
  2629              	.LVL212:
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 123
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 123
 
 
 1320:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****             }
@@ -7378,7 +7378,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  2670              	.L215:
 1288:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           }
  2671              		.loc 1 1288 40 discriminator 2 view .LVU870
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 124
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 124
 
 
  2672 0310 8A4B     		ldr	r3, .L349
@@ -7438,7 +7438,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  2710              		.loc 1 1298 111 view .LVU886
  2711 0344 0133     		adds	r3, r3, #1
 1298:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****               /* f(PLL48M1CLK) = f(VCO input) / PLLQ */
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 125
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 125
 
 
  2712              		.loc 1 1298 22 view .LVU887
@@ -7498,7 +7498,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  2751              		.loc 1 1344 9 view .LVU902
  2752 0372 10F48040 		ands	r0, r0, #16384
  2753 0376 22D0     		beq	.L217
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 126
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 126
 
 
 1346:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         {
@@ -7558,7 +7558,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  2790              		.loc 1 1355 13 is_stmt 1 view .LVU920
 1355:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****             {
  2791              		.loc 1 1355 15 is_stmt 0 view .LVU921
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 127
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 127
 
 
  2792 03a6 DB0E     		lsrs	r3, r3, #27
@@ -7618,7 +7618,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  2833 03d4 B3F1806F 		cmp	r3, #67108864
  2834 03d8 40F0A682 		bne	.L174
 1397:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           {
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 128
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 128
 
 
  2835              		.loc 1 1397 11 view .LVU935
@@ -7678,7 +7678,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  2872 040a 1369     		ldr	r3, [r2, #16]
 1405:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****             }
  2873              		.loc 1 1405 93 view .LVU953
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 129
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 129
 
 
  2874 040c C3F34153 		ubfx	r3, r3, #21, #2
@@ -7738,7 +7738,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  2913              	.L224:
 1380:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           }
  2914              		.loc 1 1380 23 discriminator 4 view .LVU969
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 130
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 130
 
 
  2915 0444 3E4A     		ldr	r2, .L349+4
@@ -7798,7 +7798,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  2954 0476 03FB01F0 		mul	r0, r3, r1
 1390:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****               /* f(PLL48M1CLK) = f(VCO input) / PLLQ */
  2955              		.loc 1 1390 45 view .LVU985
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 131
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 131
 
 
  2956 047a D368     		ldr	r3, [r2, #12]
@@ -7858,7 +7858,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 1427:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
  2995              		.loc 1 1427 9 is_stmt 1 view .LVU1001
 1427:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 132
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 132
 
 
  2996              		.loc 1 1427 18 is_stmt 0 view .LVU1002
@@ -7918,7 +7918,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 1440:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           }
  3038              		.loc 1 1440 23 view .LVU1015
  3039 04d8 1B48     		ldr	r0, .L349+12
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 133
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 133
 
 
  3040 04da 25E2     		b	.L174
@@ -7978,7 +7978,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  3084              		.loc 1 1465 11 view .LVU1025
 1465:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           break;
  3085              		.loc 1 1465 23 is_stmt 0 view .LVU1026
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 134
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 134
 
 
  3086 051e FFF7FEFF 		bl	HAL_RCC_GetPCLK1Freq
@@ -8038,7 +8038,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  3127              		.loc 1 1477 13 view .LVU1039
  3128 0552 10F00200 		ands	r0, r0, #2
  3129 0556 00F0E781 		beq	.L174
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 135
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 135
 
 
 1479:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           }
@@ -8098,7 +8098,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  3171 058e 00F0CB81 		beq	.L174
 1514:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           }
  3172              		.loc 1 1514 23 view .LVU1053
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 136
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 136
 
 
  3173 0592 4FF40040 		mov	r0, #32768
@@ -8158,7 +8158,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  3214 05c2 A3B1     		cbz	r3, .L242
  3215 05c4 402B     		cmp	r3, #64
  3216 05c6 02D1     		bne	.L338
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 137
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 137
 
 
 1540:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           break;
@@ -8218,7 +8218,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  3257              		.loc 1 1543 11 view .LVU1080
 1543:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           {
  3258              		.loc 1 1543 14 is_stmt 0 view .LVU1081
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 138
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 138
 
 
  3259 05f4 7E4B     		ldr	r3, .L351
@@ -8278,7 +8278,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  3300              		.loc 1 1586 14 is_stmt 0 view .LVU1094
  3301 062e 704B     		ldr	r3, .L351
  3302              	.LVL302:
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 139
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 139
 
 
 1586:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           {
@@ -8338,7 +8338,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 1604:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
  3343              		.loc 1 1604 16 view .LVU1109
  3344 0662 03F44063 		and	r3, r3, #3072
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 140
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 140
 
 
  3345              	.LVL308:
@@ -8398,7 +8398,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  3386              		.loc 1 1609 23 is_stmt 0 view .LVU1122
  3387 069e FFF7FEFF 		bl	HAL_RCC_GetPCLK1Freq
  3388              	.LVL313:
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 141
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 141
 
 
 1610:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         case RCC_LPUART1CLKSOURCE_SYSCLK:
@@ -8458,7 +8458,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  3428              		.loc 1 1645 14 is_stmt 0 view .LVU1137
  3429 06d2 474B     		ldr	r3, .L351
  3430              	.LVL320:
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 142
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 142
 
 
 1645:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           {
@@ -8518,7 +8518,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  3468 0706 0133     		adds	r3, r3, #1
 1657:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           }
  3469              		.loc 1 1657 130 view .LVU1155
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 143
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 143
 
 
  3470 0708 5B00     		lsls	r3, r3, #1
@@ -8578,7 +8578,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 1719:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           {
  3511              		.loc 1 1719 11 view .LVU1169
 1719:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           {
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 144
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 144
 
 
  3512              		.loc 1 1719 14 is_stmt 0 view .LVU1170
@@ -8638,7 +8638,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 1726:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           {
  3553              		.loc 1 1726 14 view .LVU1184
  3554 076a 1868     		ldr	r0, [r3]
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 145
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 145
 
 
  3555              	.LVL339:
@@ -8698,7 +8698,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  3595              		.loc 1 1757 14 is_stmt 0 view .LVU1198
  3596 07a0 134B     		ldr	r3, .L351
  3597              	.LVL346:
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 146
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 146
 
 
 1757:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           {
@@ -8758,7 +8758,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  3638              	.LVL354:
 1806:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         {
  3639              		.loc 1 1806 9 is_stmt 1 view .LVU1213
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 147
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 147
 
 
  3640 07d0 B3F5803F 		cmp	r3, #65536
@@ -8818,7 +8818,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 1841:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           break;
  3683              		.loc 1 1841 11 is_stmt 1 view .LVU1225
 1841:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           break;
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 148
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 148
 
 
  3684              		.loc 1 1841 23 is_stmt 0 view .LVU1226
@@ -8878,7 +8878,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  3725 0836 77D0     		beq	.L174
 1893:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           }
  3726              		.loc 1 1893 23 view .LVU1240
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 149
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 149
 
 
  3727 0838 4FF40040 		mov	r0, #32768
@@ -8938,7 +8938,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 1909:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****         {
  3768              		.loc 1 1909 9 is_stmt 1 view .LVU1254
  3769 0860 B3F5001F 		cmp	r3, #2097152
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 150
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 150
 
 
  3770 0864 20D0     		beq	.L274
@@ -8998,7 +8998,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  3811 0898 4FF40040 		mov	r0, #32768
  3812 089c 44E0     		b	.L174
  3813              	.LVL387:
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 151
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 151
 
 
  3814              	.L346:
@@ -9058,7 +9058,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  3854 08be 33D0     		beq	.L174
 1993:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           }
  3855              		.loc 1 1993 13 is_stmt 1 view .LVU1282
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 152
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 152
 
 
 1993:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****           }
@@ -9118,7 +9118,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 1999:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****             {
  3896              		.loc 1 1999 15 view .LVU1297
  3897 08f0 10F48010 		ands	r0, r0, #1048576
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 153
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 153
 
 
  3898 08f4 18D0     		beq	.L174
@@ -9178,7 +9178,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  3935              		.loc 1 1166 5 view .LVU1314
  3936 091e 0020     		movs	r0, #0
  3937              	.LVL407:
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 154
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 154
 
 
 1166:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     {
@@ -9238,7 +9238,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  3980              		.loc 1 2025 1 view .LVU1326
  3981 093a 0020     		movs	r0, #0
  3982              	.LVL418:
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 155
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 155
 
 
 2025:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
@@ -9298,7 +9298,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  4025 0958 0024F400 		.word	16000000
  4026 095c 00000000 		.word	MSIRangeTable
  4027              		.cfi_endproc
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 156
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 156
 
 
  4028              	.LFE134:
@@ -9358,7 +9358,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  4070              	.LVL431:
 2072:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
  4071              		.loc 1 2072 15 view .LVU1353
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 157
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 157
 
 
  4072 0012 0446     		mov	r4, r0
@@ -9418,7 +9418,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  4111 0032 38BD     		pop	{r3, r4, r5, pc}
  4112              	.LVL438:
  4113              	.L366:
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 158
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 158
 
 
 2089:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** #else
@@ -9478,7 +9478,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  4159 0084 D4D1     		bne	.L359
 2107:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       {
  4160              		.loc 1 2107 7 is_stmt 1 view .LVU1378
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 159
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 159
 
 
 2107:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****       {
@@ -9538,7 +9538,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  4207              		.loc 1 2131 3 view .LVU1388
 2131:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
  4208              		.loc 1 2131 15 is_stmt 0 view .LVU1389
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 160
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 160
 
 
  4209 000c FFF7FEFF 		bl	HAL_GetTick
@@ -9598,7 +9598,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  4249 003c 13F0085F 		tst	r3, #570425344
  4250 0040 03D1     		bne	.L373
 2150:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   }
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 161
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 161
 
 
  4251              		.loc 1 2150 5 is_stmt 1 view .LVU1404
@@ -9658,7 +9658,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  4296              		.loc 1 2181 3 view .LVU1415
 2183:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** #endif /* RCC_PLLSAI2Q_DIV_SUPPORT */
  4297              		.loc 1 2183 3 view .LVU1416
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 162
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 162
 
 
 2185:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   assert_param(IS_RCC_PLLSAI2CLOCKOUT_VALUE(PLLSAI2Init->PLLSAI2ClockOut));
@@ -9718,7 +9718,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  4336              	.L389:
 2175:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
  4337              		.loc 1 2175 21 view .LVU1433
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 163
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 163
 
 
  4338 002c 0024     		movs	r4, #0
@@ -9778,7 +9778,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 2230:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
  4384              		.loc 1 2230 17 is_stmt 0 view .LVU1442
  4385 0076 FFF7FEFF 		bl	HAL_GetTick
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 164
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 164
 
 
  4386              	.LVL459:
@@ -9838,7 +9838,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  4431              		@ args = 0, pretend = 0, frame = 0
  4432              		@ frame_needed = 0, uses_anonymous_args = 0
  4433 0000 10B5     		push	{r4, lr}
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 165
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 165
 
 
  4434              		.cfi_def_cfa_offset 8
@@ -9898,7 +9898,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  4473              		.loc 1 2253 21 view .LVU1468
  4474 002a 0020     		movs	r0, #0
  4475              	.L395:
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 166
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 166
 
 
  4476              	.LVL467:
@@ -9958,7 +9958,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 2303:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** }
  4522              		.loc 1 2303 3 view .LVU1479
  4523 0000 034A     		ldr	r2, .L404
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 167
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 167
 
 
  4524 0002 9368     		ldr	r3, [r2, #8]
@@ -10018,7 +10018,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 2332:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   SET_BIT(RCC->BDCR, RCC_BDCR_LSECSSON);
  4577              		.loc 1 2332 1 is_stmt 1 view -0
  4578              		.cfi_startproc
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 168
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 168
 
 
  4579              		@ args = 0, pretend = 0, frame = 0
@@ -10078,7 +10078,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  4630              		.global	HAL_RCCEx_EnableLSECSS_IT
  4631              		.syntax unified
  4632              		.thumb
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 169
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 169
 
 
  4633              		.thumb_func
@@ -10138,7 +10138,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 2393:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
  4683              		.loc 1 2393 1 view .LVU1499
  4684 0000 7047     		bx	lr
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 170
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 170
 
 
  4685              		.cfi_endproc
@@ -10198,7 +10198,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  4734              		.global	HAL_RCCEx_EnableLSCO
  4735              		.syntax unified
  4736              		.thumb
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 171
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 171
 
 
  4737              		.thumb_func
@@ -10258,7 +10258,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  4778 001a 0423     		movs	r3, #4
  4779 001c 0393     		str	r3, [sp, #12]
 2417:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 172
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 172
 
 
  4780              		.loc 1 2417 3 is_stmt 1 view .LVU1522
@@ -10318,7 +10318,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 2425:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     pwrclkchanged = SET;
  4819              		.loc 1 2425 5 view .LVU1538
 2426:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   }
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 173
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 173
 
 
  4820              		.loc 1 2426 5 view .LVU1539
@@ -10378,7 +10378,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  4862              		.loc 1 2406 20 view .LVU1551
  4863 0078 0024     		movs	r4, #0
  4864 007a E9E7     		b	.L426
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 174
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 174
 
 
  4865              	.LVL481:
@@ -10438,7 +10438,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  4913              		.cfi_offset 14, -4
  4914 0002 82B0     		sub	sp, sp, #8
  4915              		.cfi_def_cfa_offset 16
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 175
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 175
 
 
 2452:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   FlagStatus       backupchanged = RESET;
@@ -10498,7 +10498,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  4954 002c 0DD0     		beq	.L446
 2453:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
  4955              		.loc 1 2453 20 view .LVU1576
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 176
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 176
 
 
  4956 002e 0021     		movs	r1, #0
@@ -10558,7 +10558,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 2474:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   }
  4999              		.loc 1 2474 5 is_stmt 0 view .LVU1588
  5000 0056 F3E7     		b	.L441
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 177
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 177
 
 
  5001              	.L448:
@@ -10618,7 +10618,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 2499:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   CLEAR_BIT(RCC->CR, RCC_CR_MSIPLLEN) ;
  5054              		.loc 1 2499 1 is_stmt 1 view -0
  5055              		.cfi_startproc
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 178
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 178
 
 
  5056              		@ args = 0, pretend = 0, frame = 0
@@ -10678,7 +10678,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  5104 0018 00100240 		.word	1073876992
  5105              		.cfi_endproc
  5106              	.LFE150:
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 179
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 179
 
 
  5108              		.section	.text.HAL_RCCEx_CRSConfig,"ax",%progbits
@@ -10738,7 +10738,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 2616:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   /* Set the RELOAD[15:0] bits according to ReloadValue value */
  5148              		.loc 1 2616 9 view .LVU1618
  5149 001a 1A43     		orrs	r2, r2, r3
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 180
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 180
 
 
  5150              	.LVL498:
@@ -10798,7 +10798,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  5194              		.thumb_func
  5196              	HAL_RCCEx_CRSSoftwareSynchronizationGenerate:
  5197              	.LFB152:
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 181
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 181
 
 
 2639:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   SET_BIT(CRS->CR, CRS_CR_SWSYNC);
@@ -10858,7 +10858,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  5243              		.loc 1 2657 73 view .LVU1640
  5244 000a C2F30522 		ubfx	r2, r2, #8, #6
 2657:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 182
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 182
 
 
  5245              		.loc 1 2657 39 view .LVU1641
@@ -10918,7 +10918,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 2683:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   uint32_t tickstart;
  5291              		.loc 1 2683 3 is_stmt 1 view .LVU1652
  5292              	.LVL505:
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 183
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 183
 
 
 2684:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
@@ -10978,7 +10978,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 2753:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     }
  5332              		.loc 1 2753 7 view .LVU1668
 2753:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     }
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 184
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 184
 
 
  5333              		.loc 1 2753 7 discriminator 2 view .LVU1669
@@ -11038,7 +11038,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  5371              		.loc 1 2710 8 is_stmt 0 view .LVU1685
  5372 0046 184B     		ldr	r3, .L484
  5373 0048 9B68     		ldr	r3, [r3, #8]
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 185
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 185
 
 
 2710:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     {
@@ -11098,7 +11098,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  5410 006e 0E4B     		ldr	r3, .L484
  5411 0070 9B68     		ldr	r3, [r3, #8]
 2730:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     {
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 186
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 186
 
 
  5412              		.loc 1 2730 7 view .LVU1704
@@ -11158,7 +11158,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  5449 0098 9B68     		ldr	r3, [r3, #8]
 2750:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     {
  5450              		.loc 1 2750 7 view .LVU1722
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 187
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 187
 
 
  5451 009a 13F0080F 		tst	r3, #8
@@ -11218,7 +11218,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 2845:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
  5502              		.loc 1 2845 1 view .LVU1730
  5503 0000 7047     		bx	lr
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 188
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 188
 
 
  5504              		.cfi_endproc
@@ -11278,7 +11278,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  5558              		@ args = 0, pretend = 0, frame = 0
  5559              		@ frame_needed = 0, uses_anonymous_args = 0
  5560 0000 08B5     		push	{r3, lr}
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 189
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 189
 
 
  5561              		.cfi_def_cfa_offset 8
@@ -11338,7 +11338,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
 2801:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****     {
  5600              		.loc 1 2801 7 is_stmt 0 view .LVU1752
  5601 002c 13F0040F 		tst	r3, #4
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 190
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 190
 
 
  5602 0030 1BD0     		beq	.L490
@@ -11398,7 +11398,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  5640              		.loc 1 2820 7 is_stmt 1 view .LVU1768
  5641 005a FFF7FEFF 		bl	HAL_RCCEx_CRS_ErrorCallback
  5642              	.LVL531:
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 191
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 191
 
 
 2823:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c **** 
@@ -11458,7 +11458,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  5684 007c DA60     		str	r2, [r3, #12]
 2796:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c ****   }
  5685              		.loc 1 2796 5 is_stmt 1 view .LVU1782
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 192
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 192
 
 
  5686 007e FFF7FEFF 		bl	HAL_RCCEx_CRS_ExpectedSyncCallback
@@ -11483,117 +11483,117 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 1
  5706              		.file 10 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_rcc.h"
  5707              		.file 11 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h"
  5708              		.file 12 "Drivers/CMSIS/Device/ST/STM32L4xx/Include/system_stm32l4xx.h"
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 193
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 193
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 stm32l4xx_hal_rcc_ex.c
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:21     .text.RCCEx_GetSAIxPeriphCLKFreq:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:26     .text.RCCEx_GetSAIxPeriphCLKFreq:00000000 RCCEx_GetSAIxPeriphCLKFreq
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:339    .text.RCCEx_GetSAIxPeriphCLKFreq:0000013c $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:346    .text.RCCEx_PLLSAI2_Config:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:351    .text.RCCEx_PLLSAI2_Config:00000000 RCCEx_PLLSAI2_Config
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:635    .text.RCCEx_PLLSAI2_Config:0000015c $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:643    .text.RCCEx_PLLSAI1_Config:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:648    .text.RCCEx_PLLSAI1_Config:00000000 RCCEx_PLLSAI1_Config
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:932    .text.RCCEx_PLLSAI1_Config:0000015c $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:940    .text.HAL_RCCEx_PeriphCLKConfig:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:946    .text.HAL_RCCEx_PeriphCLKConfig:00000000 HAL_RCCEx_PeriphCLKConfig
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:1328   .text.HAL_RCCEx_PeriphCLKConfig:000001c8 $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:1333   .text.HAL_RCCEx_PeriphCLKConfig:000001d0 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:1806   .text.HAL_RCCEx_PeriphCLKConfig:000004bc $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:1811   .text.HAL_RCCEx_PeriphCLKConfig:000004c0 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:1835   .text.HAL_RCCEx_GetPeriphCLKConfig:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:1841   .text.HAL_RCCEx_GetPeriphCLKConfig:00000000 HAL_RCCEx_GetPeriphCLKConfig
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:2112   .text.HAL_RCCEx_GetPeriphCLKConfig:0000017c $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:2118   .text.HAL_RCCEx_GetPeriphCLKFreq:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:2124   .text.HAL_RCCEx_GetPeriphCLKFreq:00000000 HAL_RCCEx_GetPeriphCLKFreq
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:2302   .text.HAL_RCCEx_GetPeriphCLKFreq:000000e4 $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:2335   .text.HAL_RCCEx_GetPeriphCLKFreq:00000124 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:2553   .text.HAL_RCCEx_GetPeriphCLKFreq:0000026c $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:2562   .text.HAL_RCCEx_GetPeriphCLKFreq:00000280 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:3007   .text.HAL_RCCEx_GetPeriphCLKFreq:000004bc $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:3011   .text.HAL_RCCEx_GetPeriphCLKFreq:000004c0 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:3069   .text.HAL_RCCEx_GetPeriphCLKFreq:00000504 $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:3082   .text.HAL_RCCEx_GetPeriphCLKFreq:0000051e $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:3115   .text.HAL_RCCEx_GetPeriphCLKFreq:0000053c $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:3123   .text.HAL_RCCEx_GetPeriphCLKFreq:0000054c $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:3663   .text.HAL_RCCEx_GetPeriphCLKFreq:000007f0 $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:3670   .text.HAL_RCCEx_GetPeriphCLKFreq:000007fc $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4024   .text.HAL_RCCEx_GetPeriphCLKFreq:00000954 $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4031   .text.HAL_RCCEx_EnablePLLSAI1:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4037   .text.HAL_RCCEx_EnablePLLSAI1:00000000 HAL_RCCEx_EnablePLLSAI1
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4177   .text.HAL_RCCEx_EnablePLLSAI1:00000094 $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4183   .text.HAL_RCCEx_DisablePLLSAI1:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4189   .text.HAL_RCCEx_DisablePLLSAI1:00000000 HAL_RCCEx_DisablePLLSAI1
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4264   .text.HAL_RCCEx_DisablePLLSAI1:0000004c $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4269   .text.HAL_RCCEx_EnablePLLSAI2:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4275   .text.HAL_RCCEx_EnablePLLSAI2:00000000 HAL_RCCEx_EnablePLLSAI2
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4415   .text.HAL_RCCEx_EnablePLLSAI2:00000094 $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4421   .text.HAL_RCCEx_DisablePLLSAI2:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4427   .text.HAL_RCCEx_DisablePLLSAI2:00000000 HAL_RCCEx_DisablePLLSAI2
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4502   .text.HAL_RCCEx_DisablePLLSAI2:0000004c $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4507   .text.HAL_RCCEx_WakeUpStopCLKConfig:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4513   .text.HAL_RCCEx_WakeUpStopCLKConfig:00000000 HAL_RCCEx_WakeUpStopCLKConfig
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4533   .text.HAL_RCCEx_WakeUpStopCLKConfig:00000010 $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4538   .text.HAL_RCCEx_StandbyMSIRangeConfig:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4544   .text.HAL_RCCEx_StandbyMSIRangeConfig:00000000 HAL_RCCEx_StandbyMSIRangeConfig
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4564   .text.HAL_RCCEx_StandbyMSIRangeConfig:00000014 $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4569   .text.HAL_RCCEx_EnableLSECSS:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4575   .text.HAL_RCCEx_EnableLSECSS:00000000 HAL_RCCEx_EnableLSECSS
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4592   .text.HAL_RCCEx_EnableLSECSS:00000010 $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4597   .text.HAL_RCCEx_DisableLSECSS:00000000 $t
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 194
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:21     .text.RCCEx_GetSAIxPeriphCLKFreq:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:26     .text.RCCEx_GetSAIxPeriphCLKFreq:00000000 RCCEx_GetSAIxPeriphCLKFreq
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:339    .text.RCCEx_GetSAIxPeriphCLKFreq:0000013c $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:346    .text.RCCEx_PLLSAI2_Config:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:351    .text.RCCEx_PLLSAI2_Config:00000000 RCCEx_PLLSAI2_Config
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:635    .text.RCCEx_PLLSAI2_Config:0000015c $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:643    .text.RCCEx_PLLSAI1_Config:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:648    .text.RCCEx_PLLSAI1_Config:00000000 RCCEx_PLLSAI1_Config
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:932    .text.RCCEx_PLLSAI1_Config:0000015c $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:940    .text.HAL_RCCEx_PeriphCLKConfig:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:946    .text.HAL_RCCEx_PeriphCLKConfig:00000000 HAL_RCCEx_PeriphCLKConfig
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:1328   .text.HAL_RCCEx_PeriphCLKConfig:000001c8 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:1333   .text.HAL_RCCEx_PeriphCLKConfig:000001d0 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:1806   .text.HAL_RCCEx_PeriphCLKConfig:000004bc $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:1811   .text.HAL_RCCEx_PeriphCLKConfig:000004c0 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:1835   .text.HAL_RCCEx_GetPeriphCLKConfig:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:1841   .text.HAL_RCCEx_GetPeriphCLKConfig:00000000 HAL_RCCEx_GetPeriphCLKConfig
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:2112   .text.HAL_RCCEx_GetPeriphCLKConfig:0000017c $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:2118   .text.HAL_RCCEx_GetPeriphCLKFreq:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:2124   .text.HAL_RCCEx_GetPeriphCLKFreq:00000000 HAL_RCCEx_GetPeriphCLKFreq
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:2302   .text.HAL_RCCEx_GetPeriphCLKFreq:000000e4 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:2335   .text.HAL_RCCEx_GetPeriphCLKFreq:00000124 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:2553   .text.HAL_RCCEx_GetPeriphCLKFreq:0000026c $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:2562   .text.HAL_RCCEx_GetPeriphCLKFreq:00000280 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:3007   .text.HAL_RCCEx_GetPeriphCLKFreq:000004bc $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:3011   .text.HAL_RCCEx_GetPeriphCLKFreq:000004c0 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:3069   .text.HAL_RCCEx_GetPeriphCLKFreq:00000504 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:3082   .text.HAL_RCCEx_GetPeriphCLKFreq:0000051e $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:3115   .text.HAL_RCCEx_GetPeriphCLKFreq:0000053c $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:3123   .text.HAL_RCCEx_GetPeriphCLKFreq:0000054c $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:3663   .text.HAL_RCCEx_GetPeriphCLKFreq:000007f0 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:3670   .text.HAL_RCCEx_GetPeriphCLKFreq:000007fc $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4024   .text.HAL_RCCEx_GetPeriphCLKFreq:00000954 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4031   .text.HAL_RCCEx_EnablePLLSAI1:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4037   .text.HAL_RCCEx_EnablePLLSAI1:00000000 HAL_RCCEx_EnablePLLSAI1
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4177   .text.HAL_RCCEx_EnablePLLSAI1:00000094 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4183   .text.HAL_RCCEx_DisablePLLSAI1:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4189   .text.HAL_RCCEx_DisablePLLSAI1:00000000 HAL_RCCEx_DisablePLLSAI1
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4264   .text.HAL_RCCEx_DisablePLLSAI1:0000004c $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4269   .text.HAL_RCCEx_EnablePLLSAI2:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4275   .text.HAL_RCCEx_EnablePLLSAI2:00000000 HAL_RCCEx_EnablePLLSAI2
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4415   .text.HAL_RCCEx_EnablePLLSAI2:00000094 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4421   .text.HAL_RCCEx_DisablePLLSAI2:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4427   .text.HAL_RCCEx_DisablePLLSAI2:00000000 HAL_RCCEx_DisablePLLSAI2
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4502   .text.HAL_RCCEx_DisablePLLSAI2:0000004c $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4507   .text.HAL_RCCEx_WakeUpStopCLKConfig:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4513   .text.HAL_RCCEx_WakeUpStopCLKConfig:00000000 HAL_RCCEx_WakeUpStopCLKConfig
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4533   .text.HAL_RCCEx_WakeUpStopCLKConfig:00000010 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4538   .text.HAL_RCCEx_StandbyMSIRangeConfig:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4544   .text.HAL_RCCEx_StandbyMSIRangeConfig:00000000 HAL_RCCEx_StandbyMSIRangeConfig
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4564   .text.HAL_RCCEx_StandbyMSIRangeConfig:00000014 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4569   .text.HAL_RCCEx_EnableLSECSS:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4575   .text.HAL_RCCEx_EnableLSECSS:00000000 HAL_RCCEx_EnableLSECSS
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4592   .text.HAL_RCCEx_EnableLSECSS:00000010 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4597   .text.HAL_RCCEx_DisableLSECSS:00000000 $t
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 194
 
 
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4603   .text.HAL_RCCEx_DisableLSECSS:00000000 HAL_RCCEx_DisableLSECSS
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4624   .text.HAL_RCCEx_DisableLSECSS:00000018 $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4629   .text.HAL_RCCEx_EnableLSECSS_IT:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4635   .text.HAL_RCCEx_EnableLSECSS_IT:00000000 HAL_RCCEx_EnableLSECSS_IT
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4665   .text.HAL_RCCEx_EnableLSECSS_IT:0000002c $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4670   .text.HAL_RCCEx_LSECSS_Callback:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4676   .text.HAL_RCCEx_LSECSS_Callback:00000000 HAL_RCCEx_LSECSS_Callback
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4689   .text.HAL_RCCEx_LSECSS_IRQHandler:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4695   .text.HAL_RCCEx_LSECSS_IRQHandler:00000000 HAL_RCCEx_LSECSS_IRQHandler
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4728   .text.HAL_RCCEx_LSECSS_IRQHandler:0000001c $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4733   .text.HAL_RCCEx_EnableLSCO:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4739   .text.HAL_RCCEx_EnableLSCO:00000000 HAL_RCCEx_EnableLSCO
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4892   .text.HAL_RCCEx_EnableLSCO:00000098 $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4898   .text.HAL_RCCEx_DisableLSCO:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:4904   .text.HAL_RCCEx_DisableLSCO:00000000 HAL_RCCEx_DisableLSCO
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5012   .text.HAL_RCCEx_DisableLSCO:00000064 $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5018   .text.HAL_RCCEx_EnableMSIPLLMode:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5024   .text.HAL_RCCEx_EnableMSIPLLMode:00000000 HAL_RCCEx_EnableMSIPLLMode
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5041   .text.HAL_RCCEx_EnableMSIPLLMode:0000000c $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5046   .text.HAL_RCCEx_DisableMSIPLLMode:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5052   .text.HAL_RCCEx_DisableMSIPLLMode:00000000 HAL_RCCEx_DisableMSIPLLMode
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5069   .text.HAL_RCCEx_DisableMSIPLLMode:0000000c $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5074   .text.HAL_RCCEx_OCTOSPIDelayConfig:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5080   .text.HAL_RCCEx_OCTOSPIDelayConfig:00000000 HAL_RCCEx_OCTOSPIDelayConfig
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5104   .text.HAL_RCCEx_OCTOSPIDelayConfig:00000018 $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5109   .text.HAL_RCCEx_CRSConfig:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5115   .text.HAL_RCCEx_CRSConfig:00000000 HAL_RCCEx_CRSConfig
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5184   .text.HAL_RCCEx_CRSConfig:00000044 $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5190   .text.HAL_RCCEx_CRSSoftwareSynchronizationGenerate:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5196   .text.HAL_RCCEx_CRSSoftwareSynchronizationGenerate:00000000 HAL_RCCEx_CRSSoftwareSynchronizationGenerate
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5213   .text.HAL_RCCEx_CRSSoftwareSynchronizationGenerate:0000000c $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5218   .text.HAL_RCCEx_CRSGetSynchronizationInfo:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5224   .text.HAL_RCCEx_CRSGetSynchronizationInfo:00000000 HAL_RCCEx_CRSGetSynchronizationInfo
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5265   .text.HAL_RCCEx_CRSGetSynchronizationInfo:00000020 $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5270   .text.HAL_RCCEx_CRSWaitSynchronization:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5276   .text.HAL_RCCEx_CRSWaitSynchronization:00000000 HAL_RCCEx_CRSWaitSynchronization
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5465   .text.HAL_RCCEx_CRSWaitSynchronization:000000a8 $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5470   .text.HAL_RCCEx_CRS_SyncOkCallback:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5476   .text.HAL_RCCEx_CRS_SyncOkCallback:00000000 HAL_RCCEx_CRS_SyncOkCallback
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5489   .text.HAL_RCCEx_CRS_SyncWarnCallback:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5495   .text.HAL_RCCEx_CRS_SyncWarnCallback:00000000 HAL_RCCEx_CRS_SyncWarnCallback
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5508   .text.HAL_RCCEx_CRS_ExpectedSyncCallback:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5514   .text.HAL_RCCEx_CRS_ExpectedSyncCallback:00000000 HAL_RCCEx_CRS_ExpectedSyncCallback
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5527   .text.HAL_RCCEx_CRS_ErrorCallback:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5533   .text.HAL_RCCEx_CRS_ErrorCallback:00000000 HAL_RCCEx_CRS_ErrorCallback
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5548   .text.HAL_RCCEx_CRS_IRQHandler:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5554   .text.HAL_RCCEx_CRS_IRQHandler:00000000 HAL_RCCEx_CRS_IRQHandler
-C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s:5692   .text.HAL_RCCEx_CRS_IRQHandler:00000084 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4603   .text.HAL_RCCEx_DisableLSECSS:00000000 HAL_RCCEx_DisableLSECSS
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4624   .text.HAL_RCCEx_DisableLSECSS:00000018 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4629   .text.HAL_RCCEx_EnableLSECSS_IT:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4635   .text.HAL_RCCEx_EnableLSECSS_IT:00000000 HAL_RCCEx_EnableLSECSS_IT
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4665   .text.HAL_RCCEx_EnableLSECSS_IT:0000002c $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4670   .text.HAL_RCCEx_LSECSS_Callback:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4676   .text.HAL_RCCEx_LSECSS_Callback:00000000 HAL_RCCEx_LSECSS_Callback
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4689   .text.HAL_RCCEx_LSECSS_IRQHandler:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4695   .text.HAL_RCCEx_LSECSS_IRQHandler:00000000 HAL_RCCEx_LSECSS_IRQHandler
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4728   .text.HAL_RCCEx_LSECSS_IRQHandler:0000001c $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4733   .text.HAL_RCCEx_EnableLSCO:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4739   .text.HAL_RCCEx_EnableLSCO:00000000 HAL_RCCEx_EnableLSCO
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4892   .text.HAL_RCCEx_EnableLSCO:00000098 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4898   .text.HAL_RCCEx_DisableLSCO:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:4904   .text.HAL_RCCEx_DisableLSCO:00000000 HAL_RCCEx_DisableLSCO
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5012   .text.HAL_RCCEx_DisableLSCO:00000064 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5018   .text.HAL_RCCEx_EnableMSIPLLMode:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5024   .text.HAL_RCCEx_EnableMSIPLLMode:00000000 HAL_RCCEx_EnableMSIPLLMode
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5041   .text.HAL_RCCEx_EnableMSIPLLMode:0000000c $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5046   .text.HAL_RCCEx_DisableMSIPLLMode:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5052   .text.HAL_RCCEx_DisableMSIPLLMode:00000000 HAL_RCCEx_DisableMSIPLLMode
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5069   .text.HAL_RCCEx_DisableMSIPLLMode:0000000c $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5074   .text.HAL_RCCEx_OCTOSPIDelayConfig:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5080   .text.HAL_RCCEx_OCTOSPIDelayConfig:00000000 HAL_RCCEx_OCTOSPIDelayConfig
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5104   .text.HAL_RCCEx_OCTOSPIDelayConfig:00000018 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5109   .text.HAL_RCCEx_CRSConfig:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5115   .text.HAL_RCCEx_CRSConfig:00000000 HAL_RCCEx_CRSConfig
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5184   .text.HAL_RCCEx_CRSConfig:00000044 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5190   .text.HAL_RCCEx_CRSSoftwareSynchronizationGenerate:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5196   .text.HAL_RCCEx_CRSSoftwareSynchronizationGenerate:00000000 HAL_RCCEx_CRSSoftwareSynchronizationGenerate
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5213   .text.HAL_RCCEx_CRSSoftwareSynchronizationGenerate:0000000c $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5218   .text.HAL_RCCEx_CRSGetSynchronizationInfo:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5224   .text.HAL_RCCEx_CRSGetSynchronizationInfo:00000000 HAL_RCCEx_CRSGetSynchronizationInfo
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5265   .text.HAL_RCCEx_CRSGetSynchronizationInfo:00000020 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5270   .text.HAL_RCCEx_CRSWaitSynchronization:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5276   .text.HAL_RCCEx_CRSWaitSynchronization:00000000 HAL_RCCEx_CRSWaitSynchronization
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5465   .text.HAL_RCCEx_CRSWaitSynchronization:000000a8 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5470   .text.HAL_RCCEx_CRS_SyncOkCallback:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5476   .text.HAL_RCCEx_CRS_SyncOkCallback:00000000 HAL_RCCEx_CRS_SyncOkCallback
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5489   .text.HAL_RCCEx_CRS_SyncWarnCallback:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5495   .text.HAL_RCCEx_CRS_SyncWarnCallback:00000000 HAL_RCCEx_CRS_SyncWarnCallback
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5508   .text.HAL_RCCEx_CRS_ExpectedSyncCallback:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5514   .text.HAL_RCCEx_CRS_ExpectedSyncCallback:00000000 HAL_RCCEx_CRS_ExpectedSyncCallback
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5527   .text.HAL_RCCEx_CRS_ErrorCallback:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5533   .text.HAL_RCCEx_CRS_ErrorCallback:00000000 HAL_RCCEx_CRS_ErrorCallback
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5548   .text.HAL_RCCEx_CRS_IRQHandler:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5554   .text.HAL_RCCEx_CRS_IRQHandler:00000000 HAL_RCCEx_CRS_IRQHandler
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s:5692   .text.HAL_RCCEx_CRS_IRQHandler:00000084 $d
 
 UNDEFINED SYMBOLS
 HAL_GetTick
@@ -11603,7 +11603,7 @@ HAL_RCC_GetSysClockFreq
 MSIRangeTable
 HAL_GPIO_Init
 HAL_PWR_EnableBkUpAccess
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8QaDZL.s 			page 195
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccoUD1oX.s 			page 195
 
 
 HAL_PWR_DisableBkUpAccess

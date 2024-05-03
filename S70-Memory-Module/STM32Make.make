@@ -39,7 +39,10 @@ C_SOURCES =  \
 Core/Src/debug_tools/debug_i2c.c \
 Core/Src/debug_tools/debug_uart.c \
 Core/Src/freertos.c \
+Core/Src/littlefs/lfs.c \
+Core/Src/littlefs/lfs_util.c \
 Core/Src/main.c \
+Core/Src/memory_utilities.c \
 Core/Src/rtos_tasks/rtos_tasks.c \
 Core/Src/stm32l4xx_hal_msp.c \
 Core/Src/stm32l4xx_hal_timebase_tim.c \
@@ -151,6 +154,7 @@ AS_INCLUDES = \
 C_INCLUDES =  \
 -ICore/Inc \
 -ICore/Inc/debug_tools \
+-ICore/Inc/littlefs \
 -ICore/Inc/rtos_tasks \
 -IDrivers/CMSIS/Device/ST/STM32L4xx/Include \
 -IDrivers/CMSIS/Include \
