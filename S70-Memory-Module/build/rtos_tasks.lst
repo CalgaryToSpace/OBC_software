@@ -1,0 +1,111 @@
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccObsZ6W.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"rtos_tasks.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "Core/Src/rtos_tasks/rtos_tasks.c"
+  20              		.section	.rodata.TASK_debug_print_heartbeat.str1.4,"aMS",%progbits,1
+  21              		.align	2
+  22              	.LC0:
+  23 0000 5441534B 		.ascii	"TASK_debug_print_heartbeat()\012\000"
+  23      5F646562 
+  23      75675F70 
+  23      72696E74 
+  23      5F686561 
+  24              		.section	.text.TASK_debug_print_heartbeat,"ax",%progbits
+  25              		.align	1
+  26              		.global	TASK_debug_print_heartbeat
+  27              		.syntax unified
+  28              		.thumb
+  29              		.thumb_func
+  31              	TASK_debug_print_heartbeat:
+  32              	.LFB136:
+   1:Core/Src/rtos_tasks/rtos_tasks.c **** 
+   2:Core/Src/rtos_tasks/rtos_tasks.c **** #include "main.h"
+   3:Core/Src/rtos_tasks/rtos_tasks.c **** #include "rtos_tasks/rtos_tasks.h"
+   4:Core/Src/rtos_tasks/rtos_tasks.c **** #include "debug_tools/debug_uart.h"
+   5:Core/Src/rtos_tasks/rtos_tasks.c **** #include "cmsis_os.h"
+   6:Core/Src/rtos_tasks/rtos_tasks.c **** 
+   7:Core/Src/rtos_tasks/rtos_tasks.c **** void TASK_debug_print_heartbeat(void *argument) {
+  33              		.loc 1 7 49 view -0
+  34              		.cfi_startproc
+  35              		@ Volatile: function does not return.
+  36              		@ args = 0, pretend = 0, frame = 0
+  37              		@ frame_needed = 0, uses_anonymous_args = 0
+  38              	.LVL0:
+  39              		.loc 1 7 49 is_stmt 0 view .LVU1
+  40 0000 08B5     		push	{r3, lr}
+  41              		.cfi_def_cfa_offset 8
+  42              		.cfi_offset 3, -8
+  43              		.cfi_offset 14, -4
+  44              	.LVL1:
+  45              	.L2:
+   8:Core/Src/rtos_tasks/rtos_tasks.c **** 	while (1) {
+  46              		.loc 1 8 2 is_stmt 1 view .LVU2
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccObsZ6W.s 			page 2
+
+
+   9:Core/Src/rtos_tasks/rtos_tasks.c **** 		debug_uart_print_str("TASK_debug_print_heartbeat()\n");
+  47              		.loc 1 9 3 view .LVU3
+  48 0002 0648     		ldr	r0, .L4
+  49 0004 FFF7FEFF 		bl	debug_uart_print_str
+  50              	.LVL2:
+  10:Core/Src/rtos_tasks/rtos_tasks.c **** 		HAL_GPIO_TogglePin(PIN_DEVKIT_LD2_GPIO_Port, PIN_DEVKIT_LD2_Pin);
+  51              		.loc 1 10 3 view .LVU4
+  52 0008 8021     		movs	r1, #128
+  53 000a 0548     		ldr	r0, .L4+4
+  54 000c FFF7FEFF 		bl	HAL_GPIO_TogglePin
+  55              	.LVL3:
+  11:Core/Src/rtos_tasks/rtos_tasks.c **** 		osDelay(1000);
+  56              		.loc 1 11 3 discriminator 1 view .LVU5
+  57 0010 4FF47A70 		mov	r0, #1000
+  58 0014 FFF7FEFF 		bl	osDelay
+  59              	.LVL4:
+   8:Core/Src/rtos_tasks/rtos_tasks.c **** 		debug_uart_print_str("TASK_debug_print_heartbeat()\n");
+  60              		.loc 1 8 8 view .LVU6
+  61 0018 F3E7     		b	.L2
+  62              	.L5:
+  63 001a 00BF     		.align	2
+  64              	.L4:
+  65 001c 00000000 		.word	.LC0
+  66 0020 00040048 		.word	1207960576
+  67              		.cfi_endproc
+  68              	.LFE136:
+  70              		.text
+  71              	.Letext0:
+  72              		.file 2 "C:/Users/Saksham Puri/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack
+  73              		.file 3 "C:/Users/Saksham Puri/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack
+  74              		.file 4 "Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l4r5xx.h"
+  75              		.file 5 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h"
+  76              		.file 6 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_gpio.h"
+  77              		.file 7 "Core/Inc/debug_tools/debug_uart.h"
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccObsZ6W.s 			page 3
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 rtos_tasks.c
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccObsZ6W.s:21     .rodata.TASK_debug_print_heartbeat.str1.4:00000000 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccObsZ6W.s:25     .text.TASK_debug_print_heartbeat:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccObsZ6W.s:31     .text.TASK_debug_print_heartbeat:00000000 TASK_debug_print_heartbeat
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccObsZ6W.s:65     .text.TASK_debug_print_heartbeat:0000001c $d
+
+UNDEFINED SYMBOLS
+debug_uart_print_str
+HAL_GPIO_TogglePin
+osDelay

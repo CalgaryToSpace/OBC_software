@@ -7,7 +7,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2023 STMicroelectronics.
+  * Copyright (c) 2024 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -37,6 +37,21 @@ extern "C" {
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
 
+// These externs expose peripherals for use across the project.
+extern I2C_HandleTypeDef hi2c1;
+extern I2C_HandleTypeDef hi2c2;
+extern I2C_HandleTypeDef hi2c3;
+extern I2C_HandleTypeDef hi2c4;
+
+extern UART_HandleTypeDef hlpuart1;
+extern UART_HandleTypeDef huart4;
+extern UART_HandleTypeDef huart5;
+extern UART_HandleTypeDef huart1;
+extern UART_HandleTypeDef huart2;
+extern UART_HandleTypeDef huart3;
+
+extern SPI_HandleTypeDef hspi1;
+
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -49,8 +64,6 @@ extern "C" {
 
 /* USER CODE END EM */
 
-void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
-
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
 
@@ -59,46 +72,110 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define GPLED1_Pin GPIO_PIN_2
-#define GPLED1_GPIO_Port GPIOE
-#define GPLED2_Pin GPIO_PIN_3
-#define GPLED2_GPIO_Port GPIOE
-#define GPLED3_Pin GPIO_PIN_4
-#define GPLED3_GPIO_Port GPIOE
-#define CAMERA_EN_Pin GPIO_PIN_2
-#define CAMERA_EN_GPIO_Port GPIOA
-#define GPS_PPS_Pin GPIO_PIN_6
-#define GPS_PPS_GPIO_Port GPIOA
-#define FLASH_NCS_A2_Pin GPIO_PIN_0
-#define FLASH_NCS_A2_GPIO_Port GPIOG
-#define FLASH_NCS_A1_Pin GPIO_PIN_1
-#define FLASH_NCS_A1_GPIO_Port GPIOG
-#define FLASH_CS_A0_Pin GPIO_PIN_7
-#define FLASH_CS_A0_GPIO_Port GPIOE
-#define FRAM_NCS_1_Pin GPIO_PIN_8
-#define FRAM_NCS_1_GPIO_Port GPIOE
-#define FRAM_NCS_0_Pin GPIO_PIN_9
-#define FRAM_NCS_0_GPIO_Port GPIOE
-#define MOTOR_NFAULT_Pin GPIO_PIN_12
-#define MOTOR_NFAULT_GPIO_Port GPIOB
-#define MOTOR_NEN_Pin GPIO_PIN_13
-#define MOTOR_NEN_GPIO_Port GPIOB
-#define MOTOR_PWM_Pin GPIO_PIN_14
-#define MOTOR_PWM_GPIO_Port GPIOB
-#define MOTOR_DIR_Pin GPIO_PIN_15
-#define MOTOR_DIR_GPIO_Port GPIOB
-#define ENCODER_EN_Pin GPIO_PIN_8
-#define ENCODER_EN_GPIO_Port GPIOD
-#define ENCODER_I_Pin GPIO_PIN_9
-#define ENCODER_I_GPIO_Port GPIOD
-#define ENCODER_B_Pin GPIO_PIN_10
-#define ENCODER_B_GPIO_Port GPIOD
-#define ENCODER_A_Pin GPIO_PIN_11
-#define ENCODER_A_GPIO_Port GPIOD
-#define MPI_RX_NEN_Pin GPIO_PIN_4
-#define MPI_RX_NEN_GPIO_Port GPIOG
-#define MPI_TX_EN_Pin GPIO_PIN_5
-#define MPI_TX_EN_GPIO_Port GPIOG
+#define PIN_LED1_OUT_Pin GPIO_PIN_2
+#define PIN_LED1_OUT_GPIO_Port GPIOE
+#define PIN_LED2_OUT_Pin GPIO_PIN_3
+#define PIN_LED2_OUT_GPIO_Port GPIOE
+#define PIN_LED3_OUT_Pin GPIO_PIN_4
+#define PIN_LED3_OUT_GPIO_Port GPIOE
+#define PIN_PC14_OSC32_IN_Pin GPIO_PIN_14
+#define PIN_PC14_OSC32_IN_GPIO_Port GPIOC
+#define PIN_ANTENNA_A_I2C2_SDA_Pin GPIO_PIN_0
+#define PIN_ANTENNA_A_I2C2_SDA_GPIO_Port GPIOF
+#define PIN_ANTENNA_A_I2C2_SCL_Pin GPIO_PIN_1
+#define PIN_ANTENNA_A_I2C2_SCL_GPIO_Port GPIOF
+#define PIN_PH0_OSC_IN_Pin GPIO_PIN_0
+#define PIN_PH0_OSC_IN_GPIO_Port GPIOH
+#define PIN_ANTENNA_B_I2C3_SCL_Pin GPIO_PIN_0
+#define PIN_ANTENNA_B_I2C3_SCL_GPIO_Port GPIOC
+#define PIN_ANTENNA_B_I2C3_SDA_Pin GPIO_PIN_1
+#define PIN_ANTENNA_B_I2C3_SDA_GPIO_Port GPIOC
+#define PIN_CAMERA_MOSI_UART4_TX_Pin GPIO_PIN_0
+#define PIN_CAMERA_MOSI_UART4_TX_GPIO_Port GPIOA
+#define PIN_CAMERA_MISO_UART4_RX_Pin GPIO_PIN_1
+#define PIN_CAMERA_MISO_UART4_RX_GPIO_Port GPIOA
+#define PIN_CAM_EN_OUT_Pin GPIO_PIN_2
+#define PIN_CAM_EN_OUT_GPIO_Port GPIOA
+#define PIN_BOOM_DEPLOY_EN_OUT_Pin GPIO_PIN_3
+#define PIN_BOOM_DEPLOY_EN_OUT_GPIO_Port GPIOA
+#define PIN_BOOM_PGOOD_IN_TBC_Pin GPIO_PIN_4
+#define PIN_BOOM_PGOOD_IN_TBC_GPIO_Port GPIOA
+#define PIN_GPS_PPS_IN_Pin GPIO_PIN_6
+#define PIN_GPS_PPS_IN_GPIO_Port GPIOA
+#define PIN_GPS_MOSI_USART3_TX_Pin GPIO_PIN_4
+#define PIN_GPS_MOSI_USART3_TX_GPIO_Port GPIOC
+#define PIN_GPS_MISO_USART3_RX_Pin GPIO_PIN_5
+#define PIN_GPS_MISO_USART3_RX_GPIO_Port GPIOC
+#define PIN_SCI_NCS_FLASH_7_Pin GPIO_PIN_11
+#define PIN_SCI_NCS_FLASH_7_GPIO_Port GPIOF
+#define PIN_SCI_NCS_FLASH_6_Pin GPIO_PIN_12
+#define PIN_SCI_NCS_FLASH_6_GPIO_Port GPIOF
+#define PIN_SCI_NCS_FLASH_5_Pin GPIO_PIN_13
+#define PIN_SCI_NCS_FLASH_5_GPIO_Port GPIOF
+#define PIN_SCI_NCS_FLASH_4_Pin GPIO_PIN_14
+#define PIN_SCI_NCS_FLASH_4_GPIO_Port GPIOF
+#define PIN_SCI_NCS_FLASH_3_Pin GPIO_PIN_15
+#define PIN_SCI_NCS_FLASH_3_GPIO_Port GPIOF
+#define PIN_SCI_NCS_FLASH_2_Pin GPIO_PIN_0
+#define PIN_SCI_NCS_FLASH_2_GPIO_Port GPIOG
+#define PIN_SCI_NCS_FLASH_1_Pin GPIO_PIN_1
+#define PIN_SCI_NCS_FLASH_1_GPIO_Port GPIOG
+#define PIN_SCI_NCS_FLASH_0_Pin GPIO_PIN_7
+#define PIN_SCI_NCS_FLASH_0_GPIO_Port GPIOE
+#define PIN_SCI_NCS_FRAM_1_Pin GPIO_PIN_8
+#define PIN_SCI_NCS_FRAM_1_GPIO_Port GPIOE
+#define PIN_SCI_NCS_FRAM_0_Pin GPIO_PIN_9
+#define PIN_SCI_NCS_FRAM_0_GPIO_Port GPIOE
+#define PIN_MEMORY_SPI1_SCLK_Pin GPIO_PIN_13
+#define PIN_MEMORY_SPI1_SCLK_GPIO_Port GPIOE
+#define PIN_MEMORY_SPI1_MISO_Pin GPIO_PIN_14
+#define PIN_MEMORY_SPI1_MISO_GPIO_Port GPIOE
+#define PIN_MEMORY_SPI1_MOSI_Pin GPIO_PIN_15
+#define PIN_MEMORY_SPI1_MOSI_GPIO_Port GPIOE
+#define PIN_UHF_CTL_OUT_Pin GPIO_PIN_12
+#define PIN_UHF_CTL_OUT_GPIO_Port GPIOB
+#define PIN_TEMP_SENSOR_I2C4_SCL_Pin GPIO_PIN_12
+#define PIN_TEMP_SENSOR_I2C4_SCL_GPIO_Port GPIOD
+#define PIN_TEMP_SENSOR_I2C4_SDA_Pin GPIO_PIN_13
+#define PIN_TEMP_SENSOR_I2C4_SDA_GPIO_Port GPIOD
+#define PIN_MISO_MPI_RX_NEN_OUT_Pin GPIO_PIN_4
+#define PIN_MISO_MPI_RX_NEN_OUT_GPIO_Port GPIOG
+#define PIN_MOSI_MPI_TX_EN_OUT_Pin GPIO_PIN_5
+#define PIN_MOSI_MPI_TX_EN_OUT_GPIO_Port GPIOG
+#define PIN_DEBUG_MOSI_LPUART1_TX_Pin GPIO_PIN_7
+#define PIN_DEBUG_MOSI_LPUART1_TX_GPIO_Port GPIOG
+#define PIN_DEBUG_MISO_LPUART1_RX_Pin GPIO_PIN_8
+#define PIN_DEBUG_MISO_LPUART1_RX_GPIO_Port GPIOG
+#define PIN_MPI_MOSI_USART1_TX_Pin GPIO_PIN_9
+#define PIN_MPI_MOSI_USART1_TX_GPIO_Port GPIOA
+#define PIN_MPI_MISO_USART1_RX_Pin GPIO_PIN_10
+#define PIN_MPI_MISO_USART1_RX_GPIO_Port GPIOA
+#define PIN_SWDIO_Pin GPIO_PIN_13
+#define PIN_SWDIO_GPIO_Port GPIOA
+#define PIN_SWCLK_Pin GPIO_PIN_14
+#define PIN_SWCLK_GPIO_Port GPIOA
+#define PIN_NRST_LORA_EU_OUT_Pin GPIO_PIN_11
+#define PIN_NRST_LORA_EU_OUT_GPIO_Port GPIOC
+#define PIN_LORA_EU_MOSI_UART5_TX_Pin GPIO_PIN_12
+#define PIN_LORA_EU_MOSI_UART5_TX_GPIO_Port GPIOC
+#define PIN_LORA_EU_MISO_UART5_RX_Pin GPIO_PIN_2
+#define PIN_LORA_EU_MISO_UART5_RX_GPIO_Port GPIOD
+#define PIN_LORA_US_MOSI_UART2_TX_Pin GPIO_PIN_5
+#define PIN_LORA_US_MOSI_UART2_TX_GPIO_Port GPIOD
+#define PIN_LORA_US_MISO_UART2_RX_Pin GPIO_PIN_6
+#define PIN_LORA_US_MISO_UART2_RX_GPIO_Port GPIOD
+#define PIN_NRST_LORA_US_Pin GPIO_PIN_9
+#define PIN_NRST_LORA_US_GPIO_Port GPIOG
+#define PIN_STACK_I2C1_SDA_Pin GPIO_PIN_13
+#define PIN_STACK_I2C1_SDA_GPIO_Port GPIOG
+#define PIN_STACK_I2C1_SCL_Pin GPIO_PIN_14
+#define PIN_STACK_I2C1_SCL_GPIO_Port GPIOG
+#define PIN_SWO_Pin GPIO_PIN_3
+#define PIN_SWO_GPIO_Port GPIOB
+#define PIN_DEVKIT_LD2_Pin GPIO_PIN_7
+#define PIN_DEVKIT_LD2_GPIO_Port GPIOB
+#define PIN_BOOT0_Pin GPIO_PIN_3
+#define PIN_BOOT0_GPIO_Port GPIOH
 
 /* USER CODE BEGIN Private defines */
 

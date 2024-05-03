@@ -1,0 +1,225 @@
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8F8Hgz.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"debug_i2c.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "Core/Src/debug_tools/debug_i2c.c"
+  20              		.section	.rodata.debug_i2c_scan.str1.4,"aMS",%progbits,1
+  21              		.align	2
+  22              	.LC0:
+  23 0000 53746172 		.ascii	"Starting I2C scan...\012\000"
+  23      74696E67 
+  23      20493243 
+  23      20736361 
+  23      6E2E2E2E 
+  24 0016 0000     		.align	2
+  25              	.LC1:
+  26 0018 25327820 		.ascii	"%2x \000"
+  26      00
+  27 001d 000000   		.align	2
+  28              	.LC2:
+  29 0020 2D2D2000 		.ascii	"-- \000"
+  30              		.align	2
+  31              	.LC3:
+  32 0024 0A00     		.ascii	"\012\000"
+  33              		.section	.text.debug_i2c_scan,"ax",%progbits
+  34              		.align	1
+  35              		.global	debug_i2c_scan
+  36              		.syntax unified
+  37              		.thumb
+  38              		.thumb_func
+  40              	debug_i2c_scan:
+  41              	.LVL0:
+  42              	.LFB135:
+   1:Core/Src/debug_tools/debug_i2c.c **** 
+   2:Core/Src/debug_tools/debug_i2c.c **** #include "main.h"
+   3:Core/Src/debug_tools/debug_i2c.c **** #include "debug_tools/debug_i2c.h"
+   4:Core/Src/debug_tools/debug_i2c.c **** #include "debug_tools/debug_uart.h"
+   5:Core/Src/debug_tools/debug_i2c.c **** 
+   6:Core/Src/debug_tools/debug_i2c.c **** #include <stdio.h>
+   7:Core/Src/debug_tools/debug_i2c.c **** #include <stdint.h>
+   8:Core/Src/debug_tools/debug_i2c.c **** #include <string.h>
+   9:Core/Src/debug_tools/debug_i2c.c **** 
+  10:Core/Src/debug_tools/debug_i2c.c **** 
+  11:Core/Src/debug_tools/debug_i2c.c **** void debug_i2c_scan(I2C_HandleTypeDef *hi2c) {
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8F8Hgz.s 			page 2
+
+
+  43              		.loc 1 11 46 view -0
+  44              		.cfi_startproc
+  45              		@ args = 0, pretend = 0, frame = 8
+  46              		@ frame_needed = 0, uses_anonymous_args = 0
+  47              		.loc 1 11 46 is_stmt 0 view .LVU1
+  48 0000 30B5     		push	{r4, r5, lr}
+  49              		.cfi_def_cfa_offset 12
+  50              		.cfi_offset 4, -12
+  51              		.cfi_offset 5, -8
+  52              		.cfi_offset 14, -4
+  53 0002 83B0     		sub	sp, sp, #12
+  54              		.cfi_def_cfa_offset 24
+  55 0004 0546     		mov	r5, r0
+  12:Core/Src/debug_tools/debug_i2c.c **** 	debug_uart_print_str("Starting I2C scan...\n");
+  56              		.loc 1 12 2 is_stmt 1 view .LVU2
+  57 0006 1648     		ldr	r0, .L9
+  58              	.LVL1:
+  59              		.loc 1 12 2 is_stmt 0 view .LVU3
+  60 0008 FFF7FEFF 		bl	debug_uart_print_str
+  61              	.LVL2:
+  13:Core/Src/debug_tools/debug_i2c.c **** 
+  14:Core/Src/debug_tools/debug_i2c.c **** 	char msg[5];
+  62              		.loc 1 14 2 is_stmt 1 view .LVU4
+  15:Core/Src/debug_tools/debug_i2c.c **** 	// Go through all possible i2c addresses
+  16:Core/Src/debug_tools/debug_i2c.c **** 	for (uint8_t i = 0; i < 128; i++) {
+  63              		.loc 1 16 2 view .LVU5
+  64              	.LBB2:
+  65              		.loc 1 16 7 view .LVU6
+  66              		.loc 1 16 15 is_stmt 0 view .LVU7
+  67 000c 0024     		movs	r4, #0
+  68              		.loc 1 16 2 view .LVU8
+  69 000e 05E0     		b	.L2
+  70              	.LVL3:
+  71              	.L3:
+  17:Core/Src/debug_tools/debug_i2c.c **** 
+  18:Core/Src/debug_tools/debug_i2c.c **** 		if (HAL_I2C_IsDeviceReady(hi2c, (uint16_t)(i<<1), 3, 5) == HAL_OK) {
+  19:Core/Src/debug_tools/debug_i2c.c **** 			// We got an ack
+  20:Core/Src/debug_tools/debug_i2c.c **** 			sprintf(msg, "%2x ", i);
+  21:Core/Src/debug_tools/debug_i2c.c **** 			debug_uart_print_str(msg);
+  22:Core/Src/debug_tools/debug_i2c.c **** 		} else {
+  23:Core/Src/debug_tools/debug_i2c.c **** 			debug_uart_print_str("-- ");
+  72              		.loc 1 23 4 is_stmt 1 view .LVU9
+  73 0010 1448     		ldr	r0, .L9+4
+  74 0012 FFF7FEFF 		bl	debug_uart_print_str
+  75              	.LVL4:
+  76 0016 14E0     		b	.L4
+  77              	.L5:
+  16:Core/Src/debug_tools/debug_i2c.c **** 
+  78              		.loc 1 16 32 discriminator 2 view .LVU10
+  79 0018 0134     		adds	r4, r4, #1
+  80              	.LVL5:
+  16:Core/Src/debug_tools/debug_i2c.c **** 
+  81              		.loc 1 16 32 is_stmt 0 discriminator 2 view .LVU11
+  82 001a E4B2     		uxtb	r4, r4
+  83              	.LVL6:
+  84              	.L2:
+  16:Core/Src/debug_tools/debug_i2c.c **** 
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8F8Hgz.s 			page 3
+
+
+  85              		.loc 1 16 24 is_stmt 1 discriminator 1 view .LVU12
+  86 001c 14F0800F 		tst	r4, #128
+  87 0020 19D1     		bne	.L8
+  18:Core/Src/debug_tools/debug_i2c.c **** 			// We got an ack
+  88              		.loc 1 18 3 view .LVU13
+  18:Core/Src/debug_tools/debug_i2c.c **** 			// We got an ack
+  89              		.loc 1 18 7 is_stmt 0 view .LVU14
+  90 0022 0523     		movs	r3, #5
+  91 0024 0322     		movs	r2, #3
+  92 0026 6100     		lsls	r1, r4, #1
+  93 0028 2846     		mov	r0, r5
+  94 002a FFF7FEFF 		bl	HAL_I2C_IsDeviceReady
+  95              	.LVL7:
+  18:Core/Src/debug_tools/debug_i2c.c **** 			// We got an ack
+  96              		.loc 1 18 6 discriminator 1 view .LVU15
+  97 002e 0028     		cmp	r0, #0
+  98 0030 EED1     		bne	.L3
+  20:Core/Src/debug_tools/debug_i2c.c **** 			debug_uart_print_str(msg);
+  99              		.loc 1 20 4 is_stmt 1 view .LVU16
+ 100 0032 2246     		mov	r2, r4
+ 101 0034 0C49     		ldr	r1, .L9+8
+ 102 0036 6846     		mov	r0, sp
+ 103 0038 FFF7FEFF 		bl	sprintf
+ 104              	.LVL8:
+  21:Core/Src/debug_tools/debug_i2c.c **** 		} else {
+ 105              		.loc 1 21 4 view .LVU17
+ 106 003c 6846     		mov	r0, sp
+ 107 003e FFF7FEFF 		bl	debug_uart_print_str
+ 108              	.LVL9:
+ 109              	.L4:
+  24:Core/Src/debug_tools/debug_i2c.c **** 		}
+  25:Core/Src/debug_tools/debug_i2c.c **** 
+  26:Core/Src/debug_tools/debug_i2c.c **** 	if (i > 0 && (i + 1) % 16 == 0) debug_uart_print_str("\n");
+ 110              		.loc 1 26 2 view .LVU18
+ 111              		.loc 1 26 5 is_stmt 0 view .LVU19
+ 112 0042 002C     		cmp	r4, #0
+ 113 0044 E8D0     		beq	.L5
+ 114              		.loc 1 26 18 discriminator 1 view .LVU20
+ 115 0046 631C     		adds	r3, r4, #1
+ 116              		.loc 1 26 12 discriminator 1 view .LVU21
+ 117 0048 13F00F0F 		tst	r3, #15
+ 118 004c E4D1     		bne	.L5
+ 119              		.loc 1 26 34 is_stmt 1 discriminator 2 view .LVU22
+ 120 004e 0748     		ldr	r0, .L9+12
+ 121 0050 FFF7FEFF 		bl	debug_uart_print_str
+ 122              	.LVL10:
+ 123 0054 E0E7     		b	.L5
+ 124              	.L8:
+ 125              		.loc 1 26 34 is_stmt 0 discriminator 2 view .LVU23
+ 126              	.LBE2:
+  27:Core/Src/debug_tools/debug_i2c.c **** 
+  28:Core/Src/debug_tools/debug_i2c.c **** 	}
+  29:Core/Src/debug_tools/debug_i2c.c **** 
+  30:Core/Src/debug_tools/debug_i2c.c **** 	debug_uart_print_str("\n");
+ 127              		.loc 1 30 2 is_stmt 1 view .LVU24
+ 128 0056 0548     		ldr	r0, .L9+12
+ 129 0058 FFF7FEFF 		bl	debug_uart_print_str
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8F8Hgz.s 			page 4
+
+
+ 130              	.LVL11:
+  31:Core/Src/debug_tools/debug_i2c.c **** }
+ 131              		.loc 1 31 1 is_stmt 0 view .LVU25
+ 132 005c 03B0     		add	sp, sp, #12
+ 133              		.cfi_def_cfa_offset 12
+ 134              		@ sp needed
+ 135 005e 30BD     		pop	{r4, r5, pc}
+ 136              	.LVL12:
+ 137              	.L10:
+ 138              		.loc 1 31 1 view .LVU26
+ 139              		.align	2
+ 140              	.L9:
+ 141 0060 00000000 		.word	.LC0
+ 142 0064 20000000 		.word	.LC2
+ 143 0068 18000000 		.word	.LC1
+ 144 006c 24000000 		.word	.LC3
+ 145              		.cfi_endproc
+ 146              	.LFE135:
+ 148              		.text
+ 149              	.Letext0:
+ 150              		.file 2 "C:/Users/Saksham Puri/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack
+ 151              		.file 3 "C:/Users/Saksham Puri/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack
+ 152              		.file 4 "Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l4r5xx.h"
+ 153              		.file 5 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_def.h"
+ 154              		.file 6 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_dma.h"
+ 155              		.file 7 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_i2c.h"
+ 156              		.file 8 "C:/Users/Saksham Puri/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack
+ 157              		.file 9 "Core/Inc/debug_tools/debug_uart.h"
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\cc8F8Hgz.s 			page 5
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 debug_i2c.c
+C:\Users\SAKSHA~1\AppData\Local\Temp\cc8F8Hgz.s:21     .rodata.debug_i2c_scan.str1.4:00000000 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\cc8F8Hgz.s:34     .text.debug_i2c_scan:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\cc8F8Hgz.s:40     .text.debug_i2c_scan:00000000 debug_i2c_scan
+C:\Users\SAKSHA~1\AppData\Local\Temp\cc8F8Hgz.s:141    .text.debug_i2c_scan:00000060 $d
+
+UNDEFINED SYMBOLS
+debug_uart_print_str
+HAL_I2C_IsDeviceReady
+sprintf

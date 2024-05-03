@@ -1,0 +1,100 @@
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccQeDBIG.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"debug_uart.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "Core/Src/debug_tools/debug_uart.c"
+  20              		.section	.text.debug_uart_print_str,"ax",%progbits
+  21              		.align	1
+  22              		.global	debug_uart_print_str
+  23              		.syntax unified
+  24              		.thumb
+  25              		.thumb_func
+  27              	debug_uart_print_str:
+  28              	.LVL0:
+  29              	.LFB132:
+   1:Core/Src/debug_tools/debug_uart.c **** 
+   2:Core/Src/debug_tools/debug_uart.c **** #include "main.h"
+   3:Core/Src/debug_tools/debug_uart.c **** #include "debug_tools/debug_i2c.h"
+   4:Core/Src/debug_tools/debug_uart.c **** #include "debug_tools/debug_uart.h"
+   5:Core/Src/debug_tools/debug_uart.c **** 
+   6:Core/Src/debug_tools/debug_uart.c **** #include <stdint.h>
+   7:Core/Src/debug_tools/debug_uart.c **** #include <string.h>
+   8:Core/Src/debug_tools/debug_uart.c **** 
+   9:Core/Src/debug_tools/debug_uart.c **** void debug_uart_print_str(const char *str) {
+  30              		.loc 1 9 44 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		.loc 1 9 44 is_stmt 0 view .LVU1
+  35 0000 10B5     		push	{r4, lr}
+  36              		.cfi_def_cfa_offset 8
+  37              		.cfi_offset 4, -8
+  38              		.cfi_offset 14, -4
+  39 0002 0446     		mov	r4, r0
+  10:Core/Src/debug_tools/debug_uart.c ****     HAL_UART_Transmit(&hlpuart1, (uint8_t *)str, strlen(str), 100);
+  40              		.loc 1 10 5 is_stmt 1 view .LVU2
+  41              		.loc 1 10 50 is_stmt 0 view .LVU3
+  42 0004 FFF7FEFF 		bl	strlen
+  43              	.LVL1:
+  44              		.loc 1 10 5 discriminator 1 view .LVU4
+  45 0008 6423     		movs	r3, #100
+  46 000a 82B2     		uxth	r2, r0
+  47 000c 2146     		mov	r1, r4
+  48 000e 0248     		ldr	r0, .L3
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccQeDBIG.s 			page 2
+
+
+  49 0010 FFF7FEFF 		bl	HAL_UART_Transmit
+  50              	.LVL2:
+  11:Core/Src/debug_tools/debug_uart.c **** }
+  51              		.loc 1 11 1 view .LVU5
+  52 0014 10BD     		pop	{r4, pc}
+  53              	.LVL3:
+  54              	.L4:
+  55              		.loc 1 11 1 view .LVU6
+  56 0016 00BF     		.align	2
+  57              	.L3:
+  58 0018 00000000 		.word	hlpuart1
+  59              		.cfi_endproc
+  60              	.LFE132:
+  62              		.text
+  63              	.Letext0:
+  64              		.file 2 "C:/Users/Saksham Puri/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack
+  65              		.file 3 "C:/Users/Saksham Puri/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack
+  66              		.file 4 "Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l4r5xx.h"
+  67              		.file 5 "C:/Users/Saksham Puri/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack
+  68              		.file 6 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_def.h"
+  69              		.file 7 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_dma.h"
+  70              		.file 8 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h"
+  71              		.file 9 "C:/Users/Saksham Puri/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack
+  72              		.file 10 "Core/Inc/main.h"
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccQeDBIG.s 			page 3
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 debug_uart.c
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccQeDBIG.s:21     .text.debug_uart_print_str:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccQeDBIG.s:27     .text.debug_uart_print_str:00000000 debug_uart_print_str
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccQeDBIG.s:58     .text.debug_uart_print_str:00000018 $d
+
+UNDEFINED SYMBOLS
+strlen
+HAL_UART_Transmit
+hlpuart1
