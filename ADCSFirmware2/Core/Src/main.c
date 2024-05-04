@@ -145,10 +145,39 @@ int main(void)
   	uint8_t data_received[8];
     send_I2C_telemetry_request(ADCS_I2C_HANDLE, TLF_IDENTIFICATION, data_received, sizeof(data_received), ADCS_INCLUDE_CHECKSUM);
 */
+/*
   //Test 2: Test the telecommand wrapper function with the CubeComputer
   //TC ID, Processed Flag, Error Status, Error Index
-    uint8_t data_send[1] = {ADCS_Run_Mode_Enabled};
-    I2C_telecommand_wrapper(ADCS_I2C_HANDLE, TC_ADCS_RUN_MODE, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
+    uint8_t data_send[1] = {ADCS_Estimation_Mode_MEMS_Rate_Sensing};
+    I2C_telecommand_wrapper(ADCS_I2C_HANDLE, TC_SET_ATTITUDE_ESTIMATION_MODE, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
+*/
+  // Test 3: higher level functions
+  //ADCS_Set_Power_Control(&hi2c1, ADCS_Power_Select_On, ADCS_Power_Select_Off,ADCS_Power_Select_On,ADCS_Power_Select_Off,ADCS_Power_Select_On,ADCS_Power_Select_Off,ADCS_Power_Select_On,ADCS_Power_Select_Off,ADCS_Power_Select_On,ADCS_Power_Select_Off);
+  //ADCS_Get_Power_Control(&hi2c1);
+
+  //ADCS_Set_Wheel_Speed(&hi2c1, 0x0001, 0x0002, 0x0003);
+
+  //ADCS_Get_LLH_Position(&hi2c1);
+
+  //ADCS_Set_Magnetometer_Config(&hi2c1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+
+  //ADCS_Deploy_Magnetometer(&hi2c1);
+
+  //ADCS_Communication_Status(&hi2c1);
+
+  //ADCS_Estimate_Angular_Rates(&hi2c1);
+
+  //ADCS_Set_Run_Mode(&hi2c1, ADCS_Run_Mode_Enabled);
+
+  //ADCS_Set_Power_Control(&hi2c1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+
+  //ADCS_Attitude_Estimation_Mode(&hi2c1, ADCS_Estimation_Mode_Magnetometer_Rate_Filter);
+
+  //ADCS_Attitude_Control_Mode(&hi2c1, ADCS_Control_Mode_Detumbling, 0xFFFF);
+
+  ADCS_Save_Config(&hi2c1);
+
+  //ADCS_
 
   /*
    //Allocate only required memory

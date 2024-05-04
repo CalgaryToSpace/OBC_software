@@ -10,8 +10,12 @@
 
 /*
  * Summary list of required command IDs:
-	Commands (all done): 7 (done), 10 (done), 11 (done), 13 (done), 14 (done), 17 (done), 26 (done), 63 (done)
-	Telemetry: 147 (done), 150 (done), 155, 156, 157, 170, 197 (done), 201, 204, 240 (done)
+	Commands (all done): 7, 9, 10 (done), 11 (done), 13 (done), 14 (done), 17 (done), 26 (done), 45, 63 (done), 64
+	Telemetry: 145, 147 (done), 150 (done), 155, 156, 157, 170, 197 (done), 201, 204, 207, 240 (done)
+
+	TODO:
+		- within a byte, use the opposite endian-ness (first towards the end, last towards the beginning of the byte)
+		- check INT vs UINT (int is signed, uint is unsigned)!
  *  */
 
 ADCS_TC_Ack_Struct ADCS_TC_Ack(I2C_HandleTypeDef *hi2c) {
@@ -94,9 +98,9 @@ void ADCS_Communication_Status(I2C_HandleTypeDef *hi2c) {
 	WRITE_STRUCT_TO_MEMORY(status) // memory module function
 }
 
-void ADCS_Deploy_Magnetometer(I2C_HandleTypeDef *hi2c) {
-	// Deploys the magnetometer boom
-	uint8_t data_send[1] = {0xFF};
+void ADCS_Deploy_Magnetometer(I2C_HandleTypeDef *hi2c, uint8_t deploy_timeout) {
+	// Deploys the magnetometer boom, timeout in seconds
+	uint8_t data_send[1] = {deploy_timeout};
 	I2C_telecommand_wrapper(hi2c, TC_DEPLOY_MAGNETOMETER_BOOM, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
 }
 
@@ -115,6 +119,7 @@ void ADCS_Clear_Errors(I2C_HandleTypeDef *hi2c) {
 
 void ADCS_Attitude_Control_Mode(I2C_HandleTypeDef *hi2c, ADCS_Control_Mode mode, uint16_t timeout) {
 	// Sets the ADCS attitude control mode
+	// See User Manual, Section 4.4.3 Table 3 for requirements to switch control mode
 	uint8_t data_send[3] = {mode, timeout & 0x00FF, timeout >> 8};
 	I2C_telecommand_wrapper(hi2c, TC_SET_ATTITUDE_CONTROL_MODE, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
 }
@@ -122,6 +127,7 @@ void ADCS_Attitude_Control_Mode(I2C_HandleTypeDef *hi2c, ADCS_Control_Mode mode,
 void ADCS_Attitude_Estimation_Mode(I2C_HandleTypeDef *hi2c, ADCS_Estimation_Mode mode) {
 	// Sets the ADCS attitude estimation mode
 	// Possible values for mode given in Section 6.3 Table 80 of Firmware Reference Manual (ranges from 0 to 7)
+	// needs power control to be on
 	uint8_t data_send[1] = {mode};
 	I2C_telecommand_wrapper(hi2c, TC_SET_ATTITUDE_ESTIMATION_MODE, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
 }
@@ -176,9 +182,10 @@ void ADCS_Set_Power_Control(I2C_HandleTypeDef *hi2c, ADCS_Power_Select cube_cont
         ADCS_Power_Select cube_wheel2_power, ADCS_Power_Select cube_wheel3_power, ADCS_Power_Select motor_power,
         ADCS_Power_Select gps_power) {
 	uint8_t data_send[3]; // 3-byte data (from manual)
-	data_send[0] = (cube_control_signal << 6) | (cube_control_motor << 4) | (cube_sense1 << 2) | cube_sense2;
-	data_send[1] = (cube_star_power << 6) | (cube_wheel1_power << 4) | (cube_wheel2_power << 2) | cube_wheel3_power;
-	data_send[2] = (motor_power << 6) | (gps_power << 4);
+	// within the byte, everything goes in reverse order!!
+	data_send[0] = (cube_control_signal) | (cube_control_motor << 2) | (cube_sense1 << 4) | (cube_sense2 << 6);
+	data_send[1] = (cube_star_power) | (cube_wheel1_power << 2) | (cube_wheel2_power << 4) | (cube_wheel3_power << 6);
+	data_send[2] = (motor_power) | (gps_power << 2);
 	I2C_telecommand_wrapper(hi2c, TC_CUBEACP_SET_ADCS_POWER_CONTROL, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
 }
 
@@ -191,16 +198,19 @@ void ADCS_Get_Power_Control(I2C_HandleTypeDef *hi2c) {
 	I2C_telemetry_wrapper(hi2c, TLF_CUBEACP_GET_ADCS_POWER_CONTROL, data_received, data_length, ADCS_INCLUDE_CHECKSUM);
 
 	// map to struct; all of these are two-bit enums
-	power.cube_control_signal = (data_received[0] >> 6) & 0x02;
-	power.cube_control_motor = (data_received[0] >> 4) & 0x02;
-	power.cube_sense1 = (data_received[0] >> 2) & 0x02;
-	power.cube_sense2 = (data_received[0]) & 0x02;
-	power.cube_star_power = (data_received[1] >> 6) & 0x02;
-	power.cube_wheel1_power = (data_received[1] >> 4) & 0x02;
-	power.cube_wheel2_power = (data_received[1] >> 2) & 0x02;
-	power.cube_wheel3_power = (data_received[1]) & 0x02;
-	power.motor_power = (data_received[2] >> 6) & 0x02;
-	power.gps_power = (data_received[2] >> 4) & 0x02;
+	// within the byte, everything goes in reverse order!!
+	power.cube_control_signal = (data_received[0]) & 0x03;
+	power.cube_control_motor = (data_received[0] >> 2) & 0x03;
+	power.cube_sense1 = (data_received[0] >> 4) & 0x03;
+	power.cube_sense2 = (data_received[0] >> 6) & 0x03;
+
+	power.cube_star_power = (data_received[1]) & 0x03;
+	power.cube_wheel1_power = (data_received[1] >> 2) & 0x03;
+	power.cube_wheel2_power =  (data_received[1] >> 4) & 0x03;
+	power.cube_wheel3_power = (data_received[1] >> 6) & 0x03;
+
+	power.motor_power = (data_received[2]) & 0x03;
+	power.gps_power = (data_received[2] >> 2) & 0x03;
 
 	WRITE_STRUCT_TO_MEMORY(status) // memory module function
 }
@@ -225,6 +235,9 @@ void ADCS_Set_Magnetometer_Config(I2C_HandleTypeDef *hi2c,
 	uint8_t data_send[30]; // 30-byte data (from manual)
 
 	// reorder uint8_t bytes to be low-byte then high-byte
+	// actual config is raw value divided by 100 for mounting transform angles
+	// and raw value divided by 1000 for everything else
+	// these are all INT, not UINT! TODO change this
 	switch_order(data_send, mounting_transform_alpha_angle, 0);
 	switch_order(data_send, mounting_transform_beta_angle, 2);
 	switch_order(data_send, mounting_transform_gamma_angle, 4);
@@ -281,9 +294,9 @@ void ADCS_Get_LLH_Position(I2C_HandleTypeDef *hi2c) {
 
 	// map to struct
 	// Formatted value is obtained using the formula: (formatted value) [deg] or [km] = RAWVAL*0.01
-	pos.latitude = data_received[1] << 8 | data_received[0]; // uint16_t
-	pos.longitude = data_received[3] << 8 | data_received[2]; // uint16_t
-	pos.altitude = data_received[5] << 8 | data_received[4]; // uint16_t
+	pos.latitude = data_received[1] << 8 | data_received[0]; // int16_t (signed)
+	pos.longitude = data_received[3] << 8 | data_received[2]; // int16_t (signed)
+	pos.altitude = data_received[5] << 8 | data_received[4]; // uint16_t (unsigned)
 
 	WRITE_STRUCT_TO_MEMORY(rates) // memory module function
 }

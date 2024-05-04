@@ -151,7 +151,7 @@ int main(void)
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
-  HAL_UART_Transmit(&hlpuart1, "Potato", strlen("Potato"), 100);
+  HAL_UART_Transmit(&hlpuart1, "Potato\n", strlen("Potato\n"), 100);
 
   I2C_Scan();
 

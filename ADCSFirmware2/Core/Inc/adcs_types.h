@@ -168,8 +168,8 @@ typedef struct ADCS_Angular_Rates_Struct {
 } ADCS_Angular_Rates_Struct;
 
 typedef struct ADCS_LLH_Position_Struct {
-    uint16_t latitude;
-    uint16_t longitude;
+    int16_t latitude;
+    int16_t longitude;
     uint16_t altitude;
 } ADCS_LLH_Position_Struct;
 
@@ -214,12 +214,10 @@ void ADCS_Reset(I2C_HandleTypeDef *hi2c);
 void ADCS_Identification(I2C_HandleTypeDef *hi2c);
 void ADCS_Program_Status(I2C_HandleTypeDef *hi2c);
 void ADCS_Communication_Status(I2C_HandleTypeDef *hi2c);
-void ADCS_Deploy_Magnetometer(I2C_HandleTypeDef *hi2c);
+void ADCS_Deploy_Magnetometer(I2C_HandleTypeDef *hi2c, uint8_t deploy_timeout);
 void ADCS_Set_Run_Mode(I2C_HandleTypeDef *hi2c, ADCS_Run_Mode mode);
 void ADCS_Clear_Errors(I2C_HandleTypeDef *hi2c);
 void ADCS_Attitude_Control_Mode(I2C_HandleTypeDef *hi2c, ADCS_Control_Mode mode, uint16_t timeout);
-void ADCS_Enable_Manual_Control(I2C_HandleTypeDef *hi2c);
-void ADCS_Enable_Detumbling_Control(I2C_HandleTypeDef *hi2c);
 void ADCS_Stop_Reaction_Wheels(I2C_HandleTypeDef *hi2c);
 void ADCS_Attitude_Estimation_Mode(I2C_HandleTypeDef *hi2c, uint8_t mode);
 ADCS_TC_Ack_Struct ADCS_TC_Ack(I2C_HandleTypeDef *hi2c);
