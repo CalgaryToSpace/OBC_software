@@ -146,6 +146,8 @@ int main(void)
   MX_I2C3_Init();
   /* USER CODE BEGIN 2 */
 
+
+  /*-------------------------Memory Module Code Testing Begin-------------------------*/
   // Turn on LED1 to indicate program starting
   HAL_GPIO_WritePin(PIN_LED1_OUT_GPIO_Port, PIN_LED1_OUT_Pin, GPIO_PIN_SET);
 
@@ -155,13 +157,14 @@ int main(void)
 
   // Initialize LittleFS Values, and pass SPI pointer
   INITIALIZE(&hspi1);
+  debug_uart_print_str_mem("Test Start Code\n");
 
   result = FORMAT();
   if (result < 0)
   {
     INT_TO_STRING(result, &result_read);
-    debug_uart_print_str("Formatting Error");
-    debug_uart_print_str_new_line(&result_read);
+    debug_uart_print_str_mem("Formatting Error");
+    debug_uart_print_str_mem(&result_read);
     return -1;
   }
 
@@ -172,8 +175,8 @@ int main(void)
     if (result < 0)
     {
       INT_TO_STRING(result, &result_read);
-      debug_uart_print_str("Mounting Error");
-      debug_uart_print_str_new_line(&result_read);
+      debug_uart_print_str_mem("Mounting Error");
+      debug_uart_print_str_mem(&result_read);
       break;
     }
 
@@ -184,13 +187,13 @@ int main(void)
     if (result < 0)
     {
       INT_TO_STRING(result, &result_read);
-      debug_uart_print_str("Reading Error");
-      debug_uart_print_str_new_line(&result_read);
+      debug_uart_print_str_mem("Reading Error");
+      debug_uart_print_str_mem(&result_read);
       break;
     }
 
-    debug_uart_print_str_new_line("Read Value:");
-    debug_uart_print_str_new_line(read_buffer);
+    debug_uart_print_str_mem("Read Value:\n");
+    debug_uart_print_str_mem(read_buffer);
 
     boot_count = STRING_TO_INT(read_buffer);
     boot_count += 1;
@@ -201,8 +204,8 @@ int main(void)
     if (result < 0)
     {
       INT_TO_STRING(result, &result_read);
-      debug_uart_print_str("Writing Error");
-      debug_uart_print_str_new_line(&result_read);
+      debug_uart_print_str_mem("Writing Error");
+      debug_uart_print_str_mem(&result_read);
       break;
     }
 
@@ -213,6 +216,7 @@ int main(void)
 
   // Turn off LED1 to indicate Program End
   HAL_GPIO_WritePin(PIN_LED1_OUT_GPIO_Port, PIN_LED1_OUT_Pin, GPIO_PIN_RESET);
+  /*-------------------------Memory Module Code Testing End-------------------------*/
 
   /* USER CODE END 2 */
 

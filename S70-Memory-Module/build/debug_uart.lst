@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccqW9mAs.s 			page 1
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccdOvDFq.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -47,477 +47,440 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccqW9mAs.s 			page 1
   37              		.cfi_offset 4, -8
   38              		.cfi_offset 14, -4
   39 0002 0446     		mov	r4, r0
-   9:Core/Src/debug_tools/debug_uart.c ****     HAL_UART_Transmit(&huart1, (uint8_t *)str, strlen(str), 100);
+   9:Core/Src/debug_tools/debug_uart.c ****     HAL_UART_Transmit(&huart2, (uint8_t *)str, strlen(str), HAL_MAX_DELAY);
   40              		.loc 1 9 5 is_stmt 1 view .LVU2
   41              		.loc 1 9 48 is_stmt 0 view .LVU3
   42 0004 FFF7FEFF 		bl	strlen
   43              	.LVL1:
   44              		.loc 1 9 5 discriminator 1 view .LVU4
-  45 0008 6423     		movs	r3, #100
-  46 000a 82B2     		uxth	r2, r0
-  47 000c 2146     		mov	r1, r4
-  48 000e 0248     		ldr	r0, .L3
-  49 0010 FFF7FEFF 		bl	HAL_UART_Transmit
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccqW9mAs.s 			page 2
+  45 0008 4FF0FF33 		mov	r3, #-1
+  46 000c 82B2     		uxth	r2, r0
+  47 000e 2146     		mov	r1, r4
+  48 0010 0148     		ldr	r0, .L3
+  49 0012 FFF7FEFF 		bl	HAL_UART_Transmit
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccdOvDFq.s 			page 2
 
 
   50              	.LVL2:
   10:Core/Src/debug_tools/debug_uart.c **** }
   51              		.loc 1 10 1 view .LVU5
-  52 0014 10BD     		pop	{r4, pc}
+  52 0016 10BD     		pop	{r4, pc}
   53              	.LVL3:
   54              	.L4:
   55              		.loc 1 10 1 view .LVU6
-  56 0016 00BF     		.align	2
+  56              		.align	2
   57              	.L3:
-  58 0018 00000000 		.word	huart1
+  58 0018 00000000 		.word	huart2
   59              		.cfi_endproc
   60              	.LFE132:
-  62              		.section	.rodata.debug_uart_print_str_new_line.str1.4,"aMS",%progbits,1
-  63              		.align	2
-  64              	.LC0:
-  65 0000 0D0A00   		.ascii	"\015\012\000"
-  66              		.section	.text.debug_uart_print_str_new_line,"ax",%progbits
-  67              		.align	1
-  68              		.global	debug_uart_print_str_new_line
-  69              		.syntax unified
-  70              		.thumb
-  71              		.thumb_func
-  73              	debug_uart_print_str_new_line:
-  74              	.LVL4:
-  75              	.LFB133:
+  62              		.section	.text.debug_uart_print_str_mem,"ax",%progbits
+  63              		.align	1
+  64              		.global	debug_uart_print_str_mem
+  65              		.syntax unified
+  66              		.thumb
+  67              		.thumb_func
+  69              	debug_uart_print_str_mem:
+  70              	.LVL4:
+  71              	.LFB133:
   11:Core/Src/debug_tools/debug_uart.c **** 
-  12:Core/Src/debug_tools/debug_uart.c **** void debug_uart_print_str_new_line(const char *str)
+  12:Core/Src/debug_tools/debug_uart.c **** void debug_uart_print_str_mem(const char *str)
   13:Core/Src/debug_tools/debug_uart.c **** {
-  76              		.loc 1 13 1 is_stmt 1 view -0
-  77              		.cfi_startproc
-  78              		@ args = 0, pretend = 0, frame = 8
-  79              		@ frame_needed = 0, uses_anonymous_args = 0
-  80              		.loc 1 13 1 is_stmt 0 view .LVU8
-  81 0000 30B5     		push	{r4, r5, lr}
-  82              		.cfi_def_cfa_offset 12
-  83              		.cfi_offset 4, -12
-  84              		.cfi_offset 5, -8
-  85              		.cfi_offset 14, -4
-  86 0002 83B0     		sub	sp, sp, #12
-  87              		.cfi_def_cfa_offset 24
-  88 0004 0446     		mov	r4, r0
-  14:Core/Src/debug_tools/debug_uart.c ****     HAL_UART_Transmit(&huart1, (uint8_t *)str, strlen(str), 100);
-  89              		.loc 1 14 5 is_stmt 1 view .LVU9
-  90              		.loc 1 14 48 is_stmt 0 view .LVU10
-  91 0006 FFF7FEFF 		bl	strlen
-  92              	.LVL5:
-  93              		.loc 1 14 5 discriminator 1 view .LVU11
-  94 000a 0C4D     		ldr	r5, .L7
-  95 000c 6423     		movs	r3, #100
-  96 000e 82B2     		uxth	r2, r0
-  97 0010 2146     		mov	r1, r4
-  98 0012 2846     		mov	r0, r5
-  99 0014 FFF7FEFF 		bl	HAL_UART_Transmit
- 100              	.LVL6:
-  15:Core/Src/debug_tools/debug_uart.c **** 
-  16:Core/Src/debug_tools/debug_uart.c ****     char buf[] = "\r\n";
- 101              		.loc 1 16 5 is_stmt 1 view .LVU12
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccqW9mAs.s 			page 3
+  72              		.loc 1 13 1 is_stmt 1 view -0
+  73              		.cfi_startproc
+  74              		@ args = 0, pretend = 0, frame = 0
+  75              		@ frame_needed = 0, uses_anonymous_args = 0
+  76              		.loc 1 13 1 is_stmt 0 view .LVU8
+  77 0000 10B5     		push	{r4, lr}
+  78              		.cfi_def_cfa_offset 8
+  79              		.cfi_offset 4, -8
+  80              		.cfi_offset 14, -4
+  81 0002 0446     		mov	r4, r0
+  14:Core/Src/debug_tools/debug_uart.c ****     HAL_UART_Transmit(&huart1, (uint8_t *)str, strlen(str), HAL_MAX_DELAY);
+  82              		.loc 1 14 5 is_stmt 1 view .LVU9
+  83              		.loc 1 14 48 is_stmt 0 view .LVU10
+  84 0004 FFF7FEFF 		bl	strlen
+  85              	.LVL5:
+  86              		.loc 1 14 5 discriminator 1 view .LVU11
+  87 0008 4FF0FF33 		mov	r3, #-1
+  88 000c 82B2     		uxth	r2, r0
+  89 000e 2146     		mov	r1, r4
+  90 0010 0148     		ldr	r0, .L7
+  91 0012 FFF7FEFF 		bl	HAL_UART_Transmit
+  92              	.LVL6:
+  15:Core/Src/debug_tools/debug_uart.c **** }
+  93              		.loc 1 15 1 view .LVU12
+  94 0016 10BD     		pop	{r4, pc}
+  95              	.LVL7:
+  96              	.L8:
+  97              		.loc 1 15 1 view .LVU13
+  98              		.align	2
+  99              	.L7:
+ 100 0018 00000000 		.word	huart1
+ 101              		.cfi_endproc
+ 102              	.LFE133:
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccdOvDFq.s 			page 3
 
 
- 102              		.loc 1 16 10 is_stmt 0 view .LVU13
- 103 0018 094B     		ldr	r3, .L7+4
- 104 001a 1B68     		ldr	r3, [r3]
- 105 001c ADF80430 		strh	r3, [sp, #4]	@ movhi
- 106 0020 1B0C     		lsrs	r3, r3, #16
- 107 0022 8DF80630 		strb	r3, [sp, #6]
-  17:Core/Src/debug_tools/debug_uart.c ****     HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 100);
- 108              		.loc 1 17 5 is_stmt 1 view .LVU14
- 109              		.loc 1 17 48 is_stmt 0 view .LVU15
- 110 0026 01A8     		add	r0, sp, #4
- 111 0028 FFF7FEFF 		bl	strlen
- 112              	.LVL7:
- 113              		.loc 1 17 5 discriminator 1 view .LVU16
- 114 002c 6423     		movs	r3, #100
- 115 002e 82B2     		uxth	r2, r0
- 116 0030 01A9     		add	r1, sp, #4
- 117 0032 2846     		mov	r0, r5
- 118 0034 FFF7FEFF 		bl	HAL_UART_Transmit
- 119              	.LVL8:
-  18:Core/Src/debug_tools/debug_uart.c **** }
- 120              		.loc 1 18 1 view .LVU17
- 121 0038 03B0     		add	sp, sp, #12
- 122              		.cfi_def_cfa_offset 12
- 123              		@ sp needed
- 124 003a 30BD     		pop	{r4, r5, pc}
- 125              	.LVL9:
- 126              	.L8:
- 127              		.loc 1 18 1 view .LVU18
- 128              		.align	2
- 129              	.L7:
- 130 003c 00000000 		.word	huart1
- 131 0040 00000000 		.word	.LC0
- 132              		.cfi_endproc
- 133              	.LFE133:
- 135              		.section	.text.INT_TO_STRING,"ax",%progbits
- 136              		.align	1
- 137              		.global	INT_TO_STRING
- 138              		.syntax unified
- 139              		.thumb
- 140              		.thumb_func
- 142              	INT_TO_STRING:
- 143              	.LVL10:
- 144              	.LFB134:
-  19:Core/Src/debug_tools/debug_uart.c **** 
-  20:Core/Src/debug_tools/debug_uart.c **** // Function to convert an integer to a string
-  21:Core/Src/debug_tools/debug_uart.c **** void INT_TO_STRING(int num, char *str)
-  22:Core/Src/debug_tools/debug_uart.c **** {
- 145              		.loc 1 22 1 is_stmt 1 view -0
- 146              		.cfi_startproc
- 147              		@ args = 0, pretend = 0, frame = 0
- 148              		@ frame_needed = 0, uses_anonymous_args = 0
- 149              		.loc 1 22 1 is_stmt 0 view .LVU20
- 150 0000 10B5     		push	{r4, lr}
- 151              		.cfi_def_cfa_offset 8
- 152              		.cfi_offset 4, -8
- 153              		.cfi_offset 14, -4
-  23:Core/Src/debug_tools/debug_uart.c ****     int i = 0;
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccqW9mAs.s 			page 4
+ 104              		.section	.text.INT_TO_STRING,"ax",%progbits
+ 105              		.align	1
+ 106              		.global	INT_TO_STRING
+ 107              		.syntax unified
+ 108              		.thumb
+ 109              		.thumb_func
+ 111              	INT_TO_STRING:
+ 112              	.LVL8:
+ 113              	.LFB134:
+  16:Core/Src/debug_tools/debug_uart.c **** 
+  17:Core/Src/debug_tools/debug_uart.c **** // Function to convert an integer to a string
+  18:Core/Src/debug_tools/debug_uart.c **** void INT_TO_STRING(int num, char *str)
+  19:Core/Src/debug_tools/debug_uart.c **** {
+ 114              		.loc 1 19 1 is_stmt 1 view -0
+ 115              		.cfi_startproc
+ 116              		@ args = 0, pretend = 0, frame = 0
+ 117              		@ frame_needed = 0, uses_anonymous_args = 0
+ 118              		.loc 1 19 1 is_stmt 0 view .LVU15
+ 119 0000 10B5     		push	{r4, lr}
+ 120              		.cfi_def_cfa_offset 8
+ 121              		.cfi_offset 4, -8
+ 122              		.cfi_offset 14, -4
+  20:Core/Src/debug_tools/debug_uart.c ****     int i = 0;
+ 123              		.loc 1 20 5 is_stmt 1 view .LVU16
+ 124              	.LVL9:
+  21:Core/Src/debug_tools/debug_uart.c ****     int is_negative = 0;
+ 125              		.loc 1 21 5 view .LVU17
+  22:Core/Src/debug_tools/debug_uart.c **** 
+  23:Core/Src/debug_tools/debug_uart.c ****     // Handle negative numbers
+  24:Core/Src/debug_tools/debug_uart.c ****     if (num < 0)
+ 126              		.loc 1 24 5 view .LVU18
+ 127              		.loc 1 24 8 is_stmt 0 view .LVU19
+ 128 0002 0028     		cmp	r0, #0
+ 129              		.loc 1 24 8 view .LVU20
+ 130 0004 1FDB     		blt	.L17
+  21:Core/Src/debug_tools/debug_uart.c ****     int is_negative = 0;
+ 131              		.loc 1 21 9 view .LVU21
+ 132 0006 0024     		movs	r4, #0
+ 133              	.LVL10:
+ 134              	.L10:
+  25:Core/Src/debug_tools/debug_uart.c ****     {
+  26:Core/Src/debug_tools/debug_uart.c ****         is_negative = 1;
+ 135              		.loc 1 26 21 view .LVU22
+ 136 0008 0022     		movs	r2, #0
+ 137              	.LVL11:
+ 138              	.L11:
+  27:Core/Src/debug_tools/debug_uart.c ****         num = -num;
+  28:Core/Src/debug_tools/debug_uart.c ****     }
+  29:Core/Src/debug_tools/debug_uart.c **** 
+  30:Core/Src/debug_tools/debug_uart.c ****     // Convert each digit to a character and store in the string in reverse order
+  31:Core/Src/debug_tools/debug_uart.c ****     do
+ 139              		.loc 1 31 5 is_stmt 1 view .LVU23
+  32:Core/Src/debug_tools/debug_uart.c ****     {
+  33:Core/Src/debug_tools/debug_uart.c ****         str[i++] = num % 10 + '0';
+ 140              		.loc 1 33 9 view .LVU24
+ 141              		.loc 1 33 24 is_stmt 0 view .LVU25
+ 142 000a 164B     		ldr	r3, .L18
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccdOvDFq.s 			page 4
 
 
- 154              		.loc 1 23 5 is_stmt 1 view .LVU21
- 155              	.LVL11:
-  24:Core/Src/debug_tools/debug_uart.c ****     int is_negative = 0;
- 156              		.loc 1 24 5 view .LVU22
-  25:Core/Src/debug_tools/debug_uart.c **** 
-  26:Core/Src/debug_tools/debug_uart.c ****     // Handle negative numbers
-  27:Core/Src/debug_tools/debug_uart.c ****     if (num < 0)
- 157              		.loc 1 27 5 view .LVU23
- 158              		.loc 1 27 8 is_stmt 0 view .LVU24
- 159 0002 0028     		cmp	r0, #0
- 160              		.loc 1 27 8 view .LVU25
- 161 0004 1FDB     		blt	.L17
-  24:Core/Src/debug_tools/debug_uart.c ****     int is_negative = 0;
- 162              		.loc 1 24 9 view .LVU26
- 163 0006 0024     		movs	r4, #0
- 164              	.LVL12:
- 165              	.L10:
-  28:Core/Src/debug_tools/debug_uart.c ****     {
-  29:Core/Src/debug_tools/debug_uart.c ****         is_negative = 1;
- 166              		.loc 1 29 21 view .LVU27
- 167 0008 0022     		movs	r2, #0
- 168              	.LVL13:
- 169              	.L11:
-  30:Core/Src/debug_tools/debug_uart.c ****         num = -num;
-  31:Core/Src/debug_tools/debug_uart.c ****     }
-  32:Core/Src/debug_tools/debug_uart.c **** 
-  33:Core/Src/debug_tools/debug_uart.c ****     // Convert each digit to a character and store in the string in reverse order
-  34:Core/Src/debug_tools/debug_uart.c ****     do
- 170              		.loc 1 34 5 is_stmt 1 view .LVU28
-  35:Core/Src/debug_tools/debug_uart.c ****     {
-  36:Core/Src/debug_tools/debug_uart.c ****         str[i++] = num % 10 + '0';
- 171              		.loc 1 36 9 view .LVU29
- 172              		.loc 1 36 24 is_stmt 0 view .LVU30
- 173 000a 164B     		ldr	r3, .L18
- 174 000c 83FB003C 		smull	r3, ip, r3, r0
- 175 0010 C317     		asrs	r3, r0, #31
- 176 0012 C3EBAC03 		rsb	r3, r3, ip, asr #2
- 177 0016 9E46     		mov	lr, r3
- 178 0018 03EB8303 		add	r3, r3, r3, lsl #2
- 179 001c A0EB4303 		sub	r3, r0, r3, lsl #1
- 180 0020 9446     		mov	ip, r2
- 181              		.loc 1 36 14 view .LVU31
- 182 0022 0132     		adds	r2, r2, #1
- 183              	.LVL14:
- 184              		.loc 1 36 29 view .LVU32
- 185 0024 3033     		adds	r3, r3, #48
- 186              		.loc 1 36 18 view .LVU33
- 187 0026 01F80C30 		strb	r3, [r1, ip]
-  37:Core/Src/debug_tools/debug_uart.c ****         num /= 10;
- 188              		.loc 1 37 9 is_stmt 1 view .LVU34
- 189 002a 0346     		mov	r3, r0
- 190              		.loc 1 37 13 is_stmt 0 view .LVU35
- 191 002c 7046     		mov	r0, lr
- 192              	.LVL15:
-  38:Core/Src/debug_tools/debug_uart.c ****     } while (num > 0);
- 193              		.loc 1 38 18 is_stmt 1 discriminator 1 view .LVU36
- 194 002e 092B     		cmp	r3, #9
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccqW9mAs.s 			page 5
-
-
- 195 0030 EBDC     		bgt	.L11
-  39:Core/Src/debug_tools/debug_uart.c **** 
-  40:Core/Src/debug_tools/debug_uart.c ****     // Add a '-' character if the number was negative
-  41:Core/Src/debug_tools/debug_uart.c ****     if (is_negative)
- 196              		.loc 1 41 5 view .LVU37
- 197              		.loc 1 41 8 is_stmt 0 view .LVU38
- 198 0032 1CB1     		cbz	r4, .L12
-  42:Core/Src/debug_tools/debug_uart.c ****     {
-  43:Core/Src/debug_tools/debug_uart.c ****         str[i++] = '-';
- 199              		.loc 1 43 9 is_stmt 1 view .LVU39
- 200              	.LVL16:
- 201              		.loc 1 43 18 is_stmt 0 view .LVU40
- 202 0034 2D23     		movs	r3, #45
- 203 0036 8B54     		strb	r3, [r1, r2]
- 204              		.loc 1 43 14 view .LVU41
- 205 0038 0CF10202 		add	r2, ip, #2
- 206              	.LVL17:
- 207              	.L12:
-  44:Core/Src/debug_tools/debug_uart.c ****     }
+ 143 000c 83FB003C 		smull	r3, ip, r3, r0
+ 144 0010 C317     		asrs	r3, r0, #31
+ 145 0012 C3EBAC03 		rsb	r3, r3, ip, asr #2
+ 146 0016 9E46     		mov	lr, r3
+ 147 0018 03EB8303 		add	r3, r3, r3, lsl #2
+ 148 001c A0EB4303 		sub	r3, r0, r3, lsl #1
+ 149 0020 9446     		mov	ip, r2
+ 150              		.loc 1 33 14 view .LVU26
+ 151 0022 0132     		adds	r2, r2, #1
+ 152              	.LVL12:
+ 153              		.loc 1 33 29 view .LVU27
+ 154 0024 3033     		adds	r3, r3, #48
+ 155              		.loc 1 33 18 view .LVU28
+ 156 0026 01F80C30 		strb	r3, [r1, ip]
+  34:Core/Src/debug_tools/debug_uart.c ****         num /= 10;
+ 157              		.loc 1 34 9 is_stmt 1 view .LVU29
+ 158 002a 0346     		mov	r3, r0
+ 159              		.loc 1 34 13 is_stmt 0 view .LVU30
+ 160 002c 7046     		mov	r0, lr
+ 161              	.LVL13:
+  35:Core/Src/debug_tools/debug_uart.c ****     } while (num > 0);
+ 162              		.loc 1 35 18 is_stmt 1 discriminator 1 view .LVU31
+ 163 002e 092B     		cmp	r3, #9
+ 164 0030 EBDC     		bgt	.L11
+  36:Core/Src/debug_tools/debug_uart.c **** 
+  37:Core/Src/debug_tools/debug_uart.c ****     // Add a '-' character if the number was negative
+  38:Core/Src/debug_tools/debug_uart.c ****     if (is_negative)
+ 165              		.loc 1 38 5 view .LVU32
+ 166              		.loc 1 38 8 is_stmt 0 view .LVU33
+ 167 0032 1CB1     		cbz	r4, .L12
+  39:Core/Src/debug_tools/debug_uart.c ****     {
+  40:Core/Src/debug_tools/debug_uart.c ****         str[i++] = '-';
+ 168              		.loc 1 40 9 is_stmt 1 view .LVU34
+ 169              	.LVL14:
+ 170              		.loc 1 40 18 is_stmt 0 view .LVU35
+ 171 0034 2D23     		movs	r3, #45
+ 172 0036 8B54     		strb	r3, [r1, r2]
+ 173              		.loc 1 40 14 view .LVU36
+ 174 0038 0CF10202 		add	r2, ip, #2
+ 175              	.LVL15:
+ 176              	.L12:
+  41:Core/Src/debug_tools/debug_uart.c ****     }
+  42:Core/Src/debug_tools/debug_uart.c **** 
+  43:Core/Src/debug_tools/debug_uart.c ****     // Add null terminator to the string
+  44:Core/Src/debug_tools/debug_uart.c ****     str[i] = '\0';
+ 177              		.loc 1 44 5 is_stmt 1 view .LVU37
+ 178              		.loc 1 44 12 is_stmt 0 view .LVU38
+ 179 003c 0020     		movs	r0, #0
+ 180              	.LVL16:
+ 181              		.loc 1 44 12 view .LVU39
+ 182 003e 8854     		strb	r0, [r1, r2]
   45:Core/Src/debug_tools/debug_uart.c **** 
-  46:Core/Src/debug_tools/debug_uart.c ****     // Add null terminator to the string
-  47:Core/Src/debug_tools/debug_uart.c ****     str[i] = '\0';
- 208              		.loc 1 47 5 is_stmt 1 view .LVU42
- 209              		.loc 1 47 12 is_stmt 0 view .LVU43
- 210 003c 0020     		movs	r0, #0
- 211              	.LVL18:
- 212              		.loc 1 47 12 view .LVU44
- 213 003e 8854     		strb	r0, [r1, r2]
-  48:Core/Src/debug_tools/debug_uart.c **** 
-  49:Core/Src/debug_tools/debug_uart.c ****     // Reverse the string
-  50:Core/Src/debug_tools/debug_uart.c ****     int j = 0;
- 214              		.loc 1 50 5 is_stmt 1 view .LVU45
- 215              	.LVL19:
-  51:Core/Src/debug_tools/debug_uart.c ****     i--;
- 216              		.loc 1 51 5 view .LVU46
- 217              		.loc 1 51 6 is_stmt 0 view .LVU47
- 218 0040 531E     		subs	r3, r2, #1
- 219              	.LVL20:
-  52:Core/Src/debug_tools/debug_uart.c ****     while (j < i)
- 220              		.loc 1 52 5 is_stmt 1 view .LVU48
-  50:Core/Src/debug_tools/debug_uart.c ****     i--;
- 221              		.loc 1 50 9 is_stmt 0 view .LVU49
- 222 0042 0246     		mov	r2, r0
- 223              		.loc 1 52 11 view .LVU50
- 224 0044 0AE0     		b	.L13
- 225              	.LVL21:
- 226              	.L17:
-  29:Core/Src/debug_tools/debug_uart.c ****         num = -num;
- 227              		.loc 1 29 9 is_stmt 1 view .LVU51
-  30:Core/Src/debug_tools/debug_uart.c ****     }
- 228              		.loc 1 30 9 view .LVU52
-  30:Core/Src/debug_tools/debug_uart.c ****     }
- 229              		.loc 1 30 13 is_stmt 0 view .LVU53
- 230 0046 4042     		rsbs	r0, r0, #0
- 231              	.LVL22:
-  29:Core/Src/debug_tools/debug_uart.c ****         num = -num;
- 232              		.loc 1 29 21 view .LVU54
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccqW9mAs.s 			page 6
+  46:Core/Src/debug_tools/debug_uart.c ****     // Reverse the string
+  47:Core/Src/debug_tools/debug_uart.c ****     int j = 0;
+ 183              		.loc 1 47 5 is_stmt 1 view .LVU40
+ 184              	.LVL17:
+  48:Core/Src/debug_tools/debug_uart.c ****     i--;
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccdOvDFq.s 			page 5
 
 
- 233 0048 0124     		movs	r4, #1
- 234 004a DDE7     		b	.L10
- 235              	.LVL23:
- 236              	.L14:
- 237              	.LBB2:
-  53:Core/Src/debug_tools/debug_uart.c ****     {
-  54:Core/Src/debug_tools/debug_uart.c ****         char temp = str[j];
- 238              		.loc 1 54 9 is_stmt 1 view .LVU55
- 239              		.loc 1 54 14 is_stmt 0 view .LVU56
- 240 004c 885C     		ldrb	r0, [r1, r2]	@ zero_extendqisi2
- 241              	.LVL24:
-  55:Core/Src/debug_tools/debug_uart.c ****         str[j] = str[i];
- 242              		.loc 1 55 9 is_stmt 1 view .LVU57
- 243              		.loc 1 55 21 is_stmt 0 view .LVU58
- 244 004e 11F803C0 		ldrb	ip, [r1, r3]	@ zero_extendqisi2
- 245              		.loc 1 55 16 view .LVU59
- 246 0052 01F802C0 		strb	ip, [r1, r2]
-  56:Core/Src/debug_tools/debug_uart.c ****         str[i] = temp;
- 247              		.loc 1 56 9 is_stmt 1 view .LVU60
- 248              		.loc 1 56 16 is_stmt 0 view .LVU61
- 249 0056 C854     		strb	r0, [r1, r3]
-  57:Core/Src/debug_tools/debug_uart.c ****         j++;
- 250              		.loc 1 57 9 is_stmt 1 view .LVU62
- 251              		.loc 1 57 10 is_stmt 0 view .LVU63
- 252 0058 0132     		adds	r2, r2, #1
- 253              	.LVL25:
-  58:Core/Src/debug_tools/debug_uart.c ****         i--;
- 254              		.loc 1 58 9 is_stmt 1 view .LVU64
- 255              		.loc 1 58 10 is_stmt 0 view .LVU65
- 256 005a 013B     		subs	r3, r3, #1
- 257              	.LVL26:
- 258              	.L13:
- 259              		.loc 1 58 10 view .LVU66
- 260              	.LBE2:
-  52:Core/Src/debug_tools/debug_uart.c ****     {
- 261              		.loc 1 52 14 is_stmt 1 view .LVU67
- 262 005c 9342     		cmp	r3, r2
- 263 005e F5DC     		bgt	.L14
-  59:Core/Src/debug_tools/debug_uart.c ****     }
-  60:Core/Src/debug_tools/debug_uart.c **** }
- 264              		.loc 1 60 1 is_stmt 0 view .LVU68
- 265 0060 10BD     		pop	{r4, pc}
- 266              	.LVL27:
- 267              	.L19:
- 268              		.loc 1 60 1 view .LVU69
- 269 0062 00BF     		.align	2
- 270              	.L18:
- 271 0064 67666666 		.word	1717986919
- 272              		.cfi_endproc
- 273              	.LFE134:
- 275              		.section	.text.STRING_TO_INT,"ax",%progbits
- 276              		.align	1
- 277              		.global	STRING_TO_INT
- 278              		.syntax unified
- 279              		.thumb
- 280              		.thumb_func
- 282              	STRING_TO_INT:
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccqW9mAs.s 			page 7
+ 185              		.loc 1 48 5 view .LVU41
+ 186              		.loc 1 48 6 is_stmt 0 view .LVU42
+ 187 0040 531E     		subs	r3, r2, #1
+ 188              	.LVL18:
+  49:Core/Src/debug_tools/debug_uart.c ****     while (j < i)
+ 189              		.loc 1 49 5 is_stmt 1 view .LVU43
+  47:Core/Src/debug_tools/debug_uart.c ****     i--;
+ 190              		.loc 1 47 9 is_stmt 0 view .LVU44
+ 191 0042 0246     		mov	r2, r0
+ 192              		.loc 1 49 11 view .LVU45
+ 193 0044 0AE0     		b	.L13
+ 194              	.LVL19:
+ 195              	.L17:
+  26:Core/Src/debug_tools/debug_uart.c ****         num = -num;
+ 196              		.loc 1 26 9 is_stmt 1 view .LVU46
+  27:Core/Src/debug_tools/debug_uart.c ****     }
+ 197              		.loc 1 27 9 view .LVU47
+  27:Core/Src/debug_tools/debug_uart.c ****     }
+ 198              		.loc 1 27 13 is_stmt 0 view .LVU48
+ 199 0046 4042     		rsbs	r0, r0, #0
+ 200              	.LVL20:
+  26:Core/Src/debug_tools/debug_uart.c ****         num = -num;
+ 201              		.loc 1 26 21 view .LVU49
+ 202 0048 0124     		movs	r4, #1
+ 203 004a DDE7     		b	.L10
+ 204              	.LVL21:
+ 205              	.L14:
+ 206              	.LBB2:
+  50:Core/Src/debug_tools/debug_uart.c ****     {
+  51:Core/Src/debug_tools/debug_uart.c ****         char temp = str[j];
+ 207              		.loc 1 51 9 is_stmt 1 view .LVU50
+ 208              		.loc 1 51 14 is_stmt 0 view .LVU51
+ 209 004c 885C     		ldrb	r0, [r1, r2]	@ zero_extendqisi2
+ 210              	.LVL22:
+  52:Core/Src/debug_tools/debug_uart.c ****         str[j] = str[i];
+ 211              		.loc 1 52 9 is_stmt 1 view .LVU52
+ 212              		.loc 1 52 21 is_stmt 0 view .LVU53
+ 213 004e 11F803C0 		ldrb	ip, [r1, r3]	@ zero_extendqisi2
+ 214              		.loc 1 52 16 view .LVU54
+ 215 0052 01F802C0 		strb	ip, [r1, r2]
+  53:Core/Src/debug_tools/debug_uart.c ****         str[i] = temp;
+ 216              		.loc 1 53 9 is_stmt 1 view .LVU55
+ 217              		.loc 1 53 16 is_stmt 0 view .LVU56
+ 218 0056 C854     		strb	r0, [r1, r3]
+  54:Core/Src/debug_tools/debug_uart.c ****         j++;
+ 219              		.loc 1 54 9 is_stmt 1 view .LVU57
+ 220              		.loc 1 54 10 is_stmt 0 view .LVU58
+ 221 0058 0132     		adds	r2, r2, #1
+ 222              	.LVL23:
+  55:Core/Src/debug_tools/debug_uart.c ****         i--;
+ 223              		.loc 1 55 9 is_stmt 1 view .LVU59
+ 224              		.loc 1 55 10 is_stmt 0 view .LVU60
+ 225 005a 013B     		subs	r3, r3, #1
+ 226              	.LVL24:
+ 227              	.L13:
+ 228              		.loc 1 55 10 view .LVU61
+ 229              	.LBE2:
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccdOvDFq.s 			page 6
 
 
- 283              	.LVL28:
- 284              	.LFB135:
-  61:Core/Src/debug_tools/debug_uart.c **** 
-  62:Core/Src/debug_tools/debug_uart.c **** int STRING_TO_INT(const char *str)
-  63:Core/Src/debug_tools/debug_uart.c **** {
- 285              		.loc 1 63 1 is_stmt 1 view -0
- 286              		.cfi_startproc
- 287              		@ args = 0, pretend = 0, frame = 0
- 288              		@ frame_needed = 0, uses_anonymous_args = 0
- 289              		@ link register save eliminated.
-  64:Core/Src/debug_tools/debug_uart.c ****     int result = 0;
- 290              		.loc 1 64 5 view .LVU71
-  65:Core/Src/debug_tools/debug_uart.c ****     int sign = 1; // Positive by default
- 291              		.loc 1 65 5 view .LVU72
-  66:Core/Src/debug_tools/debug_uart.c **** 
-  67:Core/Src/debug_tools/debug_uart.c ****     // Handle negative sign
-  68:Core/Src/debug_tools/debug_uart.c ****     if (*str == '-')
- 292              		.loc 1 68 5 view .LVU73
- 293              		.loc 1 68 9 is_stmt 0 view .LVU74
- 294 0000 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
- 295              		.loc 1 68 8 view .LVU75
- 296 0002 2D2B     		cmp	r3, #45
- 297 0004 03D0     		beq	.L27
-  65:Core/Src/debug_tools/debug_uart.c ****     int sign = 1; // Positive by default
- 298              		.loc 1 65 9 view .LVU76
- 299 0006 4FF0010C 		mov	ip, #1
- 300              	.LVL29:
- 301              	.L21:
-  65:Core/Src/debug_tools/debug_uart.c ****     int sign = 1; // Positive by default
- 302              		.loc 1 65 9 view .LVU77
- 303 000a 0022     		movs	r2, #0
- 304 000c 09E0     		b	.L23
- 305              	.LVL30:
- 306              	.L27:
-  69:Core/Src/debug_tools/debug_uart.c ****     {
-  70:Core/Src/debug_tools/debug_uart.c ****         sign = -1;
- 307              		.loc 1 70 9 is_stmt 1 view .LVU78
-  71:Core/Src/debug_tools/debug_uart.c ****         str++;
- 308              		.loc 1 71 9 view .LVU79
- 309              		.loc 1 71 12 is_stmt 0 view .LVU80
- 310 000e 0130     		adds	r0, r0, #1
- 311              	.LVL31:
-  70:Core/Src/debug_tools/debug_uart.c ****         str++;
- 312              		.loc 1 70 14 view .LVU81
- 313 0010 4FF0FF3C 		mov	ip, #-1
- 314 0014 F9E7     		b	.L21
- 315              	.LVL32:
- 316              	.L29:
-  72:Core/Src/debug_tools/debug_uart.c ****     }
-  73:Core/Src/debug_tools/debug_uart.c **** 
-  74:Core/Src/debug_tools/debug_uart.c ****     // Iterate through each character in the string
-  75:Core/Src/debug_tools/debug_uart.c ****     while (*str != '\0')
-  76:Core/Src/debug_tools/debug_uart.c ****     {
-  77:Core/Src/debug_tools/debug_uart.c ****         // Ensure character is a digit
-  78:Core/Src/debug_tools/debug_uart.c ****         if (*str >= '0' && *str <= '9')
-  79:Core/Src/debug_tools/debug_uart.c ****         {
-  80:Core/Src/debug_tools/debug_uart.c ****             // Convert character to digit and update result
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccqW9mAs.s 			page 8
+  49:Core/Src/debug_tools/debug_uart.c ****     {
+ 230              		.loc 1 49 14 is_stmt 1 view .LVU62
+ 231 005c 9342     		cmp	r3, r2
+ 232 005e F5DC     		bgt	.L14
+  56:Core/Src/debug_tools/debug_uart.c ****     }
+  57:Core/Src/debug_tools/debug_uart.c **** }
+ 233              		.loc 1 57 1 is_stmt 0 view .LVU63
+ 234 0060 10BD     		pop	{r4, pc}
+ 235              	.LVL25:
+ 236              	.L19:
+ 237              		.loc 1 57 1 view .LVU64
+ 238 0062 00BF     		.align	2
+ 239              	.L18:
+ 240 0064 67666666 		.word	1717986919
+ 241              		.cfi_endproc
+ 242              	.LFE134:
+ 244              		.section	.text.STRING_TO_INT,"ax",%progbits
+ 245              		.align	1
+ 246              		.global	STRING_TO_INT
+ 247              		.syntax unified
+ 248              		.thumb
+ 249              		.thumb_func
+ 251              	STRING_TO_INT:
+ 252              	.LVL26:
+ 253              	.LFB135:
+  58:Core/Src/debug_tools/debug_uart.c **** 
+  59:Core/Src/debug_tools/debug_uart.c **** int STRING_TO_INT(const char *str)
+  60:Core/Src/debug_tools/debug_uart.c **** {
+ 254              		.loc 1 60 1 is_stmt 1 view -0
+ 255              		.cfi_startproc
+ 256              		@ args = 0, pretend = 0, frame = 0
+ 257              		@ frame_needed = 0, uses_anonymous_args = 0
+ 258              		@ link register save eliminated.
+  61:Core/Src/debug_tools/debug_uart.c ****     int result = 0;
+ 259              		.loc 1 61 5 view .LVU66
+  62:Core/Src/debug_tools/debug_uart.c ****     int sign = 1; // Positive by default
+ 260              		.loc 1 62 5 view .LVU67
+  63:Core/Src/debug_tools/debug_uart.c **** 
+  64:Core/Src/debug_tools/debug_uart.c ****     // Handle negative sign
+  65:Core/Src/debug_tools/debug_uart.c ****     if (*str == '-')
+ 261              		.loc 1 65 5 view .LVU68
+ 262              		.loc 1 65 9 is_stmt 0 view .LVU69
+ 263 0000 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
+ 264              		.loc 1 65 8 view .LVU70
+ 265 0002 2D2B     		cmp	r3, #45
+ 266 0004 03D0     		beq	.L27
+  62:Core/Src/debug_tools/debug_uart.c ****     int sign = 1; // Positive by default
+ 267              		.loc 1 62 9 view .LVU71
+ 268 0006 4FF0010C 		mov	ip, #1
+ 269              	.LVL27:
+ 270              	.L21:
+  62:Core/Src/debug_tools/debug_uart.c ****     int sign = 1; // Positive by default
+ 271              		.loc 1 62 9 view .LVU72
+ 272 000a 0022     		movs	r2, #0
+ 273 000c 09E0     		b	.L23
+ 274              	.LVL28:
+ 275              	.L27:
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccdOvDFq.s 			page 7
 
 
-  81:Core/Src/debug_tools/debug_uart.c ****             result = result * 10 + (*str - '0');
- 317              		.loc 1 81 13 is_stmt 1 view .LVU82
- 318              		.loc 1 81 29 is_stmt 0 view .LVU83
- 319 0016 02EB8202 		add	r2, r2, r2, lsl #2
- 320              	.LVL33:
- 321              		.loc 1 81 42 view .LVU84
- 322 001a 303B     		subs	r3, r3, #48
- 323              		.loc 1 81 20 view .LVU85
- 324 001c 03EB4202 		add	r2, r3, r2, lsl #1
- 325              	.LVL34:
-  82:Core/Src/debug_tools/debug_uart.c ****         }
-  83:Core/Src/debug_tools/debug_uart.c ****         else
-  84:Core/Src/debug_tools/debug_uart.c ****         {
-  85:Core/Src/debug_tools/debug_uart.c ****             // Invalid character encountered, return 0 or handle error
-  86:Core/Src/debug_tools/debug_uart.c ****             return 0;
-  87:Core/Src/debug_tools/debug_uart.c ****         }
-  88:Core/Src/debug_tools/debug_uart.c ****         str++; // Move to the next character
- 326              		.loc 1 88 9 is_stmt 1 view .LVU86
- 327              		.loc 1 88 12 is_stmt 0 view .LVU87
- 328 0020 0130     		adds	r0, r0, #1
- 329              	.LVL35:
- 330              	.L23:
-  75:Core/Src/debug_tools/debug_uart.c ****     {
- 331              		.loc 1 75 17 is_stmt 1 view .LVU88
-  75:Core/Src/debug_tools/debug_uart.c ****     {
- 332              		.loc 1 75 12 is_stmt 0 view .LVU89
- 333 0022 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
-  75:Core/Src/debug_tools/debug_uart.c ****     {
- 334              		.loc 1 75 17 view .LVU90
- 335 0024 33B1     		cbz	r3, .L28
-  78:Core/Src/debug_tools/debug_uart.c ****         {
- 336              		.loc 1 78 9 is_stmt 1 view .LVU91
-  78:Core/Src/debug_tools/debug_uart.c ****         {
- 337              		.loc 1 78 25 is_stmt 0 view .LVU92
- 338 0026 A3F13001 		sub	r1, r3, #48
- 339 002a C9B2     		uxtb	r1, r1
-  78:Core/Src/debug_tools/debug_uart.c ****         {
- 340              		.loc 1 78 12 view .LVU93
- 341 002c 0929     		cmp	r1, #9
- 342 002e F2D9     		bls	.L29
-  86:Core/Src/debug_tools/debug_uart.c ****         }
- 343              		.loc 1 86 20 view .LVU94
- 344 0030 0020     		movs	r0, #0
- 345              	.LVL36:
-  89:Core/Src/debug_tools/debug_uart.c ****     }
-  90:Core/Src/debug_tools/debug_uart.c **** 
-  91:Core/Src/debug_tools/debug_uart.c ****     // Apply sign to result and return
-  92:Core/Src/debug_tools/debug_uart.c ****     return result * sign;
-  93:Core/Src/debug_tools/debug_uart.c **** }...
- 346              		.loc 1 93 1 view .LVU95
- 347 0032 7047     		bx	lr
- 348              	.LVL37:
- 349              	.L28:
-  92:Core/Src/debug_tools/debug_uart.c ****     return result * sign;
- 350              		.loc 1 92 5 is_stmt 1 view .LVU96
-  92:Core/Src/debug_tools/debug_uart.c ****     return result * sign;
- 351              		.loc 1 92 19 is_stmt 0 view .LVU97
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccqW9mAs.s 			page 9
+  66:Core/Src/debug_tools/debug_uart.c ****     {
+  67:Core/Src/debug_tools/debug_uart.c ****         sign = -1;
+ 276              		.loc 1 67 9 is_stmt 1 view .LVU73
+  68:Core/Src/debug_tools/debug_uart.c ****         str++;
+ 277              		.loc 1 68 9 view .LVU74
+ 278              		.loc 1 68 12 is_stmt 0 view .LVU75
+ 279 000e 0130     		adds	r0, r0, #1
+ 280              	.LVL29:
+  67:Core/Src/debug_tools/debug_uart.c ****         str++;
+ 281              		.loc 1 67 14 view .LVU76
+ 282 0010 4FF0FF3C 		mov	ip, #-1
+ 283 0014 F9E7     		b	.L21
+ 284              	.LVL30:
+ 285              	.L29:
+  69:Core/Src/debug_tools/debug_uart.c ****     }
+  70:Core/Src/debug_tools/debug_uart.c **** 
+  71:Core/Src/debug_tools/debug_uart.c ****     // Iterate through each character in the string
+  72:Core/Src/debug_tools/debug_uart.c ****     while (*str != '\0')
+  73:Core/Src/debug_tools/debug_uart.c ****     {
+  74:Core/Src/debug_tools/debug_uart.c ****         // Ensure character is a digit
+  75:Core/Src/debug_tools/debug_uart.c ****         if (*str >= '0' && *str <= '9')
+  76:Core/Src/debug_tools/debug_uart.c ****         {
+  77:Core/Src/debug_tools/debug_uart.c ****             // Convert character to digit and update result
+  78:Core/Src/debug_tools/debug_uart.c ****             result = result * 10 + (*str - '0');
+ 286              		.loc 1 78 13 is_stmt 1 view .LVU77
+ 287              		.loc 1 78 29 is_stmt 0 view .LVU78
+ 288 0016 02EB8202 		add	r2, r2, r2, lsl #2
+ 289              	.LVL31:
+ 290              		.loc 1 78 42 view .LVU79
+ 291 001a 303B     		subs	r3, r3, #48
+ 292              		.loc 1 78 20 view .LVU80
+ 293 001c 03EB4202 		add	r2, r3, r2, lsl #1
+ 294              	.LVL32:
+  79:Core/Src/debug_tools/debug_uart.c ****         }
+  80:Core/Src/debug_tools/debug_uart.c ****         else
+  81:Core/Src/debug_tools/debug_uart.c ****         {
+  82:Core/Src/debug_tools/debug_uart.c ****             // Invalid character encountered, return 0 or handle error
+  83:Core/Src/debug_tools/debug_uart.c ****             return 0;
+  84:Core/Src/debug_tools/debug_uart.c ****         }
+  85:Core/Src/debug_tools/debug_uart.c ****         str++; // Move to the next character
+ 295              		.loc 1 85 9 is_stmt 1 view .LVU81
+ 296              		.loc 1 85 12 is_stmt 0 view .LVU82
+ 297 0020 0130     		adds	r0, r0, #1
+ 298              	.LVL33:
+ 299              	.L23:
+  72:Core/Src/debug_tools/debug_uart.c ****     {
+ 300              		.loc 1 72 17 is_stmt 1 view .LVU83
+  72:Core/Src/debug_tools/debug_uart.c ****     {
+ 301              		.loc 1 72 12 is_stmt 0 view .LVU84
+ 302 0022 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
+  72:Core/Src/debug_tools/debug_uart.c ****     {
+ 303              		.loc 1 72 17 view .LVU85
+ 304 0024 33B1     		cbz	r3, .L28
+  75:Core/Src/debug_tools/debug_uart.c ****         {
+ 305              		.loc 1 75 9 is_stmt 1 view .LVU86
+  75:Core/Src/debug_tools/debug_uart.c ****         {
+ 306              		.loc 1 75 25 is_stmt 0 view .LVU87
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccdOvDFq.s 			page 8
 
 
- 352 0034 0CFB02F0 		mul	r0, ip, r2
- 353              	.LVL38:
-  92:Core/Src/debug_tools/debug_uart.c ****     return result * sign;
- 354              		.loc 1 92 19 view .LVU98
- 355 0038 7047     		bx	lr
- 356              		.cfi_endproc
- 357              	.LFE135:
- 359              		.text
- 360              	.Letext0:
- 361              		.file 2 "C:/Users/Saksham Puri/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack
- 362              		.file 3 "C:/Users/Saksham Puri/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack
- 363              		.file 4 "Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l4r5xx.h"
- 364              		.file 5 "C:/Users/Saksham Puri/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack
- 365              		.file 6 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_def.h"
- 366              		.file 7 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_dma.h"
- 367              		.file 8 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h"
- 368              		.file 9 "C:/Users/Saksham Puri/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack
- 369              		.file 10 "Core/Inc/main.h"
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccqW9mAs.s 			page 10
+ 307 0026 A3F13001 		sub	r1, r3, #48
+ 308 002a C9B2     		uxtb	r1, r1
+  75:Core/Src/debug_tools/debug_uart.c ****         {
+ 309              		.loc 1 75 12 view .LVU88
+ 310 002c 0929     		cmp	r1, #9
+ 311 002e F2D9     		bls	.L29
+  83:Core/Src/debug_tools/debug_uart.c ****         }
+ 312              		.loc 1 83 20 view .LVU89
+ 313 0030 0020     		movs	r0, #0
+ 314              	.LVL34:
+  86:Core/Src/debug_tools/debug_uart.c ****     }
+  87:Core/Src/debug_tools/debug_uart.c **** 
+  88:Core/Src/debug_tools/debug_uart.c ****     // Apply sign to result and return
+  89:Core/Src/debug_tools/debug_uart.c ****     return result * sign;
+  90:Core/Src/debug_tools/debug_uart.c **** }...
+ 315              		.loc 1 90 1 view .LVU90
+ 316 0032 7047     		bx	lr
+ 317              	.LVL35:
+ 318              	.L28:
+  89:Core/Src/debug_tools/debug_uart.c ****     return result * sign;
+ 319              		.loc 1 89 5 is_stmt 1 view .LVU91
+  89:Core/Src/debug_tools/debug_uart.c ****     return result * sign;
+ 320              		.loc 1 89 19 is_stmt 0 view .LVU92
+ 321 0034 0CFB02F0 		mul	r0, ip, r2
+ 322              	.LVL36:
+  89:Core/Src/debug_tools/debug_uart.c ****     return result * sign;
+ 323              		.loc 1 89 19 view .LVU93
+ 324 0038 7047     		bx	lr
+ 325              		.cfi_endproc
+ 326              	.LFE135:
+ 328              		.text
+ 329              	.Letext0:
+ 330              		.file 2 "C:/Users/Saksham Puri/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack
+ 331              		.file 3 "C:/Users/Saksham Puri/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack
+ 332              		.file 4 "Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l4r5xx.h"
+ 333              		.file 5 "C:/Users/Saksham Puri/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack
+ 334              		.file 6 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_def.h"
+ 335              		.file 7 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_dma.h"
+ 336              		.file 8 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h"
+ 337              		.file 9 "Core/Inc/main.h"
+ 338              		.file 10 "C:/Users/Saksham Puri/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpac
+ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccdOvDFq.s 			page 9
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 debug_uart.c
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccqW9mAs.s:21     .text.debug_uart_print_str:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccqW9mAs.s:27     .text.debug_uart_print_str:00000000 debug_uart_print_str
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccqW9mAs.s:58     .text.debug_uart_print_str:00000018 $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccqW9mAs.s:63     .rodata.debug_uart_print_str_new_line.str1.4:00000000 $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccqW9mAs.s:67     .text.debug_uart_print_str_new_line:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccqW9mAs.s:73     .text.debug_uart_print_str_new_line:00000000 debug_uart_print_str_new_line
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccqW9mAs.s:130    .text.debug_uart_print_str_new_line:0000003c $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccqW9mAs.s:136    .text.INT_TO_STRING:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccqW9mAs.s:142    .text.INT_TO_STRING:00000000 INT_TO_STRING
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccqW9mAs.s:271    .text.INT_TO_STRING:00000064 $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccqW9mAs.s:276    .text.STRING_TO_INT:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccqW9mAs.s:282    .text.STRING_TO_INT:00000000 STRING_TO_INT
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccdOvDFq.s:21     .text.debug_uart_print_str:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccdOvDFq.s:27     .text.debug_uart_print_str:00000000 debug_uart_print_str
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccdOvDFq.s:58     .text.debug_uart_print_str:00000018 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccdOvDFq.s:63     .text.debug_uart_print_str_mem:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccdOvDFq.s:69     .text.debug_uart_print_str_mem:00000000 debug_uart_print_str_mem
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccdOvDFq.s:100    .text.debug_uart_print_str_mem:00000018 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccdOvDFq.s:105    .text.INT_TO_STRING:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccdOvDFq.s:111    .text.INT_TO_STRING:00000000 INT_TO_STRING
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccdOvDFq.s:240    .text.INT_TO_STRING:00000064 $d
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccdOvDFq.s:245    .text.STRING_TO_INT:00000000 $t
+C:\Users\SAKSHA~1\AppData\Local\Temp\ccdOvDFq.s:251    .text.STRING_TO_INT:00000000 STRING_TO_INT
 
 UNDEFINED SYMBOLS
 strlen
 HAL_UART_Transmit
+huart2
 huart1

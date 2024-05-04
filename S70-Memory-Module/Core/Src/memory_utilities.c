@@ -130,7 +130,7 @@ void ENABLE_WREN(SPI_HandleTypeDef *hspi1)
     PULL_CS();
     if (HAL_SPI_Transmit(hspi1, (uint8_t *)&FLASH_WREN, 1, HAL_MAX_DELAY) != HAL_OK)
     {
-        debug_uart_print_str_new_line("Timeout when enabling WREN");
+        debug_uart_print_str_mem("Timeout when enabling WREN\n");
     }
     SET_CS();
 
@@ -192,7 +192,7 @@ void MEM_CLEAR_LFS(SPI_HandleTypeDef *ptr_hspi1, lfs_block_t block)
         err = statusRegBuffer[0] & 0b01000000;
         if (err == 1)
         {
-            debug_uart_print_str_new_line("Error during Erasing");
+            debug_uart_print_str_mem("Error during Erasing\n");
         }
     }
 }
@@ -291,17 +291,17 @@ int8_t MOUNT()
         int8_t result = lfs_mount(&lfs, &cfg);
         if (result < 0)
         {
-            debug_uart_print_str_new_line("Mounting Unsuccessful");
+            debug_uart_print_str_mem("Mounting Unsuccessful\n");
             return result;
         }
         else
         {
-            debug_uart_print_str_new_line("Mounting Successful");
+            debug_uart_print_str_mem("Mounting Successful\n");
             mounted = 1;
             return 0;
         }
     }
-    debug_uart_print_str_new_line("LittleFS not Initialized or already mounted");
+    debug_uart_print_str_mem("LittleFS not Initialized or already mounted\n");
     return -1;
 }
 
@@ -325,7 +325,7 @@ int8_t FORCE_MOUNT()
         }
         return 0;
     }
-    debug_uart_print_str_new_line("LittleFS not Initialized or already mounted");
+    debug_uart_print_str_mem("LittleFS not Initialized or already mounted\n");
     return -1;
 }
 
@@ -337,17 +337,17 @@ int8_t UNMOUNT()
         int8_t result = lfs_unmount(&lfs);
         if (result < 0)
         {
-            debug_uart_print_str_new_line("Error Un-mounting!");
+            debug_uart_print_str_mem("Error Un-mounting!\n");
             return result;
         }
         else
         {
-            debug_uart_print_str_new_line("Successfully Un-mounted LittleFS!");
+            debug_uart_print_str_mem("Successfully Un-mounted LittleFS!\n");
             mounted = 0;
             return result;
         }
     }
-    debug_uart_print_str_new_line("LittleFS not Initialized or not mounted");
+    debug_uart_print_str_mem("LittleFS not Initialized or not mounted\n");
     return -1;
 }
 
@@ -358,16 +358,16 @@ int8_t FORMAT()
         int8_t result = lfs_format(&lfs, &cfg);
         if (result < 0)
         {
-            debug_uart_print_str_new_line("Error Formatting!");
+            debug_uart_print_str_mem("Error Formatting!\n");
             return result;
         }
         else
         {
-            debug_uart_print_str_new_line("Formatting Successful!");
+            debug_uart_print_str_mem("Formatting Successful!\n");
             return result;
         }
     }
-    debug_uart_print_str_new_line("LittleFS not Initialized");
+    debug_uart_print_str_mem("LittleFS not Initialized\n");
     return -1;
 }
 
@@ -394,35 +394,35 @@ int8_t WRITE_FILE(char *file_name, void *write_buffer, uint32_t size)
                                   LFS_O_WRONLY | LFS_O_CREAT);
     if (result < 0)
     {
-        debug_uart_print_str_new_line("Error Opening / Creating a File!");
+        debug_uart_print_str_mem("Error Opening / Creating a File!\n");
         return result;
     }
     else
     {
-        debug_uart_print_str("Opened / Created a file named: ");
-        debug_uart_print_str_new_line(file_name);
+        debug_uart_print_str_mem("Opened / Created a file named: \n");
+        debug_uart_print_str_mem(file_name);
 
         // Write defined data to file
         result = lfs_file_write(&lfs, &file, write_buffer, size);
         if (result < 0)
         {
-            debug_uart_print_str_new_line("Error Writing to File!");
+            debug_uart_print_str_mem("Error Writing to File!\n");
             return result;
         }
         else
         {
-            debug_uart_print_str_new_line("Successfully wrote data to file!");
+            debug_uart_print_str_mem("Successfully wrote data to file!\n");
 
             // Close the File, the storage is not updated until the file is closed successfully
             result = lfs_file_close(&lfs, &file);
             if (result < 0)
             {
-                debug_uart_print_str_new_line("Error Closing the File!");
+                debug_uart_print_str_mem("Error Closing the File!\n");
                 return result;
             }
             else
             {
-                debug_uart_print_str_new_line("Successfully closed the File!");
+                debug_uart_print_str_mem("Successfully closed the File!\n");
                 return result;
             }
         }
@@ -435,35 +435,35 @@ int8_t READ_FILE(char *file_name, void *read_buffer, uint32_t size)
                                   LFS_O_RDONLY | LFS_O_CREAT);
     if (result < 0)
     {
-        debug_uart_print_str_new_line("Error Opening / Creating a File!");
+        debug_uart_print_str_mem("Error Opening / Creating a File!\n");
         return result;
     }
     else
     {
-        debug_uart_print_str("Opened / Created a file named: ");
-        debug_uart_print_str_new_line(file_name);
+        debug_uart_print_str_mem("Opened / Created a file named: \n");
+        debug_uart_print_str_mem(file_name);
 
         // Write defined data to file
         result = lfs_file_read(&lfs, &file, read_buffer, size);
         if (result < 0)
         {
-            debug_uart_print_str_new_line("Error Reading File!");
+            debug_uart_print_str_mem("Error Reading File!\n");
             return result;
         }
         else
         {
-            debug_uart_print_str_new_line("Successfully read file!");
+            debug_uart_print_str_mem("Successfully read file!\n");
 
             // Close the File, the storage is not updated until the file is closed successfully
             result = lfs_file_close(&lfs, &file);
             if (result < 0)
             {
-                debug_uart_print_str_new_line("Error Closing the File!");
+                debug_uart_print_str_mem("Error Closing the File!\n");
                 return result;
             }
             else
             {
-                debug_uart_print_str_new_line("Successfully closed the File!");
+                debug_uart_print_str_mem("Successfully closed the File!\n");
                 return result;
             }
         }
