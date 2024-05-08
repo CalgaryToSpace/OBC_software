@@ -10,12 +10,17 @@
 
 /*
  * Summary list of required command IDs:
-	Commands (all done): 7, 9, 10 (done), 11 (done), 13 (done), 14 (done), 17 (done), 26 (done), 45, 63 (done), 64
-	Telemetry: 145, 147 (done), 150 (done), 155, 156, 157, 170, 197 (done), 201, 204, 207, 240 (done)
 
-	TODO:
-		- within a byte, use the opposite endian-ness (first towards the end, last towards the beginning of the byte)
-		- check INT vs UINT (int is signed, uint is unsigned)!
+	Todo:
+	Commands: 64
+	Telemetry: 155, 156, 157, 170, 201, 204, 207
+
+	Done:
+	Untested: 7, 9, 145, 45 [next to make: 155]
+	Tested: 10, 11, 13, 14, 17, 26, 63, 147, 150, 197, 240
+
+	- within a byte, use the opposite endian-ness (first towards the end, last towards the beginning of the byte)
+	- check INT vs UINT (int is signed, uint is unsigned)!
  *  */
 
 ADCS_TC_Ack_Struct ADCS_TC_Ack(I2C_HandleTypeDef *hi2c) {
@@ -139,18 +144,8 @@ void ADCS_Run_Once(I2C_HandleTypeDef *hi2c) {
 	I2C_telecommand_wrapper(hi2c, TC_TRIGGER_ADCS_LOOP, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
 }
 
-void ADCS_Use_Main_Magnetorquer(I2C_HandleTypeDef *hi2c) {
-	uint8_t data_send[1] = {0};
-	I2C_telecommand_wrapper(hi2c, TC_SET_MODE_OF_MAGNETOMETER_OPERATION, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
-}
-
-void ADCS_Use_Redundant_Magnetorquer(I2C_HandleTypeDef *hi2c) {
-	uint8_t data_send[1] = {1};
-	I2C_telecommand_wrapper(hi2c, TC_SET_MODE_OF_MAGNETOMETER_OPERATION, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
-}
-
-void ADCS_Use_Main_Magnetorquer_With_Alternate_Microcontroller(I2C_HandleTypeDef *hi2c) {
-	uint8_t data_send[1] = {2};
+void ADCS_Set_Magnetometer_Mode(I2C_HandleTypeDef *hi2c, ADCS_Magnetometer_Mode mode) {
+	uint8_t data_send[1] = {mode};
 	I2C_telecommand_wrapper(hi2c, TC_SET_MODE_OF_MAGNETOMETER_OPERATION, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
 }
 
@@ -281,8 +276,6 @@ void ADCS_Estimate_Angular_Rates(I2C_HandleTypeDef *hi2c) {
 	WRITE_STRUCT_TO_MEMORY(rates) // memory module function
 }
 
-
-// TLF_CUBEACP_SATELLITE_POSITION_LLH
 void ADCS_Get_LLH_Position(I2C_HandleTypeDef *hi2c) {
 	// gets ADCS position in WGS-84 coords (Table 106)
 	ADCS_LLH_Position_Struct pos;
@@ -299,6 +292,57 @@ void ADCS_Get_LLH_Position(I2C_HandleTypeDef *hi2c) {
 	pos.altitude = data_received[5] << 8 | data_received[4]; // uint16_t (unsigned)
 
 	WRITE_STRUCT_TO_MEMORY(rates) // memory module function
+}
+
+void ADCS_Bootloader_Clear_Errors(I2C_HandleTypeDef *hi2c) {
+	uint8_t data_send[0]; // 0-byte data (from manual)
+	I2C_telecommand_wrapper(hi2c, TC_BL_CLEAR_ERRORS, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
+}
+
+void ADCS_Set_Unix_Time_Save_Mode(I2C_HandleTypeDef *hi2c, bool save_now, bool save_on_update, bool save_periodic, uint8_t period) {
+	uint8_t data_send[2] = { (save_now | (save_on_update << 1) | (save_periodic << 2) ) , period}; // 2-byte data (from manual)
+	I2C_telecommand_wrapper(hi2c, TC_SET_UNIX_TIME_SAVE_TO_FLASH, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
+}
+
+void ADCS_Get_Unix_Time_Save_Mode(I2C_HandleTypeDef *hi2c) {
+	ADCS_Set_Unix_Time_Save_Mode_Struct mode;
+
+	uint8_t data_length = 2;
+	uint8_t data_received[data_length]; // define temp buffer
+
+	I2C_telemetry_wrapper(hi2c, TLF_GET_UNIX_TIME_SAVE_TO_FLASH, data_received, data_length, ADCS_INCLUDE_CHECKSUM);
+
+	mode.save_now = data_received[0] & 0b00000001;
+	mode.save_on_update = data_received[0] & 0b00000010;
+	mode.save_periodic = data_received[0] & 0b00000100;
+
+	mode.period = data_received[1];
+
+	WRITE_STRUCT_TO_MEMORY(mode) // memory module function
+}
+
+void ADCS_Set_SGP4_Orbit_Params(I2C_HandleTypeDef *hi2c, double inclination, double eccentricity, double ascending_node_right_ascension,
+														//  degrees,					dimensionless, 		degrees
+		double perigee_argument, double b_star_drag_term, double mean_motion, double mean_anomaly, double epoch) {
+		// degrees,					dimensionless,			orbits/day,			degrees,			years.days
+
+	uint8_t data_send[64] = {};
+
+	// convert doubles to arrays of uint8_t
+	memcpy(&data_send[0], &inclination, sizeof(inclination));
+	memcpy(&data_send[8], &eccentricity, sizeof(eccentricity));
+	memcpy(&data_send[16], &ascending_node_right_ascension, sizeof(ascending_node_right_ascension));
+	memcpy(&data_send[24], &perigee_argument, sizeof(perigee_argument));
+	memcpy(&data_send[32], &b_star_drag_term, sizeof(b_star_drag_term));
+	memcpy(&data_send[40], &mean_motion, sizeof(mean_motion));
+	memcpy(&data_send[48], &mean_anomaly, sizeof(mean_anomaly));
+	memcpy(&data_send[56], &epoch, sizeof(epoch));
+
+	I2C_telecommand_wrapper(hi2c, TC_CUBEACP_SET_SGP4_ORBIT_PARAMETERS, data_send, sizeof(data_send), ADCS_INCLUDE_CHECKSUM);
+}
+
+void ADCS_Get_SGP4_Orbit_Params(I2C_HandleTypeDef *hi2c) {
+
 }
 
 

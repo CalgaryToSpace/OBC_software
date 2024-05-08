@@ -126,6 +126,13 @@ typedef enum ADCS_Power_Select {
 	ADCS_Power_Select_Same
 } ADCS_Power_Select;
 
+typedef enum ADCS_Magnetometer_Mode {
+	ADCS_Magnetometer_Mode_Main_Signal,
+	ADCS_Magnetometer_Mode_Redundant_Signal,
+	ADCS_Magnetometer_Mode_Main_Motor,
+	ADCS_Magnetometer_Mode_None
+} ADCS_Magnetometer_Mode;
+
 /* Structs */
 
 typedef struct ADCS_TC_Ack_Struct {
@@ -186,6 +193,13 @@ typedef struct ADCS_Power_Control_Struct{
 	ADCS_Power_Select gps_power;
 } ADCS_Power_Control_Struct;
 
+typedef struct ADCS_Set_Unix_Time_Save_Mode_Struct{
+	bool save_now;
+	bool save_on_update;
+	bool save_periodic;
+	uint8_t period;
+} ADCS_Set_Unix_Time_Save_Mode_Struct;
+
 /* Function Definitions */
 
 #define ADCS_I2C_HANDLE &hi2c1
@@ -222,9 +236,7 @@ void ADCS_Stop_Reaction_Wheels(I2C_HandleTypeDef *hi2c);
 void ADCS_Attitude_Estimation_Mode(I2C_HandleTypeDef *hi2c, uint8_t mode);
 ADCS_TC_Ack_Struct ADCS_TC_Ack(I2C_HandleTypeDef *hi2c);
 void ADCS_Run_Once(I2C_HandleTypeDef *hi2c);
-void ADCS_Use_Main_Magnetorquer(I2C_HandleTypeDef *hi2c);
-void ADCS_Use_Redundant_Magnetorquer(I2C_HandleTypeDef *hi2c);
-void ADCS_Use_Main_Magnetorquer_With_Alternate_Microcontroller(I2C_HandleTypeDef *hi2c);
+void ADCS_Set_Magnetometer_Mode(I2C_HandleTypeDef *hi2c, ADCS_Magnetometer_Mode mode);
 void ADCS_Set_Magnetorquer_Output(I2C_HandleTypeDef *hi2c, uint16_t x_duty, uint16_t y_duty, uint16_t z_duty);
 void ADCS_Set_Wheel_Speed(I2C_HandleTypeDef *hi2c, uint16_t x_speed, uint16_t y_speed, uint16_t z_speed);
 void ADCS_Set_Magnetometer_Config(I2C_HandleTypeDef *hi2c, uint16_t mounting_transform_alpha_angle, uint16_t mounting_transform_beta_angle, uint16_t mounting_transform_gamma_angle, uint16_t channel_1_offset, uint16_t channel_2_offset, uint16_t channel_3_offset, uint16_t sensitivity_matrix_s11, uint16_t sensitivity_matrix_s22, uint16_t sensitivity_matrix_s33, uint16_t sensitivity_matrix_s12, uint16_t sensitivity_matrix_s13, uint16_t sensitivity_matrix_s21, uint16_t sensitivity_matrix_s23, uint16_t sensitivity_matrix_s31, uint16_t sensitivity_matrix_s32);
@@ -252,5 +264,10 @@ void ADCS_Set_Magnetometer_Config(I2C_HandleTypeDef *hi2c,
         uint16_t sensitivity_matrix_s23,
         uint16_t sensitivity_matrix_s31,
         uint16_t sensitivity_matrix_s32);
+void ADCS_Bootloader_Clear_Errors(I2C_HandleTypeDef *hi2c);
+void ADCS_Set_Unix_Time_Save_Mode(I2C_HandleTypeDef *hi2c, bool save_now, bool save_on_update, bool save_periodic, uint8_t period);
+void ADCS_Get_Unix_Time_Save_Mode(I2C_HandleTypeDef *hi2c);
+void ADCS_Set_SGP4_Orbit_Params(I2C_HandleTypeDef *hi2c, double inclination, double eccentricity, double ascending_node_right_ascension, double perigee_argument, double b_star_drag_term, double mean_motion, double mean_anomaly, double epoch);
+void ADCS_Get_SGP4_Orbit_Params(I2C_HandleTypeDef *hi2c);
 
 #endif /* INC_ADCS_TYPES_H_ */
