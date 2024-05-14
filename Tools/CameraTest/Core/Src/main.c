@@ -19,7 +19,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
-
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdlib.h>
@@ -41,7 +40,8 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
- UART_HandleTypeDef hlpuart1;
+UART_HandleTypeDef hlpuart1;
+UART_HandleTypeDef huart4;
 UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart3;
 
@@ -58,6 +58,7 @@ static void MX_LPUART1_UART_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_USART1_UART_Init(void);
+static void MX_UART4_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -65,8 +66,6 @@ static void MX_USART1_UART_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 uint8_t dataRec[300];
-// File pointer init
-FILE *fptr;
 
 /* USER CODE END 0 */
 
@@ -76,6 +75,7 @@ FILE *fptr;
   */
 int main(void)
 {
+
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -102,6 +102,7 @@ int main(void)
   MX_USART3_UART_Init();
   MX_USB_OTG_FS_PCD_Init();
   MX_USART1_UART_Init();
+  MX_UART4_Init();
   /* USER CODE BEGIN 2 */
 
 
@@ -122,7 +123,7 @@ int main(void)
   		  while(loop == T){
 
   			  // get sentence
-  			  HAL_UART_Receive(&hlpuart1, (uint8_t*)sentence, 64, HAL_MAX_DELAY);
+  			  HAL_UART_Receive(&huart4, (uint8_t*)sentence, 64, HAL_MAX_DELAY);
 //  		  HAL_UART_Transmit(&hlpuart1, (uint8_t*)sentence, 10, HAL_MAX_DELAY);
 
   			  // if no total exists, get it
@@ -162,7 +163,7 @@ int main(void)
   		  		HAL_UART_Transmit(&hlpuart1, (uint8_t*)"L", 1, HAL_MAX_DELAY);
   		  		  for(int i=0; i<totalSentences; i++){
   		  			// get sentence
-  		  			HAL_UART_Receive(&hlpuart1, (uint8_t*)sentence, 64, HAL_MAX_DELAY);
+  		  			HAL_UART_Receive(&huart4, (uint8_t*)sentence, 64, HAL_MAX_DELAY);
   		  			// add to group
   		  			strcpy(group[i],sentence);
   		  			SentencesNum += 1;
@@ -173,7 +174,7 @@ int main(void)
   		  	  }
 
   		  // receive final telemetry sentence
-  		  	HAL_UART_Receive(&hlpuart1, (uint8_t*)sentence, 64, HAL_MAX_DELAY);
+  		  	HAL_UART_Receive(&huart4, (uint8_t*)sentence, 64, HAL_MAX_DELAY);
   		  	//memWrite(CAMERA_DATA, group, 67);
   }
 
@@ -193,11 +194,11 @@ int main(void)
   	  switch(lighting){
   	  case 'd':
   		  if(flash){
-  			  HAL_UART_Transmit(&hlpuart1, (uint8_t*)"D", 1, HAL_MAX_DELAY);
+  			  HAL_UART_Transmit(&huart4, "D", 1, HAL_MAX_DELAY);
   			  HAL_Delay(25);
   		  }
   		  else{
-  			  HAL_UART_Transmit(&hlpuart1, (uint8_t*)"d", 1, HAL_MAX_DELAY);
+  			  HAL_UART_Transmit(&huart4, (uint8_t*)"d", 1, HAL_MAX_DELAY);
   			  HAL_Delay(25);
   		  }
   		  receiveImage();
@@ -242,10 +243,6 @@ int main(void)
 
     }
 
-    // tester function to write groups of data to a file
-    void fileWrite(char group[][]){
-
-    }
 
 
 
@@ -273,15 +270,13 @@ const char *m = "t";
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  HAL_UART_Receive(&hlpuart1, (uint8_t*)dataRec, 1, HAL_MAX_DELAY);
+	  Capture_Image(false, dataRec[0]);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-//	  HAL_UART_Receive(&hlpuart1, (uint8_t*)dataRec, 4, HAL_MAX_DELAY);
 
-
-
-	  HAL_UART_Transmit(&hlpuart1, (uint8_t*)m, 1, HAL_MAX_DELAY);
-	  HAL_UART_Receive(&hlpuart1, (uint8_t*)dataRec, 202, HAL_MAX_DELAY);
 
   }
   /* USER CODE END 3 */
@@ -353,7 +348,7 @@ static void MX_LPUART1_UART_Init(void)
 
   /* USER CODE END LPUART1_Init 1 */
   hlpuart1.Instance = LPUART1;
-  hlpuart1.Init.BaudRate = 115200;
+  hlpuart1.Init.BaudRate = 209700;
   hlpuart1.Init.WordLength = UART_WORDLENGTH_8B;
   hlpuart1.Init.StopBits = UART_STOPBITS_1;
   hlpuart1.Init.Parity = UART_PARITY_NONE;
@@ -382,6 +377,54 @@ static void MX_LPUART1_UART_Init(void)
   /* USER CODE BEGIN LPUART1_Init 2 */
 
   /* USER CODE END LPUART1_Init 2 */
+
+}
+
+/**
+  * @brief UART4 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_UART4_Init(void)
+{
+
+  /* USER CODE BEGIN UART4_Init 0 */
+
+  /* USER CODE END UART4_Init 0 */
+
+  /* USER CODE BEGIN UART4_Init 1 */
+
+  /* USER CODE END UART4_Init 1 */
+  huart4.Instance = UART4;
+  huart4.Init.BaudRate = 115200;
+  huart4.Init.WordLength = UART_WORDLENGTH_8B;
+  huart4.Init.StopBits = UART_STOPBITS_1;
+  huart4.Init.Parity = UART_PARITY_NONE;
+  huart4.Init.Mode = UART_MODE_TX_RX;
+  huart4.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart4.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart4.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart4.Init.ClockPrescaler = UART_PRESCALER_DIV1;
+  huart4.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_SetTxFifoThreshold(&huart4, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_SetRxFifoThreshold(&huart4, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_DisableFifoMode(&huart4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN UART4_Init 2 */
+
+  /* USER CODE END UART4_Init 2 */
 
 }
 
@@ -498,6 +541,7 @@ static void MX_USB_OTG_FS_PCD_Init(void)
   /* USER CODE END USB_OTG_FS_Init 1 */
   hpcd_USB_OTG_FS.Instance = USB_OTG_FS;
   hpcd_USB_OTG_FS.Init.dev_endpoints = 6;
+  hpcd_USB_OTG_FS.Init.speed = PCD_SPEED_FULL;
   hpcd_USB_OTG_FS.Init.phy_itface = PCD_PHY_EMBEDDED;
   hpcd_USB_OTG_FS.Init.Sof_enable = ENABLE;
   hpcd_USB_OTG_FS.Init.low_power_enable = DISABLE;
@@ -523,15 +567,17 @@ static void MX_USB_OTG_FS_PCD_Init(void)
 static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
+/* USER CODE BEGIN MX_GPIO_Init_1 */
+/* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOG_CLK_ENABLE();
   HAL_PWREx_EnableVddIO2();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, LD3_Pin|LD2_Pin, GPIO_PIN_RESET);
@@ -565,6 +611,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(USB_OverCurrent_GPIO_Port, &GPIO_InitStruct);
 
+/* USER CODE BEGIN MX_GPIO_Init_2 */
+/* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */

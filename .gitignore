@@ -1,2 +1,6 @@
+/.idea
+**/.metadata/*
+**/.settings/*
+**/debug/*
 Workspace/.metadata
 Workspace/CTS-1_STM_OS/.settings
