@@ -49,6 +49,9 @@ typedef struct __attribute__((__packed__)) {
 
 } header_status;
 
+
+
+
 // Messgae ID: 241, 00x00F1: BESTXYZ
 typedef struct {
 	uint32_t psol_status; //P-sol status, Enum, see table 92 offset: H
@@ -82,6 +85,92 @@ typedef struct {
 	uint8_t crc[4];             // 32-bit CRC, Hex 4 , offset: H+112
 
 }  __attribute__((__packed__)) gps_bestxyz_status;
+
+
+
+
+// Message ID: 101, 00x0065: TIME
+//page 960 OEM7 Commands and Logs Reference Manual
+typedef struct {
+    uint32_t clock_status;        // Clock model status, Table 106 Enum, offset: H
+    int64_t offset;                // Receiver clock offset GPS system time = GPS reference time - offset, Double, offset: H+4
+    int64_t offset_std;            // Receiver clock offset standard deviation, Double, offset: H+12
+    int64_t utc_offset;            // UTC offset,UTC time = GPS reference time - offset + UTC offset, Double, offset: H+20
+    uint32_t utc_year;            // UTC year, Ulong, offset: H+28
+    uint8_t utc_month;            // UTC month (0-12), UTC time unknown then 0, Uchar, offset: H+32
+    uint8_t utc_day;              // UTC day (0-31),UTC time unknown then 0, Uchar, offset: H+33
+    uint8_t utc_hour;             // UTC hour (0-23), Uchar, offset: H+34
+    uint8_t utc_min;              // UTC minute (0-59), Uchar, offset: H+35
+    uint32_t utc_ms;              // UTC millisecond (0-60999), max 60999 when leapsecond applied, Ulong, offset: H+36
+    uint32_t utc_status;          // UTC status, 0 = Invalid, 1 = Valid, 2 = warning, Enum, offset: H+40
+    uint8_t crc[4];                 // 32-bit CRC, Ulong, offset: H+44
+} __attribute__((__packed__)) time_status;
+
+
+
+
+// Message ID: 2065, 00x0811: ITDETECTSTATUS
+//page 656 OEM7 Commands and Logs Reference Manual
+typedef struct {
+    uint32_t num_entries;        // Number of interferences to follow, Ulong, offset: H
+} __attribute__((__packed__)) itdetectstatus_entry_count;
+
+//entry number starts at 0
+typedef struct {
+    uint32_t rf_path;            // RF path for this entry, 2= L1, 3 = L2, 5 = L5, See Table 131, Enum, offset: H+4 + (entry# * 36)
+    uint32_t interference_type;  // Interference detection type,0 = SPECTRUMANALYSIS, 1 = STATISTICALANALYSIS, Enum, offset: H+8+ (entry# * 36)
+    int32_t parameter1;          // The first parameter of the interference: for SPECTRUMANALYSIS type, this is the center frequency in MHz; for STATISTICALANALYSIS type, this is reserved, Float, offset: H+12
+    int32_t parameter2;          // The second parameter of the interference: for SPECTRUMANALYSIS type, this is the bandwidth in MHz; for STATISTICALANALYSIS type, this is reserved, Float, offset: H+16
+    int32_t parameter3;          // The third parameter of the interference: for SPECTRUMANALYSIS type, this is the estimated power in dBm of the interference; for STATISTICALANALYSIS type, this is reserved, Float, offset: H+20
+    int32_t parameter4;          // The fourth parameter of the interference: for SPECTRUMANALYSIS type, this is the highest estimated power spectrum density in dBmHz of the interference; for STATISTICALANALYSIS type, this is reserved, Float, offset: H+24
+    uint32_t reserved1;          // Reserved, Ulong, offset: H+28+ (entry# * 36)
+    uint32_t reserved2;          // Reserved, Ulong, offset: H+32+ (entry# * 36)
+    uint32_t reserved3;          // Reserved, Ulong, offset: H+36+ (entry# * 36)
+} __attribute__((__packed__)) itdetectstatus_entry;
+
+typedef struct {
+    uint32_t crc[4];        // Number of interferences to follow, Ulong, offset: H+ 4 + (entries# * 36)
+} __attribute__((__packed__)) itdetectstatus_entry_crc;
+
+
+
+
+
+// Message ID: 93, 00x005D: RXSTATUS
+//page 873 OEM7 Commands and Logs Reference Manual
+//Need to look into if the num_stats is always 5??? if it is need to check this!!!!!!!!!!!!!!!!!!!
+typedef struct {
+    uint32_t error;                 // Receiver error (see Table 197), Ulong, offset: H
+    uint32_t num_stats;            // Number of status codes, Ulong, offset: H+4
+    uint32_t rxstat;               // Receiver status word (see Table 198), Ulong, offset: H+8
+    uint32_t rxstat_pri;           // Receiver status priority mask (can be set using STATUSCONFIG see page 403, applies for all masks), Ulong, offset: H+12
+    uint32_t rxstat_set;           // Receiver status event set mask, Ulong, offset: H+16
+    uint32_t rxstat_clear;         // Receiver status event clear mask, Ulong, offset: H+20
+    uint32_t aux1stat;             // Auxiliary 1 status word (see Table 200), Ulong, offset: H+24
+    uint32_t aux1stat_pri;         // Auxiliary 1 status priority mask, Ulong, offset: H+28
+    uint32_t aux1stat_set;         // Auxiliary 1 status event set mask, Ulong, offset: H+32
+    uint32_t aux1stat_clear;       // Auxiliary 1 status event clear mask, Ulong, offset: H+36
+    uint32_t aux2stat;             // Auxiliary 2 status word (see Table 202), Ulong, offset: H+40
+    uint32_t aux2stat_pri;         // Auxiliary 2 status priority mask, Ulong, offset: H+44
+    uint32_t aux2stat_set;         // Auxiliary 2 status event set mask, Ulong, offset: H+48
+    uint32_t aux2stat_clear;       // Auxiliary 2 status event clear mask, Ulong, offset: H+52
+    uint32_t aux3stat;             // Auxiliary 3 status word (see Table 203), Ulong, offset: H+56
+    uint32_t aux3stat_pri;         // Auxiliary 3 status priority mask, Ulong, offset: H+60
+    uint32_t aux3stat_set;         // Auxiliary 3 status event set mask, Ulong, offset: H+64
+    uint32_t aux3stat_clear;       // Auxiliary 3 status event clear mask, Ulong, offset: H+68
+    uint32_t aux4stat;             // Auxiliary 4 status word (see Table 205), Ulong, offset: H+72
+    uint32_t aux4stat_pri;         // Auxiliary 4 status priority mask, Ulong, offset: H+76
+    uint32_t aux4stat_set;         // Auxiliary 4 status event set mask, Ulong, offset: H+80
+    uint32_t aux4stat_clear;       // Auxiliary 4 status event clear mask, Ulong, offset: H+84
+    uint8_t crc[4];                // 32-bit CRC, Ulong, offset: H+88
+    // Note: The offset for CRC will depend on the number of entries.
+} __attribute__((__packed__)) rxstatus_entry;
+
+
+
+//Look into RXCONFIG because this is very variable not sure if necesarry to parse on the GPS
+
+
 
 
 #endif /* __INCLUDE_GUARD__GPS_TYPES_H__ */
