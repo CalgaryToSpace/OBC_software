@@ -45,8 +45,8 @@ void LFS_Config()
     // block device configuration
     cfg.read_size = 512;
     cfg.prog_size = 512;
-    cfg.block_size = 262144;
-    cfg.block_count = 256;
+    cfg.block_size = 1024; // 262144
+    cfg.block_count = 8196;
     cfg.block_cycles = 100; // ASK ABOUT THIS (HOW FREQUENT ARE WE USING THE MODULE)
     cfg.cache_size = 512;
     cfg.lookahead_size = 16;
@@ -90,7 +90,7 @@ int block_device_sync(const struct lfs_config *c)
  */
 void PULL_CS()
 {
-    HAL_GPIO_WritePin(PIN_SCI_NCS_FLASH_0_GPIO_Port, PIN_SCI_NCS_FLASH_0_Pin, GPIO_PIN_RESET); // LSB
+    HAL_GPIO_WritePin(PIN_SCI_NCS_FLASH_1_GPIO_Port, PIN_SCI_NCS_FLASH_1_Pin, GPIO_PIN_RESET); // LSB
 }
 
 /*
@@ -99,7 +99,7 @@ void PULL_CS()
  */
 void SET_CS()
 {
-    HAL_GPIO_WritePin(PIN_SCI_NCS_FLASH_0_GPIO_Port, PIN_SCI_NCS_FLASH_0_Pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(PIN_SCI_NCS_FLASH_1_GPIO_Port, PIN_SCI_NCS_FLASH_1_Pin, GPIO_PIN_SET);
 }
 
 /*
@@ -128,7 +128,8 @@ void ENABLE_WREN(SPI_HandleTypeDef *hspi1)
     READ_STATUS_REGISTER(hspi1, statusRegBuffer);
 
     PULL_CS();
-    if (HAL_SPI_Transmit(hspi1, (uint8_t *)&FLASH_WREN, 1, HAL_MAX_DELAY) != HAL_OK)
+    const uint8_t res = HAL_SPI_Transmit(hspi1, (uint8_t *)&FLASH_WREN, 1, HAL_MAX_DELAY);
+    if (res != HAL_OK)
     {
         debug_uart_print_str_new_line("Timeout when enabling WREN");
     }
@@ -171,8 +172,9 @@ void ENABLE_WRDI(SPI_HandleTypeDef *hspi1)
  */
 void MEM_CLEAR_LFS(SPI_HandleTypeDef *ptr_hspi1, lfs_block_t block)
 {
-    uint8_t addr[3] =
-        {(block >> 16) & 0xFF, (block >> 8) & 0xFF, block & 0xFF};
+    // uint8_t addr[3] =
+    //     {(block >> 16) & 0xFF, (block >> 8) & 0xFF, block & 0xFF};
+    uint8_t addr[3] = {0xff, 0x00, 0x00};
     ENABLE_WREN(ptr_hspi1);
 
     PULL_CS();
@@ -211,8 +213,9 @@ void MEM_CLEAR_LFS(SPI_HandleTypeDef *ptr_hspi1, lfs_block_t block)
 uint8_t WRITE_LFS(SPI_HandleTypeDef *hspi1, uint8_t *packetBuffer,
                   lfs_block_t block, lfs_size_t size)
 {
-    uint8_t addr[3] =
-        {(block >> 16) & 0xFF, (block >> 8) & 0xFF, block & 0xFF};
+    // uint8_t addr[3] =
+    //     {(block >> 16) & 0xFF, (block >> 8) & 0xFF, block & 0xFF};
+    uint8_t addr[3] = {0xff, 0x00, 0x00};
 
     // Buffer for receiving status register data
     uint8_t statusRegBuffer[1] = {0};
@@ -262,8 +265,9 @@ uint8_t WRITE_LFS(SPI_HandleTypeDef *hspi1, uint8_t *packetBuffer,
 uint8_t READ_LFS(SPI_HandleTypeDef *hspi1, uint8_t *spiRxBuffer,
                  lfs_block_t block, lfs_size_t size)
 {
-    uint8_t addr[3] =
-        {(block >> 16) & 0xFF, (block >> 8) & 0xFF, block & 0xFF};
+    // uint8_t addr[3] =
+    //     {(block >> 16) & 0xFF, (block >> 8) & 0xFF, block & 0xFF};
+    uint8_t addr[3] = {0xff, 0x00, 0x00};
 
     // Set Chip select to LOW and read from the address and store data in given buffer
     PULL_CS();

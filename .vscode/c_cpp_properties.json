@@ -1,0 +1,24 @@
+{
+  "configurations": [
+    {
+      "name": "STM32",
+      "includePath": [
+        "Core/Inc",
+        "Drivers/CMSIS/Device/ST/STM32L4xx/Include",
+        "Drivers/CMSIS/Include",
+        "Drivers/STM32L4xx_HAL_Driver/Inc",
+        "Drivers/STM32L4xx_HAL_Driver/Inc/Legacy",
+        "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2",
+        "Middlewares/Third_Party/FreeRTOS/Source/include",
+        "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F"
+      ],
+      "defines": [
+        "DEBUG",
+        "STM32L4R5xx",
+        "USE_HAL_DRIVER"
+      ],
+      "compilerPath": "C:\\USERS\\VAIBH\\APPDATA\\ROAMING\\CODE\\USER\\GLOBALSTORAGE\\BMD.STM32-FOR-VSCODE\\@XPACK-DEV-TOOLS\\ARM-NONE-EABI-GCC\\13.2.1-1.1.1\\.CONTENT\\BIN\\ARM-NONE-EABI-GCC.EXE"
+    }
+  ],
+  "version": 4
+}

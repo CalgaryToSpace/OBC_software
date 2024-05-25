@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 1
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s 			page 1
 
 
    1              		.cpu cortex-m4
@@ -58,7 +58,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 1
   27:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c ****     (+) Each port bit of the general-purpose I/O (GPIO) ports can be individually
   28:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c ****         configured by software in several modes:
   29:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c ****         (++) Input mode
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 2
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s 			page 2
 
 
   30:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c ****         (++) Analog mode
@@ -118,7 +118,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 1
   84:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c ****     (#) To set/reset the level of a pin configured in output mode use
   85:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c ****         HAL_GPIO_WritePin()/HAL_GPIO_TogglePin().
   86:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c **** 
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 3
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s 			page 3
 
 
   87:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c ****    (#) To lock pin configuration until next reset use HAL_GPIO_LockPin().
@@ -178,7 +178,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 1
  141:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c ****   * @{
  142:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c ****   */
  143:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c **** 
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 4
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s 			page 4
 
 
  144:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c **** /** @defgroup GPIO_Exported_Functions_Group1 Initialization/de-initialization functions
@@ -238,7 +238,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 1
  165:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c ****   uint32_t iocurrent;
   52              		.loc 1 165 12 is_stmt 0 view .LVU9
   53 0004 0023     		movs	r3, #0
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 5
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s 			page 5
 
 
   54              		.loc 1 175 9 view .LVU10
@@ -298,7 +298,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 1
  197:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c ****         temp &= ~(GPIO_OTYPER_OT0 << position) ;
   87              		.loc 1 197 9 is_stmt 1 view .LVU26
   88              		.loc 1 197 14 is_stmt 0 view .LVU27
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 6
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s 			page 6
 
 
   89 001e 25EA0C05 		bic	r5, r5, ip
@@ -358,7 +358,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 1
  233:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c ****         assert_param(IS_GPIO_AF(GPIO_Init->Alternate));
  108              		.loc 1 233 9 view .LVU36
  234:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c **** 
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 7
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s 			page 7
 
 
  235:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c ****         /* Configure Alternate function mapped with the current IO */
@@ -418,7 +418,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 1
  257:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c ****         temp |= (GPIO_GET_INDEX(GPIOx) << (4u * (position & 0x03u)));
  141              		.loc 1 257 18 discriminator 15 view .LVU51
  142 005c 0724     		movs	r4, #7
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 8
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s 			page 8
 
 
  143 005e 00E0     		b	.L7
@@ -478,7 +478,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 1
  185              		.loc 1 269 9 is_stmt 1 view .LVU69
  186              		.loc 1 269 14 is_stmt 0 view .LVU70
  187 008c ED68     		ldr	r5, [r5, #12]
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 9
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s 			page 9
 
 
  188              	.LVL19:
@@ -538,7 +538,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 1
  227 00b4 4B4D     		ldr	r5, .L26+4
  228 00b6 6E60     		str	r6, [r5, #4]
  285:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c **** 
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 10
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s 			page 10
 
 
  286:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c ****         temp = EXTI->IMR1;
@@ -598,7 +598,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 1
  178:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c **** 
  268              		.loc 1 178 41 is_stmt 0 view .LVU107
  269 00d8 4FF0010C 		mov	ip, #1
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 11
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s 			page 11
 
 
  270 00dc 0CFA03FC 		lsl	ip, ip, r3
@@ -658,7 +658,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 1
  306 0100 4FF0030C 		mov	ip, #3
  307 0104 0CFA05FC 		lsl	ip, ip, r5
  223:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c ****         temp |= ((GPIO_Init->Pull) << (position * 2U));
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 12
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s 			page 12
 
 
  308              		.loc 1 223 14 view .LVU126
@@ -718,7 +718,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 1
  245:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c ****       GPIOx->MODER = temp;
  346              		.loc 1 245 7 is_stmt 1 view .LVU143
  245:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c ****       GPIOx->MODER = temp;
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 13
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s 			page 13
 
 
  347              		.loc 1 245 26 is_stmt 0 view .LVU144
@@ -778,7 +778,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 1
  385 015e 4FEA930C 		lsr	ip, r3, #2
  255:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c ****         temp &= ~(0x0FuL << (4u * (position & 0x03u)));
  386              		.loc 1 255 14 view .LVU161
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 14
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s 			page 14
 
 
  387 0162 0CF10205 		add	r5, ip, #2
@@ -838,7 +838,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 1
  428 01b0 A042     		cmp	r0, r4
  429 01b2 10D0     		beq	.L19
  257:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c ****         SYSCFG->EXTICR[position >> 2u] = temp;
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 15
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s 			page 15
 
 
  430              		.loc 1 257 18 discriminator 13 view .LVU175
@@ -898,7 +898,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 1
  475              		.cfi_endproc
  476              	.LFE132:
  478              		.section	.text.HAL_GPIO_DeInit,"ax",%progbits
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 16
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s 			page 16
 
 
  479              		.align	1
@@ -958,7 +958,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 1
  512 000c 2EE0     		b	.L33
  513              	.LVL47:
  514              	.L48:
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 17
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s 			page 17
 
 
  319:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c ****   {
@@ -1018,7 +1018,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 1
  348:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c ****       /* Configure the default Alternate Function in current IO */
  349:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c ****       GPIOx->AFR[position >> 3u] &= ~(0xFu << ((position & 0x07u) * 4u)) ;
  540              		.loc 1 349 7 is_stmt 1 view .LVU203
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 18
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s 			page 18
 
 
  541              		.loc 1 349 17 is_stmt 0 view .LVU204
@@ -1078,7 +1078,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 1
  578 0064 0133     		adds	r3, r3, #1
  579              	.LVL50:
  318:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c ****   {
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 19
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s 			page 19
 
 
  580              		.loc 1 318 33 is_stmt 1 view .LVU221
@@ -1138,7 +1138,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 1
  330:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c ****       {
  619              		.loc 1 330 19 discriminator 1 view .LVU237
  620 009a 244D     		ldr	r5, .L49+4
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 20
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s 			page 20
 
 
  621 009c A842     		cmp	r0, r5
@@ -1198,7 +1198,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 1
  664 00e0 0425     		movs	r5, #4
  665 00e2 97E7     		b	.L31
  666              	.L39:
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 21
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s 			page 21
 
 
  330:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c ****       {
@@ -1258,7 +1258,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 1
  704              		.loc 1 341 9 view .LVU265
  341:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c ****       }
  705              		.loc 1 341 23 is_stmt 0 view .LVU266
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 22
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s 			page 22
 
 
  706 010e 064F     		ldr	r7, .L49
@@ -1318,7 +1318,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 1
  379:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c ****                        ##### IO operation functions #####
  380:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c ****  ===============================================================================
  381:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c **** 
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 23
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s 			page 23
 
 
  382:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c **** @endverbatim
@@ -1378,7 +1378,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 1
  774              		.cfi_endproc
  775              	.LFE134:
  777              		.section	.text.HAL_GPIO_WritePin,"ax",%progbits
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 24
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s 			page 24
 
 
  778              		.align	1
@@ -1438,7 +1438,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 1
  803              		.loc 1 439 16 is_stmt 0 view .LVU290
  804 0006 8162     		str	r1, [r0, #40]
  440:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c ****   }
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 25
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s 			page 25
 
 
  441:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c **** }
@@ -1498,7 +1498,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 1
  461:Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_gpio.c **** }
  841              		.loc 1 461 1 view .LVU302
  842 0010 7047     		bx	lr
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 26
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s 			page 26
 
 
  843              		.cfi_endproc
@@ -1558,7 +1558,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 1
  875              		.loc 1 485 3 is_stmt 1 view .LVU311
  876              		.loc 1 485 15 is_stmt 0 view .LVU312
  877 000e 019B     		ldr	r3, [sp, #4]
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 27
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s 			page 27
 
 
  878 0010 C361     		str	r3, [r0, #28]
@@ -1618,7 +1618,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 1
  913              		.loc 1 500 12 view .LVU326
  914 002c FBE7     		b	.L59
  915              		.cfi_endproc
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 28
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s 			page 28
 
 
  916              	.LFE137:
@@ -1678,7 +1678,7 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 1
  943              		.thumb
  944              		.thumb_func
  946              	HAL_GPIO_EXTI_IRQHandler:
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 29
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s 			page 29
 
 
  947              	.LVL74:
@@ -1730,34 +1730,34 @@ ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 1
  984              	.LFE138:
  986              		.text
  987              	.Letext0:
- 988              		.file 2 "C:/Users/Saksham Puri/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack
- 989              		.file 3 "C:/Users/Saksham Puri/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack
+ 988              		.file 2 "C:/Users/vaibh/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-to
+ 989              		.file 3 "C:/Users/vaibh/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-to
  990              		.file 4 "Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l4r5xx.h"
  991              		.file 5 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_def.h"
  992              		.file 6 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_gpio.h"
-ARM GAS  C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s 			page 30
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s 			page 30
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 stm32l4xx_hal_gpio.c
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s:21     .text.HAL_GPIO_Init:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s:27     .text.HAL_GPIO_Init:00000000 HAL_GPIO_Init
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s:471    .text.HAL_GPIO_Init:000001e0 $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s:479    .text.HAL_GPIO_DeInit:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s:485    .text.HAL_GPIO_DeInit:00000000 HAL_GPIO_DeInit
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s:732    .text.HAL_GPIO_DeInit:00000128 $d
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s:739    .text.HAL_GPIO_ReadPin:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s:745    .text.HAL_GPIO_ReadPin:00000000 HAL_GPIO_ReadPin
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s:778    .text.HAL_GPIO_WritePin:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s:784    .text.HAL_GPIO_WritePin:00000000 HAL_GPIO_WritePin
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s:811    .text.HAL_GPIO_TogglePin:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s:817    .text.HAL_GPIO_TogglePin:00000000 HAL_GPIO_TogglePin
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s:847    .text.HAL_GPIO_LockPin:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s:853    .text.HAL_GPIO_LockPin:00000000 HAL_GPIO_LockPin
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s:919    .text.HAL_GPIO_EXTI_Callback:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s:925    .text.HAL_GPIO_EXTI_Callback:00000000 HAL_GPIO_EXTI_Callback
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s:940    .text.HAL_GPIO_EXTI_IRQHandler:00000000 $t
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s:946    .text.HAL_GPIO_EXTI_IRQHandler:00000000 HAL_GPIO_EXTI_IRQHandler
-C:\Users\SAKSHA~1\AppData\Local\Temp\ccAUPDdh.s:982    .text.HAL_GPIO_EXTI_IRQHandler:00000018 $d
+C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s:21     .text.HAL_GPIO_Init:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s:27     .text.HAL_GPIO_Init:00000000 HAL_GPIO_Init
+C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s:471    .text.HAL_GPIO_Init:000001e0 $d
+C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s:479    .text.HAL_GPIO_DeInit:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s:485    .text.HAL_GPIO_DeInit:00000000 HAL_GPIO_DeInit
+C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s:732    .text.HAL_GPIO_DeInit:00000128 $d
+C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s:739    .text.HAL_GPIO_ReadPin:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s:745    .text.HAL_GPIO_ReadPin:00000000 HAL_GPIO_ReadPin
+C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s:778    .text.HAL_GPIO_WritePin:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s:784    .text.HAL_GPIO_WritePin:00000000 HAL_GPIO_WritePin
+C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s:811    .text.HAL_GPIO_TogglePin:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s:817    .text.HAL_GPIO_TogglePin:00000000 HAL_GPIO_TogglePin
+C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s:847    .text.HAL_GPIO_LockPin:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s:853    .text.HAL_GPIO_LockPin:00000000 HAL_GPIO_LockPin
+C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s:919    .text.HAL_GPIO_EXTI_Callback:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s:925    .text.HAL_GPIO_EXTI_Callback:00000000 HAL_GPIO_EXTI_Callback
+C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s:940    .text.HAL_GPIO_EXTI_IRQHandler:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s:946    .text.HAL_GPIO_EXTI_IRQHandler:00000000 HAL_GPIO_EXTI_IRQHandler
+C:\Users\vaibh\AppData\Local\Temp\ccc85gf8.s:982    .text.HAL_GPIO_EXTI_IRQHandler:00000018 $d
 
 NO UNDEFINED SYMBOLS

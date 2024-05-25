@@ -13,8 +13,8 @@
 ######################################
 # target
 ######################################
-TARGET = CTS-SAT-1_FW
-
+#TARGET = CTS-SAT-1_FW
+TARGET = S70-Memory-Module
 
 ######################################
 # building variables

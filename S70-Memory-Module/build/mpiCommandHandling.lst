@@ -1,0 +1,2305 @@
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"mpiCommandHandling.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "Core/Src/mpiCommandHandling.c"
+  20              		.section	.text.receiveIncomingMPIFramesTask,"ax",%progbits
+  21              		.align	1
+  22              		.global	receiveIncomingMPIFramesTask
+  23              		.syntax unified
+  24              		.thumb
+  25              		.thumb_func
+  27              	receiveIncomingMPIFramesTask:
+  28              	.LVL0:
+  29              	.LFB154:
+   1:Core/Src/mpiCommandHandling.c **** /*
+   2:Core/Src/mpiCommandHandling.c ****  * mpiCommandHandling.c
+   3:Core/Src/mpiCommandHandling.c ****  *
+   4:Core/Src/mpiCommandHandling.c ****  * Created on: Nov 17, 2023
+   5:Core/Src/mpiCommandHandling.c ****  * Author: Vaibhav Kapoor
+   6:Core/Src/mpiCommandHandling.c ****  */
+   7:Core/Src/mpiCommandHandling.c **** 
+   8:Core/Src/mpiCommandHandling.c **** #include <../Inc/mpiCommandHandling.h>
+   9:Core/Src/mpiCommandHandling.c **** #include "DoubleBuffer.h"
+  10:Core/Src/mpiCommandHandling.c **** #include "debug_tools/debug_uart.h"
+  11:Core/Src/mpiCommandHandling.c **** #include "memory_utilities.h"
+  12:Core/Src/mpiCommandHandling.c **** #include "main.h"
+  13:Core/Src/mpiCommandHandling.c **** #include "string.h"
+  14:Core/Src/mpiCommandHandling.c **** #include <stdio.h>
+  15:Core/Src/mpiCommandHandling.c **** 
+  16:Core/Src/mpiCommandHandling.c **** // Global Variables
+  17:Core/Src/mpiCommandHandling.c **** #define BUFFER_SIZE 160		 // Buffer Size set to accommodate length of a Tele-command packet
+  18:Core/Src/mpiCommandHandling.c **** DoubleBuffer MPIFrameBuffer; // Double buffer is used to receive incoming MPI Frames for processing
+  19:Core/Src/mpiCommandHandling.c **** 
+  20:Core/Src/mpiCommandHandling.c **** /**
+  21:Core/Src/mpiCommandHandling.c ****  * Sends a command to the MPI over UART and returns back the MPI response code (success / fail)
+  22:Core/Src/mpiCommandHandling.c ****  */
+  23:Core/Src/mpiCommandHandling.c **** uint8_t sendTelecommand(uint8_t commandCode, const uint8_t *params)
+  24:Core/Src/mpiCommandHandling.c **** {
+  25:Core/Src/mpiCommandHandling.c **** 
+  26:Core/Src/mpiCommandHandling.c **** 	size_t paramSize = sizeof(params);
+  27:Core/Src/mpiCommandHandling.c **** 	uint8_t UART1_txBuffer[3 + paramSize]; // Buffer stores outgoing tele-command frame
+  28:Core/Src/mpiCommandHandling.c **** 	uint8_t UART1_rxBuffer[4];			   // Buffer stores incoming tele-command response from the MPI (comm
+  29:Core/Src/mpiCommandHandling.c **** 
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 2
+
+
+  30:Core/Src/mpiCommandHandling.c **** 	// Add “TC” bytes to the buffer (Tele-Command identifier)
+  31:Core/Src/mpiCommandHandling.c **** 	UART1_txBuffer[0] = 0x54;
+  32:Core/Src/mpiCommandHandling.c **** 	UART1_txBuffer[1] = 0x43;
+  33:Core/Src/mpiCommandHandling.c **** 
+  34:Core/Src/mpiCommandHandling.c **** 	// Add the command code to the buffer
+  35:Core/Src/mpiCommandHandling.c **** 	UART1_txBuffer[2] = commandCode;
+  36:Core/Src/mpiCommandHandling.c **** 
+  37:Core/Src/mpiCommandHandling.c **** 	// Add the parameters to the buffer if any
+  38:Core/Src/mpiCommandHandling.c **** 	if (paramSize != 0)
+  39:Core/Src/mpiCommandHandling.c **** 	{
+  40:Core/Src/mpiCommandHandling.c **** 		for (size_t i = 0; i < paramSize; i++)
+  41:Core/Src/mpiCommandHandling.c **** 		{
+  42:Core/Src/mpiCommandHandling.c **** 			UART1_txBuffer[3 + i] = params[i];
+  43:Core/Src/mpiCommandHandling.c **** 		}
+  44:Core/Src/mpiCommandHandling.c **** 	}
+  45:Core/Src/mpiCommandHandling.c **** 
+  46:Core/Src/mpiCommandHandling.c **** 	//	// Append parameters onto the TX buffer if any
+  47:Core/Src/mpiCommandHandling.c **** 	//	if (parameters != 0xFF) {
+  48:Core/Src/mpiCommandHandling.c **** 	//		UART1_txBuffer[3] = parameters;
+  49:Core/Src/mpiCommandHandling.c **** 	//	}
+  50:Core/Src/mpiCommandHandling.c **** 
+  51:Core/Src/mpiCommandHandling.c **** 	// Transmit the command & receive echo from the MPI TODO: confirm why char* for size
+  52:Core/Src/mpiCommandHandling.c **** 	HAL_UART_Transmit(&huart1, (uint8_t *)UART1_txBuffer, strlen((char *)UART1_txBuffer), 100);
+  53:Core/Src/mpiCommandHandling.c **** 	HAL_UART_Receive_DMA(&huart1, UART1_rxBuffer, BUFFER_SIZE);
+  54:Core/Src/mpiCommandHandling.c **** 
+  55:Core/Src/mpiCommandHandling.c **** 	// Return the response code from the MPI TODO: confirm what exactly is echoed back, are parameters
+  56:Core/Src/mpiCommandHandling.c **** 	return UART1_rxBuffer[(sizeof(UART1_rxBuffer) / sizeof(UART1_rxBuffer[0])) - 1];
+  57:Core/Src/mpiCommandHandling.c **** }
+  58:Core/Src/mpiCommandHandling.c **** 
+  59:Core/Src/mpiCommandHandling.c **** /**
+  60:Core/Src/mpiCommandHandling.c ****  * Read incoming MPI frames into a double buffer for processing
+  61:Core/Src/mpiCommandHandling.c ****  * @param - void pointer pvParameters takes in task related information
+  62:Core/Src/mpiCommandHandling.c ****  * TODO: Error Check incoming MPI Frames & handle buffer overloading
+  63:Core/Src/mpiCommandHandling.c ****  */
+  64:Core/Src/mpiCommandHandling.c **** void receiveIncomingMPIFramesTask(void *pvParameters)
+  65:Core/Src/mpiCommandHandling.c **** {
+  30              		.loc 1 65 1 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 320
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		.loc 1 65 1 is_stmt 0 view .LVU1
+  35 0000 00B5     		push	{lr}
+  36              		.cfi_def_cfa_offset 4
+  37              		.cfi_offset 14, -4
+  38 0002 D1B0     		sub	sp, sp, #324
+  39              		.cfi_def_cfa_offset 328
+  66:Core/Src/mpiCommandHandling.c **** 
+  67:Core/Src/mpiCommandHandling.c **** 	// Check if double buffer is initialized
+  68:Core/Src/mpiCommandHandling.c **** 	static BaseType_t doubleBufferInitialized = pdFALSE;
+  40              		.loc 1 68 2 is_stmt 1 view .LVU2
+  69:Core/Src/mpiCommandHandling.c **** 	if (doubleBufferInitialized == pdFALSE)
+  41              		.loc 1 69 2 view .LVU3
+  42              		.loc 1 69 30 is_stmt 0 view .LVU4
+  43 0004 464B     		ldr	r3, .L7
+  44 0006 1B68     		ldr	r3, [r3]
+  45              		.loc 1 69 5 view .LVU5
+  46 0008 4BBB     		cbnz	r3, .L5
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 3
+
+
+  70:Core/Src/mpiCommandHandling.c **** 	{
+  71:Core/Src/mpiCommandHandling.c **** 		DoubleBuffer_Init(&MPIFrameBuffer);
+  47              		.loc 1 71 3 is_stmt 1 view .LVU6
+  48 000a 4648     		ldr	r0, .L7+4
+  49              	.LVL1:
+  50              		.loc 1 71 3 is_stmt 0 view .LVU7
+  51 000c FFF7FEFF 		bl	DoubleBuffer_Init
+  52              	.LVL2:
+  72:Core/Src/mpiCommandHandling.c **** 		doubleBufferInitialized = pdTRUE;
+  53              		.loc 1 72 3 is_stmt 1 view .LVU8
+  54              		.loc 1 72 27 is_stmt 0 view .LVU9
+  55 0010 434B     		ldr	r3, .L7
+  56 0012 0122     		movs	r2, #1
+  57 0014 1A60     		str	r2, [r3]
+  58 0016 22E0     		b	.L5
+  59              	.LVL3:
+  60              	.L4:
+  61              	.LBB2:
+  73:Core/Src/mpiCommandHandling.c **** 	}
+  74:Core/Src/mpiCommandHandling.c **** 
+  75:Core/Src/mpiCommandHandling.c **** 	// Temporary buffer to collect incoming frame
+  76:Core/Src/mpiCommandHandling.c **** 	uint8_t buffer[sizeof(MpiFrame_t)];
+  77:Core/Src/mpiCommandHandling.c **** 	MpiFrame_t frame;
+  78:Core/Src/mpiCommandHandling.c **** 
+  79:Core/Src/mpiCommandHandling.c **** 	// Continuously read incoming data frames
+  80:Core/Src/mpiCommandHandling.c **** 	while (1)
+  81:Core/Src/mpiCommandHandling.c **** 	{
+  82:Core/Src/mpiCommandHandling.c **** 		HAL_UART_Receive_DMA(&huart1, buffer, BUFFER_SIZE);
+  83:Core/Src/mpiCommandHandling.c **** 
+  84:Core/Src/mpiCommandHandling.c **** 		// Copy frame data from the buffer into a formatted Struct
+  85:Core/Src/mpiCommandHandling.c **** 		frame.sync_byte1 = buffer[0];
+  86:Core/Src/mpiCommandHandling.c **** 		frame.sync_byte2 = buffer[1];
+  87:Core/Src/mpiCommandHandling.c **** 		frame.sync_byte3 = buffer[2];
+  88:Core/Src/mpiCommandHandling.c **** 		frame.sync_byte4 = buffer[3];
+  89:Core/Src/mpiCommandHandling.c **** 		frame.frame_counter = (buffer[4] << 8) + buffer[5]; // (buffer[4] << 8) is the same as (buffer[4]
+  90:Core/Src/mpiCommandHandling.c **** 		frame.board_temperature = (buffer[6] << 8) + buffer[7];
+  91:Core/Src/mpiCommandHandling.c **** 		frame.firmware_version = buffer[8];
+  92:Core/Src/mpiCommandHandling.c **** 		frame.mpi_unit_id = buffer[9];
+  93:Core/Src/mpiCommandHandling.c **** 		frame.detector_status = (buffer[10] << 8) + buffer[11];
+  94:Core/Src/mpiCommandHandling.c **** 		frame.inner_dome_voltage_setting = (buffer[12] << 8) + buffer[13];
+  95:Core/Src/mpiCommandHandling.c **** 		frame.spib_reserved = buffer[14];
+  96:Core/Src/mpiCommandHandling.c **** 		frame.inner_dome_scan_index = buffer[15];
+  97:Core/Src/mpiCommandHandling.c **** 		frame.faceplate_voltage_setting = (buffer[16] << 8) + buffer[17];
+  98:Core/Src/mpiCommandHandling.c **** 		frame.faceplate_voltage_adc_reading = (buffer[18] << 8) + buffer[19];
+  99:Core/Src/mpiCommandHandling.c **** 		frame.inner_dome_voltage_adc_reading = (buffer[20] << 8) + buffer[21];
+ 100:Core/Src/mpiCommandHandling.c **** 
+ 101:Core/Src/mpiCommandHandling.c **** 		// Copy the pixel array (assuming 67 elements)
+ 102:Core/Src/mpiCommandHandling.c **** 		for (int i = 0; i < 67; ++i)
+ 103:Core/Src/mpiCommandHandling.c **** 		{
+ 104:Core/Src/mpiCommandHandling.c **** 			frame.pixels[i] = (buffer[22 + i * 2] << 8) + buffer[23 + i * 2];
+  62              		.loc 1 104 4 is_stmt 1 view .LVU10
+  63              		.loc 1 104 33 is_stmt 0 view .LVU11
+  64 0018 03F10B02 		add	r2, r3, #11
+  65              		.loc 1 104 29 view .LVU12
+  66 001c 50A9     		add	r1, sp, #320
+  67 001e 01EB4202 		add	r2, r1, r2, lsl #1
+  68 0022 12F8A00C 		ldrb	r0, [r2, #-160]	@ zero_extendqisi2
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 4
+
+
+  69              		.loc 1 104 64 view .LVU13
+  70 0026 5A00     		lsls	r2, r3, #1
+  71              		.loc 1 104 56 view .LVU14
+  72 0028 02F25712 		addw	r2, r2, #343
+  73 002c 6A44     		add	r2, sp, r2
+  74 002e 12F8A01C 		ldrb	r1, [r2, #-160]	@ zero_extendqisi2
+  75              		.loc 1 104 48 view .LVU15
+  76 0032 01EB0021 		add	r1, r1, r0, lsl #8
+  77              		.loc 1 104 20 view .LVU16
+  78 0036 03F10802 		add	r2, r3, #8
+  79 003a 0DEB4202 		add	r2, sp, r2, lsl #1
+  80 003e D180     		strh	r1, [r2, #6]	@ movhi
+ 102:Core/Src/mpiCommandHandling.c **** 		{
+  81              		.loc 1 102 27 is_stmt 1 discriminator 3 view .LVU17
+  82 0040 0133     		adds	r3, r3, #1
+  83              	.LVL4:
+  84              	.L3:
+ 102:Core/Src/mpiCommandHandling.c **** 		{
+  85              		.loc 1 102 21 discriminator 1 view .LVU18
+  86 0042 422B     		cmp	r3, #66
+  87 0044 E8DD     		ble	.L4
+  88              	.LBE2:
+ 105:Core/Src/mpiCommandHandling.c **** 		}
+ 106:Core/Src/mpiCommandHandling.c **** 
+ 107:Core/Src/mpiCommandHandling.c **** 		// Copy the cyclic redundancy check (CRC)
+ 108:Core/Src/mpiCommandHandling.c **** 		frame.cyclic_redundancy_check = (buffer[156] << 8) + buffer[157];
+  89              		.loc 1 108 3 view .LVU19
+  90              		.loc 1 108 42 is_stmt 0 view .LVU20
+  91 0046 9DF83C21 		ldrb	r2, [sp, #316]	@ zero_extendqisi2
+  92              		.loc 1 108 62 view .LVU21
+  93 004a 9DF83D31 		ldrb	r3, [sp, #317]	@ zero_extendqisi2
+  94              	.LVL5:
+  95              		.loc 1 108 54 view .LVU22
+  96 004e 03EB0223 		add	r3, r3, r2, lsl #8
+  97              		.loc 1 108 33 view .LVU23
+  98 0052 ADF89C30 		strh	r3, [sp, #156]	@ movhi
+ 109:Core/Src/mpiCommandHandling.c **** 
+ 110:Core/Src/mpiCommandHandling.c **** 		// Add data frame to double buffer
+ 111:Core/Src/mpiCommandHandling.c **** 		DoubleBuffer_Write(&MPIFrameBuffer, (uint8_t *)&frame);
+  99              		.loc 1 111 3 is_stmt 1 view .LVU24
+ 100 0056 6946     		mov	r1, sp
+ 101 0058 3248     		ldr	r0, .L7+4
+ 102 005a FFF7FEFF 		bl	DoubleBuffer_Write
+ 103              	.LVL6:
+  80:Core/Src/mpiCommandHandling.c **** 	{
+ 104              		.loc 1 80 8 view .LVU25
+ 105              	.L5:
+  76:Core/Src/mpiCommandHandling.c **** 	MpiFrame_t frame;
+ 106              		.loc 1 76 2 view .LVU26
+  77:Core/Src/mpiCommandHandling.c **** 
+ 107              		.loc 1 77 2 view .LVU27
+  80:Core/Src/mpiCommandHandling.c **** 	{
+ 108              		.loc 1 80 2 view .LVU28
+  82:Core/Src/mpiCommandHandling.c **** 
+ 109              		.loc 1 82 3 view .LVU29
+ 110 005e A022     		movs	r2, #160
+ 111 0060 0DEB0201 		add	r1, sp, r2
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 5
+
+
+ 112 0064 3048     		ldr	r0, .L7+8
+ 113 0066 FFF7FEFF 		bl	HAL_UART_Receive_DMA
+ 114              	.LVL7:
+  85:Core/Src/mpiCommandHandling.c **** 		frame.sync_byte2 = buffer[1];
+ 115              		.loc 1 85 3 view .LVU30
+  85:Core/Src/mpiCommandHandling.c **** 		frame.sync_byte2 = buffer[1];
+ 116              		.loc 1 85 28 is_stmt 0 view .LVU31
+ 117 006a 9DF8A030 		ldrb	r3, [sp, #160]	@ zero_extendqisi2
+  85:Core/Src/mpiCommandHandling.c **** 		frame.sync_byte2 = buffer[1];
+ 118              		.loc 1 85 20 view .LVU32
+ 119 006e 8DF80030 		strb	r3, [sp]
+  86:Core/Src/mpiCommandHandling.c **** 		frame.sync_byte3 = buffer[2];
+ 120              		.loc 1 86 3 is_stmt 1 view .LVU33
+  86:Core/Src/mpiCommandHandling.c **** 		frame.sync_byte3 = buffer[2];
+ 121              		.loc 1 86 28 is_stmt 0 view .LVU34
+ 122 0072 9DF8A130 		ldrb	r3, [sp, #161]	@ zero_extendqisi2
+  86:Core/Src/mpiCommandHandling.c **** 		frame.sync_byte3 = buffer[2];
+ 123              		.loc 1 86 20 view .LVU35
+ 124 0076 8DF80130 		strb	r3, [sp, #1]
+  87:Core/Src/mpiCommandHandling.c **** 		frame.sync_byte4 = buffer[3];
+ 125              		.loc 1 87 3 is_stmt 1 view .LVU36
+  87:Core/Src/mpiCommandHandling.c **** 		frame.sync_byte4 = buffer[3];
+ 126              		.loc 1 87 28 is_stmt 0 view .LVU37
+ 127 007a 9DF8A230 		ldrb	r3, [sp, #162]	@ zero_extendqisi2
+  87:Core/Src/mpiCommandHandling.c **** 		frame.sync_byte4 = buffer[3];
+ 128              		.loc 1 87 20 view .LVU38
+ 129 007e 8DF80230 		strb	r3, [sp, #2]
+  88:Core/Src/mpiCommandHandling.c **** 		frame.frame_counter = (buffer[4] << 8) + buffer[5]; // (buffer[4] << 8) is the same as (buffer[4]
+ 130              		.loc 1 88 3 is_stmt 1 view .LVU39
+  88:Core/Src/mpiCommandHandling.c **** 		frame.frame_counter = (buffer[4] << 8) + buffer[5]; // (buffer[4] << 8) is the same as (buffer[4]
+ 131              		.loc 1 88 28 is_stmt 0 view .LVU40
+ 132 0082 9DF8A330 		ldrb	r3, [sp, #163]	@ zero_extendqisi2
+  88:Core/Src/mpiCommandHandling.c **** 		frame.frame_counter = (buffer[4] << 8) + buffer[5]; // (buffer[4] << 8) is the same as (buffer[4]
+ 133              		.loc 1 88 20 view .LVU41
+ 134 0086 8DF80330 		strb	r3, [sp, #3]
+  89:Core/Src/mpiCommandHandling.c **** 		frame.board_temperature = (buffer[6] << 8) + buffer[7];
+ 135              		.loc 1 89 3 is_stmt 1 view .LVU42
+  89:Core/Src/mpiCommandHandling.c **** 		frame.board_temperature = (buffer[6] << 8) + buffer[7];
+ 136              		.loc 1 89 32 is_stmt 0 view .LVU43
+ 137 008a 9DF8A420 		ldrb	r2, [sp, #164]	@ zero_extendqisi2
+  89:Core/Src/mpiCommandHandling.c **** 		frame.board_temperature = (buffer[6] << 8) + buffer[7];
+ 138              		.loc 1 89 50 view .LVU44
+ 139 008e 9DF8A530 		ldrb	r3, [sp, #165]	@ zero_extendqisi2
+  89:Core/Src/mpiCommandHandling.c **** 		frame.board_temperature = (buffer[6] << 8) + buffer[7];
+ 140              		.loc 1 89 42 view .LVU45
+ 141 0092 03EB0223 		add	r3, r3, r2, lsl #8
+  89:Core/Src/mpiCommandHandling.c **** 		frame.board_temperature = (buffer[6] << 8) + buffer[7];
+ 142              		.loc 1 89 23 view .LVU46
+ 143 0096 ADF80430 		strh	r3, [sp, #4]	@ movhi
+  90:Core/Src/mpiCommandHandling.c **** 		frame.firmware_version = buffer[8];
+ 144              		.loc 1 90 3 is_stmt 1 view .LVU47
+  90:Core/Src/mpiCommandHandling.c **** 		frame.firmware_version = buffer[8];
+ 145              		.loc 1 90 36 is_stmt 0 view .LVU48
+ 146 009a 9DF8A620 		ldrb	r2, [sp, #166]	@ zero_extendqisi2
+  90:Core/Src/mpiCommandHandling.c **** 		frame.firmware_version = buffer[8];
+ 147              		.loc 1 90 54 view .LVU49
+ 148 009e 9DF8A730 		ldrb	r3, [sp, #167]	@ zero_extendqisi2
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 6
+
+
+  90:Core/Src/mpiCommandHandling.c **** 		frame.firmware_version = buffer[8];
+ 149              		.loc 1 90 46 view .LVU50
+ 150 00a2 03EB0223 		add	r3, r3, r2, lsl #8
+  90:Core/Src/mpiCommandHandling.c **** 		frame.firmware_version = buffer[8];
+ 151              		.loc 1 90 27 view .LVU51
+ 152 00a6 ADF80630 		strh	r3, [sp, #6]	@ movhi
+  91:Core/Src/mpiCommandHandling.c **** 		frame.mpi_unit_id = buffer[9];
+ 153              		.loc 1 91 3 is_stmt 1 view .LVU52
+  91:Core/Src/mpiCommandHandling.c **** 		frame.mpi_unit_id = buffer[9];
+ 154              		.loc 1 91 34 is_stmt 0 view .LVU53
+ 155 00aa 9DF8A830 		ldrb	r3, [sp, #168]	@ zero_extendqisi2
+  91:Core/Src/mpiCommandHandling.c **** 		frame.mpi_unit_id = buffer[9];
+ 156              		.loc 1 91 26 view .LVU54
+ 157 00ae 8DF80830 		strb	r3, [sp, #8]
+  92:Core/Src/mpiCommandHandling.c **** 		frame.detector_status = (buffer[10] << 8) + buffer[11];
+ 158              		.loc 1 92 3 is_stmt 1 view .LVU55
+  92:Core/Src/mpiCommandHandling.c **** 		frame.detector_status = (buffer[10] << 8) + buffer[11];
+ 159              		.loc 1 92 29 is_stmt 0 view .LVU56
+ 160 00b2 9DF8A930 		ldrb	r3, [sp, #169]	@ zero_extendqisi2
+  92:Core/Src/mpiCommandHandling.c **** 		frame.detector_status = (buffer[10] << 8) + buffer[11];
+ 161              		.loc 1 92 21 view .LVU57
+ 162 00b6 8DF80930 		strb	r3, [sp, #9]
+  93:Core/Src/mpiCommandHandling.c **** 		frame.inner_dome_voltage_setting = (buffer[12] << 8) + buffer[13];
+ 163              		.loc 1 93 3 is_stmt 1 view .LVU58
+  93:Core/Src/mpiCommandHandling.c **** 		frame.inner_dome_voltage_setting = (buffer[12] << 8) + buffer[13];
+ 164              		.loc 1 93 34 is_stmt 0 view .LVU59
+ 165 00ba 9DF8AA20 		ldrb	r2, [sp, #170]	@ zero_extendqisi2
+  93:Core/Src/mpiCommandHandling.c **** 		frame.inner_dome_voltage_setting = (buffer[12] << 8) + buffer[13];
+ 166              		.loc 1 93 53 view .LVU60
+ 167 00be 9DF8AB30 		ldrb	r3, [sp, #171]	@ zero_extendqisi2
+  93:Core/Src/mpiCommandHandling.c **** 		frame.inner_dome_voltage_setting = (buffer[12] << 8) + buffer[13];
+ 168              		.loc 1 93 45 view .LVU61
+ 169 00c2 03EB0223 		add	r3, r3, r2, lsl #8
+  93:Core/Src/mpiCommandHandling.c **** 		frame.inner_dome_voltage_setting = (buffer[12] << 8) + buffer[13];
+ 170              		.loc 1 93 25 view .LVU62
+ 171 00c6 ADF80A30 		strh	r3, [sp, #10]	@ movhi
+  94:Core/Src/mpiCommandHandling.c **** 		frame.spib_reserved = buffer[14];
+ 172              		.loc 1 94 3 is_stmt 1 view .LVU63
+  94:Core/Src/mpiCommandHandling.c **** 		frame.spib_reserved = buffer[14];
+ 173              		.loc 1 94 45 is_stmt 0 view .LVU64
+ 174 00ca 9DF8AC20 		ldrb	r2, [sp, #172]	@ zero_extendqisi2
+  94:Core/Src/mpiCommandHandling.c **** 		frame.spib_reserved = buffer[14];
+ 175              		.loc 1 94 64 view .LVU65
+ 176 00ce 9DF8AD30 		ldrb	r3, [sp, #173]	@ zero_extendqisi2
+  94:Core/Src/mpiCommandHandling.c **** 		frame.spib_reserved = buffer[14];
+ 177              		.loc 1 94 56 view .LVU66
+ 178 00d2 03EB0223 		add	r3, r3, r2, lsl #8
+  94:Core/Src/mpiCommandHandling.c **** 		frame.spib_reserved = buffer[14];
+ 179              		.loc 1 94 36 view .LVU67
+ 180 00d6 ADF80C30 		strh	r3, [sp, #12]	@ movhi
+  95:Core/Src/mpiCommandHandling.c **** 		frame.inner_dome_scan_index = buffer[15];
+ 181              		.loc 1 95 3 is_stmt 1 view .LVU68
+  95:Core/Src/mpiCommandHandling.c **** 		frame.inner_dome_scan_index = buffer[15];
+ 182              		.loc 1 95 31 is_stmt 0 view .LVU69
+ 183 00da 9DF8AE30 		ldrb	r3, [sp, #174]	@ zero_extendqisi2
+  95:Core/Src/mpiCommandHandling.c **** 		frame.inner_dome_scan_index = buffer[15];
+ 184              		.loc 1 95 23 view .LVU70
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 7
+
+
+ 185 00de 8DF80E30 		strb	r3, [sp, #14]
+  96:Core/Src/mpiCommandHandling.c **** 		frame.faceplate_voltage_setting = (buffer[16] << 8) + buffer[17];
+ 186              		.loc 1 96 3 is_stmt 1 view .LVU71
+  96:Core/Src/mpiCommandHandling.c **** 		frame.faceplate_voltage_setting = (buffer[16] << 8) + buffer[17];
+ 187              		.loc 1 96 39 is_stmt 0 view .LVU72
+ 188 00e2 9DF8AF30 		ldrb	r3, [sp, #175]	@ zero_extendqisi2
+  96:Core/Src/mpiCommandHandling.c **** 		frame.faceplate_voltage_setting = (buffer[16] << 8) + buffer[17];
+ 189              		.loc 1 96 31 view .LVU73
+ 190 00e6 8DF80F30 		strb	r3, [sp, #15]
+  97:Core/Src/mpiCommandHandling.c **** 		frame.faceplate_voltage_adc_reading = (buffer[18] << 8) + buffer[19];
+ 191              		.loc 1 97 3 is_stmt 1 view .LVU74
+  97:Core/Src/mpiCommandHandling.c **** 		frame.faceplate_voltage_adc_reading = (buffer[18] << 8) + buffer[19];
+ 192              		.loc 1 97 44 is_stmt 0 view .LVU75
+ 193 00ea 9DF8B020 		ldrb	r2, [sp, #176]	@ zero_extendqisi2
+  97:Core/Src/mpiCommandHandling.c **** 		frame.faceplate_voltage_adc_reading = (buffer[18] << 8) + buffer[19];
+ 194              		.loc 1 97 63 view .LVU76
+ 195 00ee 9DF8B130 		ldrb	r3, [sp, #177]	@ zero_extendqisi2
+  97:Core/Src/mpiCommandHandling.c **** 		frame.faceplate_voltage_adc_reading = (buffer[18] << 8) + buffer[19];
+ 196              		.loc 1 97 55 view .LVU77
+ 197 00f2 03EB0223 		add	r3, r3, r2, lsl #8
+  97:Core/Src/mpiCommandHandling.c **** 		frame.faceplate_voltage_adc_reading = (buffer[18] << 8) + buffer[19];
+ 198              		.loc 1 97 35 view .LVU78
+ 199 00f6 ADF81030 		strh	r3, [sp, #16]	@ movhi
+  98:Core/Src/mpiCommandHandling.c **** 		frame.inner_dome_voltage_adc_reading = (buffer[20] << 8) + buffer[21];
+ 200              		.loc 1 98 3 is_stmt 1 view .LVU79
+  98:Core/Src/mpiCommandHandling.c **** 		frame.inner_dome_voltage_adc_reading = (buffer[20] << 8) + buffer[21];
+ 201              		.loc 1 98 48 is_stmt 0 view .LVU80
+ 202 00fa 9DF8B220 		ldrb	r2, [sp, #178]	@ zero_extendqisi2
+  98:Core/Src/mpiCommandHandling.c **** 		frame.inner_dome_voltage_adc_reading = (buffer[20] << 8) + buffer[21];
+ 203              		.loc 1 98 67 view .LVU81
+ 204 00fe 9DF8B330 		ldrb	r3, [sp, #179]	@ zero_extendqisi2
+  98:Core/Src/mpiCommandHandling.c **** 		frame.inner_dome_voltage_adc_reading = (buffer[20] << 8) + buffer[21];
+ 205              		.loc 1 98 59 view .LVU82
+ 206 0102 03EB0223 		add	r3, r3, r2, lsl #8
+  98:Core/Src/mpiCommandHandling.c **** 		frame.inner_dome_voltage_adc_reading = (buffer[20] << 8) + buffer[21];
+ 207              		.loc 1 98 39 view .LVU83
+ 208 0106 ADF81230 		strh	r3, [sp, #18]	@ movhi
+  99:Core/Src/mpiCommandHandling.c **** 
+ 209              		.loc 1 99 3 is_stmt 1 view .LVU84
+  99:Core/Src/mpiCommandHandling.c **** 
+ 210              		.loc 1 99 49 is_stmt 0 view .LVU85
+ 211 010a 9DF8B420 		ldrb	r2, [sp, #180]	@ zero_extendqisi2
+  99:Core/Src/mpiCommandHandling.c **** 
+ 212              		.loc 1 99 68 view .LVU86
+ 213 010e 9DF8B530 		ldrb	r3, [sp, #181]	@ zero_extendqisi2
+  99:Core/Src/mpiCommandHandling.c **** 
+ 214              		.loc 1 99 60 view .LVU87
+ 215 0112 03EB0223 		add	r3, r3, r2, lsl #8
+  99:Core/Src/mpiCommandHandling.c **** 
+ 216              		.loc 1 99 40 view .LVU88
+ 217 0116 ADF81430 		strh	r3, [sp, #20]	@ movhi
+ 102:Core/Src/mpiCommandHandling.c **** 		{
+ 218              		.loc 1 102 3 is_stmt 1 view .LVU89
+ 219              	.LBB3:
+ 102:Core/Src/mpiCommandHandling.c **** 		{
+ 220              		.loc 1 102 8 view .LVU90
+ 221              	.LVL8:
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 8
+
+
+ 102:Core/Src/mpiCommandHandling.c **** 		{
+ 222              		.loc 1 102 12 is_stmt 0 view .LVU91
+ 223 011a 0023     		movs	r3, #0
+ 102:Core/Src/mpiCommandHandling.c **** 		{
+ 224              		.loc 1 102 3 view .LVU92
+ 225 011c 91E7     		b	.L3
+ 226              	.L8:
+ 227 011e 00BF     		.align	2
+ 228              	.L7:
+ 229 0120 00000000 		.word	doubleBufferInitialized.0
+ 230 0124 00000000 		.word	MPIFrameBuffer
+ 231 0128 00000000 		.word	huart1
+ 232              	.LBE3:
+ 233              		.cfi_endproc
+ 234              	.LFE154:
+ 236              		.section	.text.sendTelecommand,"ax",%progbits
+ 237              		.align	1
+ 238              		.global	sendTelecommand
+ 239              		.syntax unified
+ 240              		.thumb
+ 241              		.thumb_func
+ 243              	sendTelecommand:
+ 244              	.LVL9:
+ 245              	.LFB153:
+  24:Core/Src/mpiCommandHandling.c **** 
+ 246              		.loc 1 24 1 is_stmt 1 view -0
+ 247              		.cfi_startproc
+ 248              		@ args = 0, pretend = 0, frame = 16
+ 249              		@ frame_needed = 0, uses_anonymous_args = 0
+  24:Core/Src/mpiCommandHandling.c **** 
+ 250              		.loc 1 24 1 is_stmt 0 view .LVU94
+ 251 0000 10B5     		push	{r4, lr}
+ 252              		.cfi_def_cfa_offset 8
+ 253              		.cfi_offset 4, -8
+ 254              		.cfi_offset 14, -4
+ 255 0002 84B0     		sub	sp, sp, #16
+ 256              		.cfi_def_cfa_offset 24
+  26:Core/Src/mpiCommandHandling.c **** 	uint8_t UART1_txBuffer[3 + paramSize]; // Buffer stores outgoing tele-command frame
+ 257              		.loc 1 26 2 is_stmt 1 view .LVU95
+ 258              	.LVL10:
+  27:Core/Src/mpiCommandHandling.c **** 	uint8_t UART1_rxBuffer[4];			   // Buffer stores incoming tele-command response from the MPI (comm
+ 259              		.loc 1 27 2 view .LVU96
+  28:Core/Src/mpiCommandHandling.c **** 
+ 260              		.loc 1 28 2 view .LVU97
+  31:Core/Src/mpiCommandHandling.c **** 	UART1_txBuffer[1] = 0x43;
+ 261              		.loc 1 31 2 view .LVU98
+  31:Core/Src/mpiCommandHandling.c **** 	UART1_txBuffer[1] = 0x43;
+ 262              		.loc 1 31 20 is_stmt 0 view .LVU99
+ 263 0004 5423     		movs	r3, #84
+ 264 0006 8DF80830 		strb	r3, [sp, #8]
+  32:Core/Src/mpiCommandHandling.c **** 
+ 265              		.loc 1 32 2 is_stmt 1 view .LVU100
+  32:Core/Src/mpiCommandHandling.c **** 
+ 266              		.loc 1 32 20 is_stmt 0 view .LVU101
+ 267 000a 4323     		movs	r3, #67
+ 268 000c 8DF80930 		strb	r3, [sp, #9]
+  35:Core/Src/mpiCommandHandling.c **** 
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 9
+
+
+ 269              		.loc 1 35 2 is_stmt 1 view .LVU102
+  35:Core/Src/mpiCommandHandling.c **** 
+ 270              		.loc 1 35 20 is_stmt 0 view .LVU103
+ 271 0010 8DF80A00 		strb	r0, [sp, #10]
+  38:Core/Src/mpiCommandHandling.c **** 	{
+ 272              		.loc 1 38 2 is_stmt 1 view .LVU104
+  40:Core/Src/mpiCommandHandling.c **** 		{
+ 273              		.loc 1 40 3 view .LVU105
+ 274              	.LBB4:
+  40:Core/Src/mpiCommandHandling.c **** 		{
+ 275              		.loc 1 40 8 view .LVU106
+ 276              	.LVL11:
+  40:Core/Src/mpiCommandHandling.c **** 		{
+ 277              		.loc 1 40 15 is_stmt 0 view .LVU107
+ 278 0014 0023     		movs	r3, #0
+  40:Core/Src/mpiCommandHandling.c **** 		{
+ 279              		.loc 1 40 3 view .LVU108
+ 280 0016 06E0     		b	.L10
+ 281              	.LVL12:
+ 282              	.L11:
+  42:Core/Src/mpiCommandHandling.c **** 		}
+ 283              		.loc 1 42 4 is_stmt 1 view .LVU109
+  42:Core/Src/mpiCommandHandling.c **** 		}
+ 284              		.loc 1 42 34 is_stmt 0 view .LVU110
+ 285 0018 C85C     		ldrb	r0, [r1, r3]	@ zero_extendqisi2
+  42:Core/Src/mpiCommandHandling.c **** 		}
+ 286              		.loc 1 42 26 view .LVU111
+ 287 001a 03F11302 		add	r2, r3, #19
+ 288 001e 6A44     		add	r2, sp, r2
+ 289 0020 02F8080C 		strb	r0, [r2, #-8]
+  40:Core/Src/mpiCommandHandling.c **** 		{
+ 290              		.loc 1 40 38 is_stmt 1 discriminator 3 view .LVU112
+ 291 0024 0133     		adds	r3, r3, #1
+ 292              	.LVL13:
+ 293              	.L10:
+  40:Core/Src/mpiCommandHandling.c **** 		{
+ 294              		.loc 1 40 24 discriminator 1 view .LVU113
+ 295 0026 032B     		cmp	r3, #3
+ 296 0028 F6D9     		bls	.L11
+ 297              	.LBE4:
+  52:Core/Src/mpiCommandHandling.c **** 	HAL_UART_Receive_DMA(&huart1, UART1_rxBuffer, BUFFER_SIZE);
+ 298              		.loc 1 52 2 view .LVU114
+  52:Core/Src/mpiCommandHandling.c **** 	HAL_UART_Receive_DMA(&huart1, UART1_rxBuffer, BUFFER_SIZE);
+ 299              		.loc 1 52 56 is_stmt 0 view .LVU115
+ 300 002a 02A8     		add	r0, sp, #8
+ 301              	.LVL14:
+  52:Core/Src/mpiCommandHandling.c **** 	HAL_UART_Receive_DMA(&huart1, UART1_rxBuffer, BUFFER_SIZE);
+ 302              		.loc 1 52 56 view .LVU116
+ 303 002c FFF7FEFF 		bl	strlen
+ 304              	.LVL15:
+  52:Core/Src/mpiCommandHandling.c **** 	HAL_UART_Receive_DMA(&huart1, UART1_rxBuffer, BUFFER_SIZE);
+ 305              		.loc 1 52 2 discriminator 1 view .LVU117
+ 306 0030 074C     		ldr	r4, .L13
+ 307 0032 6423     		movs	r3, #100
+ 308 0034 82B2     		uxth	r2, r0
+ 309 0036 02A9     		add	r1, sp, #8
+ 310              	.LVL16:
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 10
+
+
+  52:Core/Src/mpiCommandHandling.c **** 	HAL_UART_Receive_DMA(&huart1, UART1_rxBuffer, BUFFER_SIZE);
+ 311              		.loc 1 52 2 discriminator 1 view .LVU118
+ 312 0038 2046     		mov	r0, r4
+ 313 003a FFF7FEFF 		bl	HAL_UART_Transmit
+ 314              	.LVL17:
+  53:Core/Src/mpiCommandHandling.c **** 
+ 315              		.loc 1 53 2 is_stmt 1 view .LVU119
+ 316 003e A022     		movs	r2, #160
+ 317 0040 01A9     		add	r1, sp, #4
+ 318 0042 2046     		mov	r0, r4
+ 319 0044 FFF7FEFF 		bl	HAL_UART_Receive_DMA
+ 320              	.LVL18:
+  56:Core/Src/mpiCommandHandling.c **** }
+ 321              		.loc 1 56 2 view .LVU120
+  57:Core/Src/mpiCommandHandling.c **** 
+ 322              		.loc 1 57 1 is_stmt 0 view .LVU121
+ 323 0048 9DF80700 		ldrb	r0, [sp, #7]	@ zero_extendqisi2
+ 324 004c 04B0     		add	sp, sp, #16
+ 325              		.cfi_def_cfa_offset 8
+ 326              		@ sp needed
+ 327 004e 10BD     		pop	{r4, pc}
+ 328              	.LVL19:
+ 329              	.L14:
+  57:Core/Src/mpiCommandHandling.c **** 
+ 330              		.loc 1 57 1 view .LVU122
+ 331              		.align	2
+ 332              	.L13:
+ 333 0050 00000000 		.word	huart1
+ 334              		.cfi_endproc
+ 335              	.LFE153:
+ 337              		.section	.rodata.StartMPIProcessingTasks.str1.4,"aMS",%progbits,1
+ 338              		.align	2
+ 339              	.LC0:
+ 340 0000 50617273 		.ascii	"ParseMPI\000"
+ 340      654D5049 
+ 340      00
+ 341 0009 000000   		.align	2
+ 342              	.LC1:
+ 343 000c 50726F63 		.ascii	"ProcessMPI\000"
+ 343      6573734D 
+ 343      504900
+ 344              		.section	.text.StartMPIProcessingTasks,"ax",%progbits
+ 345              		.align	1
+ 346              		.global	StartMPIProcessingTasks
+ 347              		.syntax unified
+ 348              		.thumb
+ 349              		.thumb_func
+ 351              	StartMPIProcessingTasks:
+ 352              	.LFB156:
+ 112:Core/Src/mpiCommandHandling.c **** 	}
+ 113:Core/Src/mpiCommandHandling.c **** }
+ 114:Core/Src/mpiCommandHandling.c **** 
+ 115:Core/Src/mpiCommandHandling.c **** /**
+ 116:Core/Src/mpiCommandHandling.c ****  * Process received MPI frames from the double buffer
+ 117:Core/Src/mpiCommandHandling.c ****  * For testing purposes currently: Write to memory & write over UART
+ 118:Core/Src/mpiCommandHandling.c ****  * @param - void pointer pvParameters takes in task related information
+ 119:Core/Src/mpiCommandHandling.c ****  */
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 11
+
+
+ 120:Core/Src/mpiCommandHandling.c **** void processIncomingMPIFramesTask(void *pvParameters)
+ 121:Core/Src/mpiCommandHandling.c **** {
+ 122:Core/Src/mpiCommandHandling.c **** 	MpiFrame_t frame;
+ 123:Core/Src/mpiCommandHandling.c **** 
+ 124:Core/Src/mpiCommandHandling.c **** 	while (1)
+ 125:Core/Src/mpiCommandHandling.c **** 	{
+ 126:Core/Src/mpiCommandHandling.c **** 		// Wait until data is ready in the buffer
+ 127:Core/Src/mpiCommandHandling.c **** 		if (xSemaphoreTake(MPIFrameBuffer.dataReady, portMAX_DELAY) == pdTRUE)
+ 128:Core/Src/mpiCommandHandling.c **** 		{
+ 129:Core/Src/mpiCommandHandling.c **** 			// Read data from double buffer
+ 130:Core/Src/mpiCommandHandling.c **** 			uint32_t bytesRead = DoubleBuffer_Read(&MPIFrameBuffer, (uint8_t *)&frame, sizeof(MpiFrame_t));
+ 131:Core/Src/mpiCommandHandling.c **** 
+ 132:Core/Src/mpiCommandHandling.c **** 			if (bytesRead > 0)
+ 133:Core/Src/mpiCommandHandling.c **** 			{
+ 134:Core/Src/mpiCommandHandling.c **** 				processFrameData(frame);
+ 135:Core/Src/mpiCommandHandling.c **** 			}
+ 136:Core/Src/mpiCommandHandling.c **** 		}
+ 137:Core/Src/mpiCommandHandling.c **** 	}
+ 138:Core/Src/mpiCommandHandling.c **** 
+ 139:Core/Src/mpiCommandHandling.c **** 	// Add delay or yield to FreeRTOS if necessary
+ 140:Core/Src/mpiCommandHandling.c **** 	// vTaskDelay(pdMS_TO_TICKS(100));
+ 141:Core/Src/mpiCommandHandling.c **** 	taskYIELD(); // Yield to other tasks to prevent busy-waiting
+ 142:Core/Src/mpiCommandHandling.c **** }
+ 143:Core/Src/mpiCommandHandling.c **** 
+ 144:Core/Src/mpiCommandHandling.c **** /**
+ 145:Core/Src/mpiCommandHandling.c ****  * Creates and starts the MPI frame receive and processing tasks for concurrent execution
+ 146:Core/Src/mpiCommandHandling.c ****  */
+ 147:Core/Src/mpiCommandHandling.c **** void StartMPIProcessingTasks()
+ 148:Core/Src/mpiCommandHandling.c **** {
+ 353              		.loc 1 148 1 is_stmt 1 view -0
+ 354              		.cfi_startproc
+ 355              		@ args = 0, pretend = 0, frame = 0
+ 356              		@ frame_needed = 0, uses_anonymous_args = 0
+ 357 0000 30B5     		push	{r4, r5, lr}
+ 358              		.cfi_def_cfa_offset 12
+ 359              		.cfi_offset 4, -12
+ 360              		.cfi_offset 5, -8
+ 361              		.cfi_offset 14, -4
+ 362 0002 83B0     		sub	sp, sp, #12
+ 363              		.cfi_def_cfa_offset 24
+ 149:Core/Src/mpiCommandHandling.c **** 	// Create tasks for parsing and processing MPI frames
+ 150:Core/Src/mpiCommandHandling.c **** 	xTaskCreate((TaskFunction_t)receiveIncomingMPIFramesTask, "ParseMPI", configMINIMAL_STACK_SIZE, NU
+ 364              		.loc 1 150 2 view .LVU124
+ 365 0004 0024     		movs	r4, #0
+ 366 0006 0194     		str	r4, [sp, #4]
+ 367 0008 0125     		movs	r5, #1
+ 368 000a 0095     		str	r5, [sp]
+ 369 000c 2346     		mov	r3, r4
+ 370 000e 8022     		movs	r2, #128
+ 371 0010 0649     		ldr	r1, .L17
+ 372 0012 0748     		ldr	r0, .L17+4
+ 373 0014 FFF7FEFF 		bl	xTaskCreate
+ 374              	.LVL20:
+ 151:Core/Src/mpiCommandHandling.c **** 	xTaskCreate((TaskFunction_t)processIncomingMPIFramesTask, "ProcessMPI", configMINIMAL_STACK_SIZE, 
+ 375              		.loc 1 151 2 view .LVU125
+ 376 0018 0194     		str	r4, [sp, #4]
+ 377 001a 0095     		str	r5, [sp]
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 12
+
+
+ 378 001c 2346     		mov	r3, r4
+ 379 001e 8022     		movs	r2, #128
+ 380 0020 0449     		ldr	r1, .L17+8
+ 381 0022 0548     		ldr	r0, .L17+12
+ 382 0024 FFF7FEFF 		bl	xTaskCreate
+ 383              	.LVL21:
+ 152:Core/Src/mpiCommandHandling.c **** }
+ 384              		.loc 1 152 1 is_stmt 0 view .LVU126
+ 385 0028 03B0     		add	sp, sp, #12
+ 386              		.cfi_def_cfa_offset 12
+ 387              		@ sp needed
+ 388 002a 30BD     		pop	{r4, r5, pc}
+ 389              	.L18:
+ 390              		.align	2
+ 391              	.L17:
+ 392 002c 00000000 		.word	.LC0
+ 393 0030 00000000 		.word	receiveIncomingMPIFramesTask
+ 394 0034 0C000000 		.word	.LC1
+ 395 0038 00000000 		.word	processIncomingMPIFramesTask
+ 396              		.cfi_endproc
+ 397              	.LFE156:
+ 399              		.section	.rodata.writeFrameToMemory.str1.4,"aMS",%progbits,1
+ 400              		.align	2
+ 401              	.LC2:
+ 402 0000 4D504946 		.ascii	"MPIFrame Written successfully\000"
+ 402      72616D65 
+ 402      20577269 
+ 402      7474656E 
+ 402      20737563 
+ 403 001e 0000     		.align	2
+ 404              	.LC3:
+ 405 0020 4572726F 		.ascii	"Error Occurred while writing MPIFrame\000"
+ 405      72204F63 
+ 405      63757272 
+ 405      65642077 
+ 405      68696C65 
+ 406              		.section	.text.writeFrameToMemory,"ax",%progbits
+ 407              		.align	1
+ 408              		.global	writeFrameToMemory
+ 409              		.syntax unified
+ 410              		.thumb
+ 411              		.thumb_func
+ 413              	writeFrameToMemory:
+ 414              	.LFB158:
+ 153:Core/Src/mpiCommandHandling.c **** 
+ 154:Core/Src/mpiCommandHandling.c **** // This function is responsible for saving / displaying the parsed MPI Frame
+ 155:Core/Src/mpiCommandHandling.c **** // Display over UART is for testing only
+ 156:Core/Src/mpiCommandHandling.c **** void processFrameData(MpiFrame_t frame)
+ 157:Core/Src/mpiCommandHandling.c **** {
+ 158:Core/Src/mpiCommandHandling.c **** 
+ 159:Core/Src/mpiCommandHandling.c **** 	// Define an array of buffers for each variable in the structure that needs to be tested
+ 160:Core/Src/mpiCommandHandling.c **** 	char variable_buffer[255];
+ 161:Core/Src/mpiCommandHandling.c **** 
+ 162:Core/Src/mpiCommandHandling.c **** 	// Clear the buffer before use
+ 163:Core/Src/mpiCommandHandling.c **** 	variable_buffer[0] = '\0';
+ 164:Core/Src/mpiCommandHandling.c **** 
+ 165:Core/Src/mpiCommandHandling.c **** 	// Concatenate test variable values into the char buffer to send formatted values over
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 13
+
+
+ 166:Core/Src/mpiCommandHandling.c **** 	sprintf(variable_buffer,
+ 167:Core/Src/mpiCommandHandling.c **** 			"Frame Counter: %u, Board Temperature: %u, Voltage ADC Reading: %u\n",
+ 168:Core/Src/mpiCommandHandling.c **** 			frame.frame_counter, frame.board_temperature,
+ 169:Core/Src/mpiCommandHandling.c **** 			frame.faceplate_voltage_adc_reading);
+ 170:Core/Src/mpiCommandHandling.c **** 
+ 171:Core/Src/mpiCommandHandling.c **** 	// Send formatted data over HLPUART for verification
+ 172:Core/Src/mpiCommandHandling.c **** 	// HAL_UART_Transmit(&hlpuart1, (uint8_t*)variable_buffer, strlen(variable_buffer), HAL_MAX_DELAY)
+ 173:Core/Src/mpiCommandHandling.c **** 	PRINT_STRING_UART(variable_buffer);
+ 174:Core/Src/mpiCommandHandling.c **** 
+ 175:Core/Src/mpiCommandHandling.c **** 	// TODO: For testing write parsed and raw data to files to verify and update test plans
+ 176:Core/Src/mpiCommandHandling.c **** 	writeFrameToMemory(frame);
+ 177:Core/Src/mpiCommandHandling.c **** }
+ 178:Core/Src/mpiCommandHandling.c **** 
+ 179:Core/Src/mpiCommandHandling.c **** // This function deals with writing data packets to memory using MEMORY UTILITIES
+ 180:Core/Src/mpiCommandHandling.c **** void writeFrameToMemory(MpiFrame_t frame)
+ 181:Core/Src/mpiCommandHandling.c **** {
+ 415              		.loc 1 181 1 is_stmt 1 view -0
+ 416              		.cfi_startproc
+ 417              		@ args = 160, pretend = 16, frame = 0
+ 418              		@ frame_needed = 0, uses_anonymous_args = 0
+ 419 0000 84B0     		sub	sp, sp, #16
+ 420              		.cfi_def_cfa_offset 16
+ 421 0002 08B5     		push	{r3, lr}
+ 422              		.cfi_def_cfa_offset 24
+ 423              		.cfi_offset 3, -24
+ 424              		.cfi_offset 14, -20
+ 425 0004 0DF1080C 		add	ip, sp, #8
+ 426 0008 8CE80F00 		stm	ip, {r0, r1, r2, r3}
+ 182:Core/Src/mpiCommandHandling.c **** 
+ 183:Core/Src/mpiCommandHandling.c **** 	// Calling the WRITE function and making sure it's successful
+ 184:Core/Src/mpiCommandHandling.c **** 	if (WRITE_FILE(&hspi1, (uint8_t *)&frame, sizeof(frame)))
+ 427              		.loc 1 184 2 view .LVU128
+ 428              		.loc 1 184 6 is_stmt 0 view .LVU129
+ 429 000c 9E22     		movs	r2, #158
+ 430 000e 6146     		mov	r1, ip
+ 431 0010 0748     		ldr	r0, .L23
+ 432 0012 FFF7FEFF 		bl	WRITE_FILE
+ 433              	.LVL22:
+ 434              		.loc 1 184 5 discriminator 1 view .LVU130
+ 435 0016 30B1     		cbz	r0, .L20
+ 436              	.LBB5:
+ 185:Core/Src/mpiCommandHandling.c **** 	{
+ 186:Core/Src/mpiCommandHandling.c **** 		PRINT_STRING_UART("MPIFrame Written successfully");
+ 437              		.loc 1 186 3 is_stmt 1 view .LVU131
+ 438 0018 0648     		ldr	r0, .L23+4
+ 439 001a FFF7FEFF 		bl	PRINT_STRING_UART
+ 440              	.LVL23:
+ 441              	.L19:
+ 442              	.LBE5:
+ 187:Core/Src/mpiCommandHandling.c **** 	}
+ 188:Core/Src/mpiCommandHandling.c **** 	else
+ 189:Core/Src/mpiCommandHandling.c **** 	{
+ 190:Core/Src/mpiCommandHandling.c **** 		PRINT_STRING_UART("Error Occurred while writing MPIFrame");
+ 191:Core/Src/mpiCommandHandling.c **** 	}
+ 192:Core/Src/mpiCommandHandling.c **** }
+ 443              		.loc 1 192 1 is_stmt 0 view .LVU132
+ 444 001e BDE80840 		pop	{r3, lr}
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 14
+
+
+ 445              		.cfi_remember_state
+ 446              		.cfi_restore 14
+ 447              		.cfi_restore 3
+ 448              		.cfi_def_cfa_offset 16
+ 449 0022 04B0     		add	sp, sp, #16
+ 450              		.cfi_def_cfa_offset 0
+ 451 0024 7047     		bx	lr
+ 452              	.L20:
+ 453              		.cfi_restore_state
+ 454              	.LBB6:
+ 190:Core/Src/mpiCommandHandling.c **** 	}
+ 455              		.loc 1 190 3 is_stmt 1 view .LVU133
+ 456 0026 0448     		ldr	r0, .L23+8
+ 457 0028 FFF7FEFF 		bl	PRINT_STRING_UART
+ 458              	.LVL24:
+ 459              	.LBE6:
+ 460              		.loc 1 192 1 is_stmt 0 view .LVU134
+ 461 002c F7E7     		b	.L19
+ 462              	.L24:
+ 463 002e 00BF     		.align	2
+ 464              	.L23:
+ 465 0030 00000000 		.word	hspi1
+ 466 0034 00000000 		.word	.LC2
+ 467 0038 20000000 		.word	.LC3
+ 468              		.cfi_endproc
+ 469              	.LFE158:
+ 471              		.section	.rodata.processFrameData.str1.4,"aMS",%progbits,1
+ 472              		.align	2
+ 473              	.LC4:
+ 474 0000 4672616D 		.ascii	"Frame Counter: %u, Board Temperature: %u, Voltage A"
+ 474      6520436F 
+ 474      756E7465 
+ 474      723A2025 
+ 474      752C2042 
+ 475 0033 44432052 		.ascii	"DC Reading: %u\012\000"
+ 475      65616469 
+ 475      6E673A20 
+ 475      25750A00 
+ 476              		.section	.text.processFrameData,"ax",%progbits
+ 477              		.align	1
+ 478              		.global	processFrameData
+ 479              		.syntax unified
+ 480              		.thumb
+ 481              		.thumb_func
+ 483              	processFrameData:
+ 484              	.LFB157:
+ 157:Core/Src/mpiCommandHandling.c **** 
+ 485              		.loc 1 157 1 is_stmt 1 view -0
+ 486              		.cfi_startproc
+ 487              		@ args = 160, pretend = 16, frame = 256
+ 488              		@ frame_needed = 0, uses_anonymous_args = 0
+ 489 0000 84B0     		sub	sp, sp, #16
+ 490              		.cfi_def_cfa_offset 16
+ 491 0002 00B5     		push	{lr}
+ 492              		.cfi_def_cfa_offset 20
+ 493              		.cfi_offset 14, -20
+ 494 0004 E5B0     		sub	sp, sp, #404
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 15
+
+
+ 495              		.cfi_def_cfa_offset 424
+ 496 0006 0DF5CC7C 		add	ip, sp, #408
+ 497 000a 8CE80F00 		stm	ip, {r0, r1, r2, r3}
+ 160:Core/Src/mpiCommandHandling.c **** 
+ 498              		.loc 1 160 2 view .LVU136
+ 163:Core/Src/mpiCommandHandling.c **** 
+ 499              		.loc 1 163 2 view .LVU137
+ 163:Core/Src/mpiCommandHandling.c **** 
+ 500              		.loc 1 163 21 is_stmt 0 view .LVU138
+ 501 000e 0023     		movs	r3, #0
+ 502 0010 8DF89030 		strb	r3, [sp, #144]
+ 166:Core/Src/mpiCommandHandling.c **** 			"Frame Counter: %u, Board Temperature: %u, Voltage ADC Reading: %u\n",
+ 503              		.loc 1 166 2 is_stmt 1 view .LVU139
+ 169:Core/Src/mpiCommandHandling.c **** 
+ 504              		.loc 1 169 9 is_stmt 0 view .LVU140
+ 505 0014 BDF8AA31 		ldrh	r3, [sp, #426]
+ 166:Core/Src/mpiCommandHandling.c **** 			"Frame Counter: %u, Board Temperature: %u, Voltage ADC Reading: %u\n",
+ 506              		.loc 1 166 2 view .LVU141
+ 507 0018 0093     		str	r3, [sp]
+ 508 001a BDF99E31 		ldrsh	r3, [sp, #414]
+ 509 001e BDF89C21 		ldrh	r2, [sp, #412]
+ 510 0022 0A49     		ldr	r1, .L27
+ 511 0024 24A8     		add	r0, sp, #144
+ 512 0026 FFF7FEFF 		bl	sprintf
+ 513              	.LVL25:
+ 173:Core/Src/mpiCommandHandling.c **** 
+ 514              		.loc 1 173 2 is_stmt 1 view .LVU142
+ 515 002a 24A8     		add	r0, sp, #144
+ 516 002c FFF7FEFF 		bl	PRINT_STRING_UART
+ 517              	.LVL26:
+ 176:Core/Src/mpiCommandHandling.c **** }
+ 518              		.loc 1 176 2 view .LVU143
+ 519 0030 8E22     		movs	r2, #142
+ 520 0032 6AA9     		add	r1, sp, #424
+ 521 0034 6846     		mov	r0, sp
+ 522 0036 FFF7FEFF 		bl	memcpy
+ 523              	.LVL27:
+ 524 003a 66AB     		add	r3, sp, #408
+ 525 003c 0FCB     		ldm	r3, {r0, r1, r2, r3}
+ 526 003e FFF7FEFF 		bl	writeFrameToMemory
+ 527              	.LVL28:
+ 177:Core/Src/mpiCommandHandling.c **** 
+ 528              		.loc 1 177 1 is_stmt 0 view .LVU144
+ 529 0042 65B0     		add	sp, sp, #404
+ 530              		.cfi_def_cfa_offset 20
+ 531              		@ sp needed
+ 532 0044 5DF804EB 		ldr	lr, [sp], #4
+ 533              		.cfi_restore 14
+ 534              		.cfi_def_cfa_offset 16
+ 535 0048 04B0     		add	sp, sp, #16
+ 536              		.cfi_def_cfa_offset 0
+ 537 004a 7047     		bx	lr
+ 538              	.L28:
+ 539              		.align	2
+ 540              	.L27:
+ 541 004c 00000000 		.word	.LC4
+ 542              		.cfi_endproc
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 16
+
+
+ 543              	.LFE157:
+ 545              		.section	.text.processIncomingMPIFramesTask,"ax",%progbits
+ 546              		.align	1
+ 547              		.global	processIncomingMPIFramesTask
+ 548              		.syntax unified
+ 549              		.thumb
+ 550              		.thumb_func
+ 552              	processIncomingMPIFramesTask:
+ 553              	.LFB155:
+ 121:Core/Src/mpiCommandHandling.c **** 	MpiFrame_t frame;
+ 554              		.loc 1 121 1 is_stmt 1 view -0
+ 555              		.cfi_startproc
+ 556              		@ args = 0, pretend = 0, frame = 160
+ 557              		@ frame_needed = 0, uses_anonymous_args = 0
+ 558              	.LVL29:
+ 121:Core/Src/mpiCommandHandling.c **** 	MpiFrame_t frame;
+ 559              		.loc 1 121 1 is_stmt 0 view .LVU146
+ 560 0000 00B5     		push	{lr}
+ 561              		.cfi_def_cfa_offset 4
+ 562              		.cfi_offset 14, -4
+ 563 0002 CDB0     		sub	sp, sp, #308
+ 564              		.cfi_def_cfa_offset 312
+ 565              	.LVL30:
+ 566              	.L30:
+ 122:Core/Src/mpiCommandHandling.c **** 
+ 567              		.loc 1 122 2 is_stmt 1 view .LVU147
+ 124:Core/Src/mpiCommandHandling.c **** 	{
+ 568              		.loc 1 124 2 view .LVU148
+ 127:Core/Src/mpiCommandHandling.c **** 		{
+ 569              		.loc 1 127 3 view .LVU149
+ 127:Core/Src/mpiCommandHandling.c **** 		{
+ 570              		.loc 1 127 7 is_stmt 0 view .LVU150
+ 571 0004 4FF0FF31 		mov	r1, #-1
+ 572 0008 0B4B     		ldr	r3, .L34
+ 573 000a D3F80404 		ldr	r0, [r3, #1028]
+ 574 000e FFF7FEFF 		bl	xQueueSemaphoreTake
+ 575              	.LVL31:
+ 127:Core/Src/mpiCommandHandling.c **** 		{
+ 576              		.loc 1 127 6 discriminator 1 view .LVU151
+ 577 0012 0128     		cmp	r0, #1
+ 578 0014 F6D1     		bne	.L30
+ 579              	.LBB7:
+ 130:Core/Src/mpiCommandHandling.c **** 
+ 580              		.loc 1 130 4 is_stmt 1 view .LVU152
+ 130:Core/Src/mpiCommandHandling.c **** 
+ 581              		.loc 1 130 25 is_stmt 0 view .LVU153
+ 582 0016 9E22     		movs	r2, #158
+ 583 0018 24A9     		add	r1, sp, #144
+ 584 001a 0748     		ldr	r0, .L34
+ 585 001c FFF7FEFF 		bl	DoubleBuffer_Read
+ 586              	.LVL32:
+ 132:Core/Src/mpiCommandHandling.c **** 			{
+ 587              		.loc 1 132 4 is_stmt 1 view .LVU154
+ 132:Core/Src/mpiCommandHandling.c **** 			{
+ 588              		.loc 1 132 7 is_stmt 0 view .LVU155
+ 589 0020 0028     		cmp	r0, #0
+ 590 0022 EFD0     		beq	.L30
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 17
+
+
+ 134:Core/Src/mpiCommandHandling.c **** 			}
+ 591              		.loc 1 134 5 is_stmt 1 view .LVU156
+ 592 0024 8E22     		movs	r2, #142
+ 593 0026 28A9     		add	r1, sp, #160
+ 594 0028 6846     		mov	r0, sp
+ 595              	.LVL33:
+ 134:Core/Src/mpiCommandHandling.c **** 			}
+ 596              		.loc 1 134 5 is_stmt 0 view .LVU157
+ 597 002a FFF7FEFF 		bl	memcpy
+ 598              	.LVL34:
+ 599 002e 24AB     		add	r3, sp, #144
+ 600 0030 0FCB     		ldm	r3, {r0, r1, r2, r3}
+ 601 0032 FFF7FEFF 		bl	processFrameData
+ 602              	.LVL35:
+ 603 0036 E5E7     		b	.L30
+ 604              	.L35:
+ 605              		.align	2
+ 606              	.L34:
+ 607 0038 00000000 		.word	MPIFrameBuffer
+ 608              	.LBE7:
+ 609              		.cfi_endproc
+ 610              	.LFE155:
+ 612              		.section	.text.sendTC_HV_INNER_DOME_SCAN_MODE,"ax",%progbits
+ 613              		.align	1
+ 614              		.global	sendTC_HV_INNER_DOME_SCAN_MODE
+ 615              		.syntax unified
+ 616              		.thumb
+ 617              		.thumb_func
+ 619              	sendTC_HV_INNER_DOME_SCAN_MODE:
+ 620              	.LVL36:
+ 621              	.LFB159:
+ 193:Core/Src/mpiCommandHandling.c **** 
+ 194:Core/Src/mpiCommandHandling.c **** // Tele-Command specific functions
+ 195:Core/Src/mpiCommandHandling.c **** 
+ 196:Core/Src/mpiCommandHandling.c **** /**
+ 197:Core/Src/mpiCommandHandling.c ****  * HV_INNER_DOME_SCAN_MODE Tele-Command
+ 198:Core/Src/mpiCommandHandling.c ****  * Command Code: 2
+ 199:Core/Src/mpiCommandHandling.c ****  * @param - Mode (0: no scan, 1: sawtooth, low to high, 4: sawtooth with beam tracking)
+ 200:Core/Src/mpiCommandHandling.c ****  * @return - 1 for successful transmission & receive by the MPI
+ 201:Core/Src/mpiCommandHandling.c ****  * 		   - 0 if an error occurs
+ 202:Core/Src/mpiCommandHandling.c ****  */
+ 203:Core/Src/mpiCommandHandling.c **** uint8_t sendTC_HV_INNER_DOME_SCAN_MODE(uint8_t mode)
+ 204:Core/Src/mpiCommandHandling.c **** {
+ 622              		.loc 1 204 1 is_stmt 1 view -0
+ 623              		.cfi_startproc
+ 624              		@ args = 0, pretend = 0, frame = 8
+ 625              		@ frame_needed = 0, uses_anonymous_args = 0
+ 205:Core/Src/mpiCommandHandling.c **** 	// Check if mode is within valid range
+ 206:Core/Src/mpiCommandHandling.c **** 	if (mode != 0 && mode != 1 && mode != 4)
+ 626              		.loc 1 206 2 view .LVU159
+ 627              		.loc 1 206 5 is_stmt 0 view .LVU160
+ 628 0000 0128     		cmp	r0, #1
+ 629 0002 01D9     		bls	.L37
+ 630              		.loc 1 206 29 discriminator 1 view .LVU161
+ 631 0004 0428     		cmp	r0, #4
+ 632 0006 0AD1     		bne	.L39
+ 633              	.L37:
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 18
+
+
+ 204:Core/Src/mpiCommandHandling.c **** 	// Check if mode is within valid range
+ 634              		.loc 1 204 1 view .LVU162
+ 635 0008 00B5     		push	{lr}
+ 636              		.cfi_def_cfa_offset 4
+ 637              		.cfi_offset 14, -4
+ 638 000a 83B0     		sub	sp, sp, #12
+ 639              		.cfi_def_cfa_offset 16
+ 207:Core/Src/mpiCommandHandling.c **** 	{
+ 208:Core/Src/mpiCommandHandling.c **** 		return 3; // Invalid mode parameter (custom code to distinguish from MPI response codes)
+ 209:Core/Src/mpiCommandHandling.c **** 	}
+ 210:Core/Src/mpiCommandHandling.c **** 
+ 211:Core/Src/mpiCommandHandling.c **** 	// Prepare parameters for the command
+ 212:Core/Src/mpiCommandHandling.c **** 	uint8_t params[] = {mode};
+ 640              		.loc 1 212 2 is_stmt 1 view .LVU163
+ 641              		.loc 1 212 10 is_stmt 0 view .LVU164
+ 642 000c 8DF80400 		strb	r0, [sp, #4]
+ 213:Core/Src/mpiCommandHandling.c **** 
+ 214:Core/Src/mpiCommandHandling.c **** 	// Command has been verified and parsed to be sent to the MPI (Returns MPI response)
+ 215:Core/Src/mpiCommandHandling.c **** 	return sendTelecommand(HV_INNER_DOME_SCAN_MODE, params);
+ 643              		.loc 1 215 2 is_stmt 1 view .LVU165
+ 644              		.loc 1 215 9 is_stmt 0 view .LVU166
+ 645 0010 01A9     		add	r1, sp, #4
+ 646 0012 0220     		movs	r0, #2
+ 647              	.LVL37:
+ 648              		.loc 1 215 9 view .LVU167
+ 649 0014 FFF7FEFF 		bl	sendTelecommand
+ 650              	.LVL38:
+ 216:Core/Src/mpiCommandHandling.c **** }
+ 651              		.loc 1 216 1 view .LVU168
+ 652 0018 03B0     		add	sp, sp, #12
+ 653              		.cfi_def_cfa_offset 4
+ 654              		@ sp needed
+ 655 001a 5DF804FB 		ldr	pc, [sp], #4
+ 656              	.LVL39:
+ 657              	.L39:
+ 658              		.cfi_def_cfa_offset 0
+ 659              		.cfi_restore 14
+ 208:Core/Src/mpiCommandHandling.c **** 	}
+ 660              		.loc 1 208 10 view .LVU169
+ 661 001e 0320     		movs	r0, #3
+ 662              	.LVL40:
+ 663              		.loc 1 216 1 view .LVU170
+ 664 0020 7047     		bx	lr
+ 665              		.cfi_endproc
+ 666              	.LFE159:
+ 668              		.section	.text.sendTC_HV_SET_FACEPLATE_VOLTAGE,"ax",%progbits
+ 669              		.align	1
+ 670              		.global	sendTC_HV_SET_FACEPLATE_VOLTAGE
+ 671              		.syntax unified
+ 672              		.thumb
+ 673              		.thumb_func
+ 675              	sendTC_HV_SET_FACEPLATE_VOLTAGE:
+ 676              	.LVL41:
+ 677              	.LFB160:
+ 217:Core/Src/mpiCommandHandling.c **** 
+ 218:Core/Src/mpiCommandHandling.c **** // TODO: Confirm for voltage methods whether they are two settings or a range between them
+ 219:Core/Src/mpiCommandHandling.c **** uint8_t sendTC_HV_SET_FACEPLATE_VOLTAGE(uint16_t voltage)
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 19
+
+
+ 220:Core/Src/mpiCommandHandling.c **** {
+ 678              		.loc 1 220 1 is_stmt 1 view -0
+ 679              		.cfi_startproc
+ 680              		@ args = 0, pretend = 0, frame = 0
+ 681              		@ frame_needed = 0, uses_anonymous_args = 0
+ 682              		@ link register save eliminated.
+ 221:Core/Src/mpiCommandHandling.c **** 	// Check if voltage is valid
+ 222:Core/Src/mpiCommandHandling.c **** 	if (voltage != 65535 || voltage != 0)
+ 683              		.loc 1 222 2 view .LVU172
+ 223:Core/Src/mpiCommandHandling.c **** 	{
+ 224:Core/Src/mpiCommandHandling.c **** 		return 3; // Invalid voltage parameter (custom code to distinguish from MPI response codes)
+ 684              		.loc 1 224 3 view .LVU173
+ 225:Core/Src/mpiCommandHandling.c **** 	}
+ 226:Core/Src/mpiCommandHandling.c **** 
+ 227:Core/Src/mpiCommandHandling.c **** 	// Prepare parameters for the command
+ 228:Core/Src/mpiCommandHandling.c **** 	uint8_t params[2];
+ 229:Core/Src/mpiCommandHandling.c **** 	params[0] = (uint8_t)(voltage >> 8); // MSB of voltage
+ 230:Core/Src/mpiCommandHandling.c **** 	params[1] = (uint8_t)(voltage);		 // LSB of voltage
+ 231:Core/Src/mpiCommandHandling.c **** 
+ 232:Core/Src/mpiCommandHandling.c **** 	// Command has been verified and parsed to be sent to the MPI (Returns MPI response)
+ 233:Core/Src/mpiCommandHandling.c **** 	return sendTelecommand(HV_SET_FACEPLATE_VOLTAGE, params);
+ 234:Core/Src/mpiCommandHandling.c **** }
+ 685              		.loc 1 234 1 is_stmt 0 view .LVU174
+ 686 0000 0320     		movs	r0, #3
+ 687              	.LVL42:
+ 688              		.loc 1 234 1 view .LVU175
+ 689 0002 7047     		bx	lr
+ 690              		.cfi_endproc
+ 691              	.LFE160:
+ 693              		.section	.text.sendTC_HV_SET_SCAN_MIDPOINT_VOLTAGE,"ax",%progbits
+ 694              		.align	1
+ 695              		.global	sendTC_HV_SET_SCAN_MIDPOINT_VOLTAGE
+ 696              		.syntax unified
+ 697              		.thumb
+ 698              		.thumb_func
+ 700              	sendTC_HV_SET_SCAN_MIDPOINT_VOLTAGE:
+ 701              	.LVL43:
+ 702              	.LFB161:
+ 235:Core/Src/mpiCommandHandling.c **** 
+ 236:Core/Src/mpiCommandHandling.c **** uint8_t sendTC_HV_SET_SCAN_MIDPOINT_VOLTAGE(uint16_t voltage)
+ 237:Core/Src/mpiCommandHandling.c **** {
+ 703              		.loc 1 237 1 is_stmt 1 view -0
+ 704              		.cfi_startproc
+ 705              		@ args = 0, pretend = 0, frame = 0
+ 706              		@ frame_needed = 0, uses_anonymous_args = 0
+ 707              		@ link register save eliminated.
+ 238:Core/Src/mpiCommandHandling.c **** 	// Check if voltage is valid
+ 239:Core/Src/mpiCommandHandling.c **** 	if (voltage != 65535 || voltage != 0)
+ 708              		.loc 1 239 2 view .LVU177
+ 240:Core/Src/mpiCommandHandling.c **** 	{
+ 241:Core/Src/mpiCommandHandling.c **** 		return 3; // Invalid voltage parameter (custom code to distinguish from MPI response codes)
+ 709              		.loc 1 241 3 view .LVU178
+ 242:Core/Src/mpiCommandHandling.c **** 	}
+ 243:Core/Src/mpiCommandHandling.c **** 
+ 244:Core/Src/mpiCommandHandling.c **** 	// Prepare parameters for the command
+ 245:Core/Src/mpiCommandHandling.c **** 	uint8_t params[2];
+ 246:Core/Src/mpiCommandHandling.c **** 	params[0] = (uint8_t)(voltage >> 8); // MSB of voltage
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 20
+
+
+ 247:Core/Src/mpiCommandHandling.c **** 	params[1] = (uint8_t)(voltage);		 // LSB of voltage
+ 248:Core/Src/mpiCommandHandling.c **** 
+ 249:Core/Src/mpiCommandHandling.c **** 	// Command has been verified and parsed to be sent to the MPI (Returns MPI response)
+ 250:Core/Src/mpiCommandHandling.c **** 	return sendTelecommand(HV_SET_SCAN_MIDPOINT_VOLTAGE, params);
+ 251:Core/Src/mpiCommandHandling.c **** }
+ 710              		.loc 1 251 1 is_stmt 0 view .LVU179
+ 711 0000 0320     		movs	r0, #3
+ 712              	.LVL44:
+ 713              		.loc 1 251 1 view .LVU180
+ 714 0002 7047     		bx	lr
+ 715              		.cfi_endproc
+ 716              	.LFE161:
+ 718              		.section	.text.sendTC_HV_SET_SCAN_AMPLITUDE_VOLTAGE,"ax",%progbits
+ 719              		.align	1
+ 720              		.global	sendTC_HV_SET_SCAN_AMPLITUDE_VOLTAGE
+ 721              		.syntax unified
+ 722              		.thumb
+ 723              		.thumb_func
+ 725              	sendTC_HV_SET_SCAN_AMPLITUDE_VOLTAGE:
+ 726              	.LVL45:
+ 727              	.LFB162:
+ 252:Core/Src/mpiCommandHandling.c **** 
+ 253:Core/Src/mpiCommandHandling.c **** uint8_t sendTC_HV_SET_SCAN_AMPLITUDE_VOLTAGE(uint16_t voltage)
+ 254:Core/Src/mpiCommandHandling.c **** {
+ 728              		.loc 1 254 1 is_stmt 1 view -0
+ 729              		.cfi_startproc
+ 730              		@ args = 0, pretend = 0, frame = 0
+ 731              		@ frame_needed = 0, uses_anonymous_args = 0
+ 732              		@ link register save eliminated.
+ 255:Core/Src/mpiCommandHandling.c **** 	// Check if voltage is valid
+ 256:Core/Src/mpiCommandHandling.c **** 	if (voltage != 32767 || voltage != 0)
+ 733              		.loc 1 256 2 view .LVU182
+ 257:Core/Src/mpiCommandHandling.c **** 	{
+ 258:Core/Src/mpiCommandHandling.c **** 		return 3; // Invalid voltage parameter (custom code to distinguish from MPI response codes)
+ 734              		.loc 1 258 3 view .LVU183
+ 259:Core/Src/mpiCommandHandling.c **** 	}
+ 260:Core/Src/mpiCommandHandling.c **** 
+ 261:Core/Src/mpiCommandHandling.c **** 	// Prepare parameters for the command
+ 262:Core/Src/mpiCommandHandling.c **** 	uint8_t params[2];
+ 263:Core/Src/mpiCommandHandling.c **** 	params[0] = (uint8_t)(voltage >> 8); // MSB of voltage
+ 264:Core/Src/mpiCommandHandling.c **** 	params[1] = (uint8_t)(voltage);		 // LSB of voltage
+ 265:Core/Src/mpiCommandHandling.c **** 
+ 266:Core/Src/mpiCommandHandling.c **** 	// Command has been verified and parsed to be sent to the MPI (Returns MPI response)
+ 267:Core/Src/mpiCommandHandling.c **** 	return sendTelecommand(HV_SET_SCAN_AMPLITUDE_VOLTAGE, params);
+ 268:Core/Src/mpiCommandHandling.c **** }
+ 735              		.loc 1 268 1 is_stmt 0 view .LVU184
+ 736 0000 0320     		movs	r0, #3
+ 737              	.LVL46:
+ 738              		.loc 1 268 1 view .LVU185
+ 739 0002 7047     		bx	lr
+ 740              		.cfi_endproc
+ 741              	.LFE162:
+ 743              		.section	.text.sendTC_HV_SET_SCAN_NUMBER_OF_STEPS,"ax",%progbits
+ 744              		.align	1
+ 745              		.global	sendTC_HV_SET_SCAN_NUMBER_OF_STEPS
+ 746              		.syntax unified
+ 747              		.thumb
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 21
+
+
+ 748              		.thumb_func
+ 750              	sendTC_HV_SET_SCAN_NUMBER_OF_STEPS:
+ 751              	.LVL47:
+ 752              	.LFB163:
+ 269:Core/Src/mpiCommandHandling.c **** 
+ 270:Core/Src/mpiCommandHandling.c **** uint8_t sendTC_HV_SET_SCAN_NUMBER_OF_STEPS(uint16_t steps)
+ 271:Core/Src/mpiCommandHandling.c **** {
+ 753              		.loc 1 271 1 is_stmt 1 view -0
+ 754              		.cfi_startproc
+ 755              		@ args = 0, pretend = 0, frame = 8
+ 756              		@ frame_needed = 0, uses_anonymous_args = 0
+ 757              		.loc 1 271 1 is_stmt 0 view .LVU187
+ 758 0000 00B5     		push	{lr}
+ 759              		.cfi_def_cfa_offset 4
+ 760              		.cfi_offset 14, -4
+ 761 0002 83B0     		sub	sp, sp, #12
+ 762              		.cfi_def_cfa_offset 16
+ 272:Core/Src/mpiCommandHandling.c **** 	// TODO: Check if steps is valid (Number of steps per voltage scan is TBD)
+ 273:Core/Src/mpiCommandHandling.c **** 
+ 274:Core/Src/mpiCommandHandling.c **** 	// Prepare parameters for the command
+ 275:Core/Src/mpiCommandHandling.c **** 	uint8_t params[2];
+ 763              		.loc 1 275 2 is_stmt 1 view .LVU188
+ 276:Core/Src/mpiCommandHandling.c **** 	params[0] = (uint8_t)(steps >> 8); // Byte 1 of steps
+ 764              		.loc 1 276 2 view .LVU189
+ 765              		.loc 1 276 14 is_stmt 0 view .LVU190
+ 766 0004 030A     		lsrs	r3, r0, #8
+ 767              		.loc 1 276 12 view .LVU191
+ 768 0006 8DF80430 		strb	r3, [sp, #4]
+ 277:Core/Src/mpiCommandHandling.c **** 	params[1] = (uint8_t)(steps);	   // Byte 0 of steps
+ 769              		.loc 1 277 2 is_stmt 1 view .LVU192
+ 770              		.loc 1 277 12 is_stmt 0 view .LVU193
+ 771 000a 8DF80500 		strb	r0, [sp, #5]
+ 278:Core/Src/mpiCommandHandling.c **** 
+ 279:Core/Src/mpiCommandHandling.c **** 	// Command has been verified and parsed to be sent to the MPI (Returns MPI response)
+ 280:Core/Src/mpiCommandHandling.c **** 	return sendTelecommand(HV_SET_SCAN_NUMBER_OF_STEPS, params);
+ 772              		.loc 1 280 2 is_stmt 1 view .LVU194
+ 773              		.loc 1 280 9 is_stmt 0 view .LVU195
+ 774 000e 01A9     		add	r1, sp, #4
+ 775 0010 0720     		movs	r0, #7
+ 776              	.LVL48:
+ 777              		.loc 1 280 9 view .LVU196
+ 778 0012 FFF7FEFF 		bl	sendTelecommand
+ 779              	.LVL49:
+ 281:Core/Src/mpiCommandHandling.c **** }
+ 780              		.loc 1 281 1 view .LVU197
+ 781 0016 03B0     		add	sp, sp, #12
+ 782              		.cfi_def_cfa_offset 4
+ 783              		@ sp needed
+ 784 0018 5DF804FB 		ldr	pc, [sp], #4
+ 785              		.cfi_endproc
+ 786              	.LFE163:
+ 788              		.section	.text.sendTC_SET_INTEGRATION_PERIOD,"ax",%progbits
+ 789              		.align	1
+ 790              		.global	sendTC_SET_INTEGRATION_PERIOD
+ 791              		.syntax unified
+ 792              		.thumb
+ 793              		.thumb_func
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 22
+
+
+ 795              	sendTC_SET_INTEGRATION_PERIOD:
+ 796              	.LVL50:
+ 797              	.LFB164:
+ 282:Core/Src/mpiCommandHandling.c **** 
+ 283:Core/Src/mpiCommandHandling.c **** uint8_t sendTC_SET_INTEGRATION_PERIOD(uint16_t period)
+ 284:Core/Src/mpiCommandHandling.c **** {
+ 798              		.loc 1 284 1 is_stmt 1 view -0
+ 799              		.cfi_startproc
+ 800              		@ args = 0, pretend = 0, frame = 8
+ 801              		@ frame_needed = 0, uses_anonymous_args = 0
+ 802              		.loc 1 284 1 is_stmt 0 view .LVU199
+ 803 0000 00B5     		push	{lr}
+ 804              		.cfi_def_cfa_offset 4
+ 805              		.cfi_offset 14, -4
+ 806 0002 83B0     		sub	sp, sp, #12
+ 807              		.cfi_def_cfa_offset 16
+ 285:Core/Src/mpiCommandHandling.c **** 	// Calculate the integration period setting (Based on Frame period tau = 8 + integrationPeriodSett
+ 286:Core/Src/mpiCommandHandling.c **** 	// float frame_period = 8.0f + (period / 12.0f);
+ 287:Core/Src/mpiCommandHandling.c **** 
+ 288:Core/Src/mpiCommandHandling.c **** 	// TODO: Need more info on the function to write error checks and perform formatting
+ 289:Core/Src/mpiCommandHandling.c **** 
+ 290:Core/Src/mpiCommandHandling.c **** 	// Prepare parameters for the command
+ 291:Core/Src/mpiCommandHandling.c **** 	uint8_t params[2];
+ 808              		.loc 1 291 2 is_stmt 1 view .LVU200
+ 292:Core/Src/mpiCommandHandling.c **** 	params[0] = (uint8_t)(period >> 8); // MSB of integration period setting
+ 809              		.loc 1 292 2 view .LVU201
+ 810              		.loc 1 292 14 is_stmt 0 view .LVU202
+ 811 0004 030A     		lsrs	r3, r0, #8
+ 812              		.loc 1 292 12 view .LVU203
+ 813 0006 8DF80430 		strb	r3, [sp, #4]
+ 293:Core/Src/mpiCommandHandling.c **** 	params[1] = (uint8_t)(period);		// LSB of integration period setting
+ 814              		.loc 1 293 2 is_stmt 1 view .LVU204
+ 815              		.loc 1 293 12 is_stmt 0 view .LVU205
+ 816 000a 8DF80500 		strb	r0, [sp, #5]
+ 294:Core/Src/mpiCommandHandling.c **** 
+ 295:Core/Src/mpiCommandHandling.c **** 	// Command has been verified and parsed to be sent to the MPI (Returns MPI response)
+ 296:Core/Src/mpiCommandHandling.c **** 	return sendTelecommand(SET_INTEGRATION_PERIOD, params);
+ 817              		.loc 1 296 2 is_stmt 1 view .LVU206
+ 818              		.loc 1 296 9 is_stmt 0 view .LVU207
+ 819 000e 01A9     		add	r1, sp, #4
+ 820 0010 0820     		movs	r0, #8
+ 821              	.LVL51:
+ 822              		.loc 1 296 9 view .LVU208
+ 823 0012 FFF7FEFF 		bl	sendTelecommand
+ 824              	.LVL52:
+ 297:Core/Src/mpiCommandHandling.c **** }
+ 825              		.loc 1 297 1 view .LVU209
+ 826 0016 03B0     		add	sp, sp, #12
+ 827              		.cfi_def_cfa_offset 4
+ 828              		@ sp needed
+ 829 0018 5DF804FB 		ldr	pc, [sp], #4
+ 830              		.cfi_endproc
+ 831              	.LFE164:
+ 833              		.section	.text.sendTC_AGC_ENABLE,"ax",%progbits
+ 834              		.align	1
+ 835              		.global	sendTC_AGC_ENABLE
+ 836              		.syntax unified
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 23
+
+
+ 837              		.thumb
+ 838              		.thumb_func
+ 840              	sendTC_AGC_ENABLE:
+ 841              	.LFB165:
+ 298:Core/Src/mpiCommandHandling.c **** 
+ 299:Core/Src/mpiCommandHandling.c **** uint8_t sendTC_AGC_ENABLE()
+ 300:Core/Src/mpiCommandHandling.c **** {
+ 842              		.loc 1 300 1 is_stmt 1 view -0
+ 843              		.cfi_startproc
+ 844              		@ args = 0, pretend = 0, frame = 0
+ 845              		@ frame_needed = 0, uses_anonymous_args = 0
+ 846 0000 08B5     		push	{r3, lr}
+ 847              		.cfi_def_cfa_offset 8
+ 848              		.cfi_offset 3, -8
+ 849              		.cfi_offset 14, -4
+ 301:Core/Src/mpiCommandHandling.c **** 	// No parameters in this command, create an empty array
+ 302:Core/Src/mpiCommandHandling.c **** 	uint8_t params[] = {};
+ 850              		.loc 1 302 2 view .LVU211
+ 303:Core/Src/mpiCommandHandling.c **** 
+ 304:Core/Src/mpiCommandHandling.c **** 	// Command ready to be sent to the MPI
+ 305:Core/Src/mpiCommandHandling.c **** 	return sendTelecommand(AGC_ENABLE, params);
+ 851              		.loc 1 305 2 view .LVU212
+ 852              		.loc 1 305 9 is_stmt 0 view .LVU213
+ 853 0002 6946     		mov	r1, sp
+ 854 0004 0920     		movs	r0, #9
+ 855 0006 FFF7FEFF 		bl	sendTelecommand
+ 856              	.LVL53:
+ 306:Core/Src/mpiCommandHandling.c **** }
+ 857              		.loc 1 306 1 view .LVU214
+ 858 000a 08BD     		pop	{r3, pc}
+ 859              		.cfi_endproc
+ 860              	.LFE165:
+ 862              		.section	.text.sendTC_AGC_DISABLE,"ax",%progbits
+ 863              		.align	1
+ 864              		.global	sendTC_AGC_DISABLE
+ 865              		.syntax unified
+ 866              		.thumb
+ 867              		.thumb_func
+ 869              	sendTC_AGC_DISABLE:
+ 870              	.LFB166:
+ 307:Core/Src/mpiCommandHandling.c **** 
+ 308:Core/Src/mpiCommandHandling.c **** uint8_t sendTC_AGC_DISABLE()
+ 309:Core/Src/mpiCommandHandling.c **** {
+ 871              		.loc 1 309 1 is_stmt 1 view -0
+ 872              		.cfi_startproc
+ 873              		@ args = 0, pretend = 0, frame = 0
+ 874              		@ frame_needed = 0, uses_anonymous_args = 0
+ 875 0000 08B5     		push	{r3, lr}
+ 876              		.cfi_def_cfa_offset 8
+ 877              		.cfi_offset 3, -8
+ 878              		.cfi_offset 14, -4
+ 310:Core/Src/mpiCommandHandling.c **** 	// No parameters in this command, create an empty array
+ 311:Core/Src/mpiCommandHandling.c **** 	uint8_t params[] = {};
+ 879              		.loc 1 311 2 view .LVU216
+ 312:Core/Src/mpiCommandHandling.c **** 
+ 313:Core/Src/mpiCommandHandling.c **** 	// Command ready to be sent to the MPI
+ 314:Core/Src/mpiCommandHandling.c **** 	return sendTelecommand(AGC_DISABLE, params);
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 24
+
+
+ 880              		.loc 1 314 2 view .LVU217
+ 881              		.loc 1 314 9 is_stmt 0 view .LVU218
+ 882 0002 6946     		mov	r1, sp
+ 883 0004 0A20     		movs	r0, #10
+ 884 0006 FFF7FEFF 		bl	sendTelecommand
+ 885              	.LVL54:
+ 315:Core/Src/mpiCommandHandling.c **** }
+ 886              		.loc 1 315 1 view .LVU219
+ 887 000a 08BD     		pop	{r3, pc}
+ 888              		.cfi_endproc
+ 889              	.LFE166:
+ 891              		.section	.text.sendTC_BL_ENTER_BOOTLOADER,"ax",%progbits
+ 892              		.align	1
+ 893              		.global	sendTC_BL_ENTER_BOOTLOADER
+ 894              		.syntax unified
+ 895              		.thumb
+ 896              		.thumb_func
+ 898              	sendTC_BL_ENTER_BOOTLOADER:
+ 899              	.LFB167:
+ 316:Core/Src/mpiCommandHandling.c **** 
+ 317:Core/Src/mpiCommandHandling.c **** uint8_t sendTC_BL_ENTER_BOOTLOADER()
+ 318:Core/Src/mpiCommandHandling.c **** {
+ 900              		.loc 1 318 1 is_stmt 1 view -0
+ 901              		.cfi_startproc
+ 902              		@ args = 0, pretend = 0, frame = 0
+ 903              		@ frame_needed = 0, uses_anonymous_args = 0
+ 904 0000 08B5     		push	{r3, lr}
+ 905              		.cfi_def_cfa_offset 8
+ 906              		.cfi_offset 3, -8
+ 907              		.cfi_offset 14, -4
+ 319:Core/Src/mpiCommandHandling.c **** 	// No parameters in this command, create an empty array
+ 320:Core/Src/mpiCommandHandling.c **** 	uint8_t params[] = {};
+ 908              		.loc 1 320 2 view .LVU221
+ 321:Core/Src/mpiCommandHandling.c **** 
+ 322:Core/Src/mpiCommandHandling.c **** 	// Command ready to be sent to the MPI
+ 323:Core/Src/mpiCommandHandling.c **** 	return sendTelecommand(BL_ENTER_BOOTLOADER, params);
+ 909              		.loc 1 323 2 view .LVU222
+ 910              		.loc 1 323 9 is_stmt 0 view .LVU223
+ 911 0002 6946     		mov	r1, sp
+ 912 0004 0D20     		movs	r0, #13
+ 913 0006 FFF7FEFF 		bl	sendTelecommand
+ 914              	.LVL55:
+ 324:Core/Src/mpiCommandHandling.c **** }
+ 915              		.loc 1 324 1 view .LVU224
+ 916 000a 08BD     		pop	{r3, pc}
+ 917              		.cfi_endproc
+ 918              	.LFE167:
+ 920              		.section	.text.sendTC_BL_EXIT_BOOTLOADER,"ax",%progbits
+ 921              		.align	1
+ 922              		.global	sendTC_BL_EXIT_BOOTLOADER
+ 923              		.syntax unified
+ 924              		.thumb
+ 925              		.thumb_func
+ 927              	sendTC_BL_EXIT_BOOTLOADER:
+ 928              	.LFB168:
+ 325:Core/Src/mpiCommandHandling.c **** 
+ 326:Core/Src/mpiCommandHandling.c **** uint8_t sendTC_BL_EXIT_BOOTLOADER()
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 25
+
+
+ 327:Core/Src/mpiCommandHandling.c **** {
+ 929              		.loc 1 327 1 is_stmt 1 view -0
+ 930              		.cfi_startproc
+ 931              		@ args = 0, pretend = 0, frame = 0
+ 932              		@ frame_needed = 0, uses_anonymous_args = 0
+ 933 0000 08B5     		push	{r3, lr}
+ 934              		.cfi_def_cfa_offset 8
+ 935              		.cfi_offset 3, -8
+ 936              		.cfi_offset 14, -4
+ 328:Core/Src/mpiCommandHandling.c **** 	// No parameters in this command, create an empty array
+ 329:Core/Src/mpiCommandHandling.c **** 	uint8_t params[] = {};
+ 937              		.loc 1 329 2 view .LVU226
+ 330:Core/Src/mpiCommandHandling.c **** 
+ 331:Core/Src/mpiCommandHandling.c **** 	// Command ready to be sent to the MPI
+ 332:Core/Src/mpiCommandHandling.c **** 	return sendTelecommand(BL_EXIT_BOOTLOADER, params);
+ 938              		.loc 1 332 2 view .LVU227
+ 939              		.loc 1 332 9 is_stmt 0 view .LVU228
+ 940 0002 6946     		mov	r1, sp
+ 941 0004 0E20     		movs	r0, #14
+ 942 0006 FFF7FEFF 		bl	sendTelecommand
+ 943              	.LVL56:
+ 333:Core/Src/mpiCommandHandling.c **** }
+ 944              		.loc 1 333 1 view .LVU229
+ 945 000a 08BD     		pop	{r3, pc}
+ 946              		.cfi_endproc
+ 947              	.LFE168:
+ 949              		.section	.text.sendTC_BL_SET_APPSW_CRC,"ax",%progbits
+ 950              		.align	1
+ 951              		.global	sendTC_BL_SET_APPSW_CRC
+ 952              		.syntax unified
+ 953              		.thumb
+ 954              		.thumb_func
+ 956              	sendTC_BL_SET_APPSW_CRC:
+ 957              	.LVL57:
+ 958              	.LFB169:
+ 334:Core/Src/mpiCommandHandling.c **** 
+ 335:Core/Src/mpiCommandHandling.c **** uint8_t sendTC_BL_SET_APPSW_CRC(uint16_t CRC_Value)
+ 336:Core/Src/mpiCommandHandling.c **** {
+ 959              		.loc 1 336 1 is_stmt 1 view -0
+ 960              		.cfi_startproc
+ 961              		@ args = 0, pretend = 0, frame = 8
+ 962              		@ frame_needed = 0, uses_anonymous_args = 0
+ 963              		.loc 1 336 1 is_stmt 0 view .LVU231
+ 964 0000 00B5     		push	{lr}
+ 965              		.cfi_def_cfa_offset 4
+ 966              		.cfi_offset 14, -4
+ 967 0002 83B0     		sub	sp, sp, #12
+ 968              		.cfi_def_cfa_offset 16
+ 337:Core/Src/mpiCommandHandling.c **** 	// TODO: Need to know if there are any error checks needed here
+ 338:Core/Src/mpiCommandHandling.c **** 
+ 339:Core/Src/mpiCommandHandling.c **** 	// Prepare parameters for the command
+ 340:Core/Src/mpiCommandHandling.c **** 	uint8_t params[2];
+ 969              		.loc 1 340 2 is_stmt 1 view .LVU232
+ 341:Core/Src/mpiCommandHandling.c **** 	params[0] = (uint8_t)(CRC_Value >> 8); // Byte 1 of CRC_Value
+ 970              		.loc 1 341 2 view .LVU233
+ 971              		.loc 1 341 14 is_stmt 0 view .LVU234
+ 972 0004 030A     		lsrs	r3, r0, #8
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 26
+
+
+ 973              		.loc 1 341 12 view .LVU235
+ 974 0006 8DF80430 		strb	r3, [sp, #4]
+ 342:Core/Src/mpiCommandHandling.c **** 	params[1] = (uint8_t)(CRC_Value);	   // Byte 0 of CRC_Value
+ 975              		.loc 1 342 2 is_stmt 1 view .LVU236
+ 976              		.loc 1 342 12 is_stmt 0 view .LVU237
+ 977 000a 8DF80500 		strb	r0, [sp, #5]
+ 343:Core/Src/mpiCommandHandling.c **** 
+ 344:Core/Src/mpiCommandHandling.c **** 	// Command has been verified and parsed to be sent to the MPI (Returns MPI response)
+ 345:Core/Src/mpiCommandHandling.c **** 	return sendTelecommand(BL_SET_APPSW_CRC, params);
+ 978              		.loc 1 345 2 is_stmt 1 view .LVU238
+ 979              		.loc 1 345 9 is_stmt 0 view .LVU239
+ 980 000e 01A9     		add	r1, sp, #4
+ 981 0010 0F20     		movs	r0, #15
+ 982              	.LVL58:
+ 983              		.loc 1 345 9 view .LVU240
+ 984 0012 FFF7FEFF 		bl	sendTelecommand
+ 985              	.LVL59:
+ 346:Core/Src/mpiCommandHandling.c **** }
+ 986              		.loc 1 346 1 view .LVU241
+ 987 0016 03B0     		add	sp, sp, #12
+ 988              		.cfi_def_cfa_offset 4
+ 989              		@ sp needed
+ 990 0018 5DF804FB 		ldr	pc, [sp], #4
+ 991              		.cfi_endproc
+ 992              	.LFE169:
+ 994              		.section	.text.sendTC_BL_ERASE_TEMP_APP_MEMORY,"ax",%progbits
+ 995              		.align	1
+ 996              		.global	sendTC_BL_ERASE_TEMP_APP_MEMORY
+ 997              		.syntax unified
+ 998              		.thumb
+ 999              		.thumb_func
+ 1001              	sendTC_BL_ERASE_TEMP_APP_MEMORY:
+ 1002              	.LFB170:
+ 347:Core/Src/mpiCommandHandling.c **** 
+ 348:Core/Src/mpiCommandHandling.c **** uint8_t sendTC_BL_ERASE_TEMP_APP_MEMORY()
+ 349:Core/Src/mpiCommandHandling.c **** {
+ 1003              		.loc 1 349 1 is_stmt 1 view -0
+ 1004              		.cfi_startproc
+ 1005              		@ args = 0, pretend = 0, frame = 0
+ 1006              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1007 0000 08B5     		push	{r3, lr}
+ 1008              		.cfi_def_cfa_offset 8
+ 1009              		.cfi_offset 3, -8
+ 1010              		.cfi_offset 14, -4
+ 350:Core/Src/mpiCommandHandling.c **** 	// No parameters in this command, create an empty array
+ 351:Core/Src/mpiCommandHandling.c **** 	uint8_t params[] = {};
+ 1011              		.loc 1 351 2 view .LVU243
+ 352:Core/Src/mpiCommandHandling.c **** 
+ 353:Core/Src/mpiCommandHandling.c **** 	// Command ready to be sent to the MPI
+ 354:Core/Src/mpiCommandHandling.c **** 	return sendTelecommand(BL_ERASE_TEMP_APP_MEMORY, params);
+ 1012              		.loc 1 354 2 view .LVU244
+ 1013              		.loc 1 354 9 is_stmt 0 view .LVU245
+ 1014 0002 6946     		mov	r1, sp
+ 1015 0004 1020     		movs	r0, #16
+ 1016 0006 FFF7FEFF 		bl	sendTelecommand
+ 1017              	.LVL60:
+ 355:Core/Src/mpiCommandHandling.c **** }
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 27
+
+
+ 1018              		.loc 1 355 1 view .LVU246
+ 1019 000a 08BD     		pop	{r3, pc}
+ 1020              		.cfi_endproc
+ 1021              	.LFE170:
+ 1023              		.section	.text.sendTC_BL_STORE_APPSW_CHUNK,"ax",%progbits
+ 1024              		.align	1
+ 1025              		.global	sendTC_BL_STORE_APPSW_CHUNK
+ 1026              		.syntax unified
+ 1027              		.thumb
+ 1028              		.thumb_func
+ 1030              	sendTC_BL_STORE_APPSW_CHUNK:
+ 1031              	.LVL61:
+ 1032              	.LFB171:
+ 356:Core/Src/mpiCommandHandling.c **** 
+ 357:Core/Src/mpiCommandHandling.c **** // @param - uint32_t + variable payload (2-byte memory offset, 2-byte memory words N, 2*N bytes of 
+ 358:Core/Src/mpiCommandHandling.c **** uint8_t sendTC_BL_STORE_APPSW_CHUNK(uint32_t offset, uint32_t N, uint8_t *memoryValues)
+ 359:Core/Src/mpiCommandHandling.c **** {
+ 1033              		.loc 1 359 1 is_stmt 1 view -0
+ 1034              		.cfi_startproc
+ 1035              		@ args = 0, pretend = 0, frame = 0
+ 1036              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1037              		.loc 1 359 1 is_stmt 0 view .LVU248
+ 1038 0000 08B5     		push	{r3, lr}
+ 1039              		.cfi_def_cfa_offset 8
+ 1040              		.cfi_offset 3, -8
+ 1041              		.cfi_offset 14, -4
+ 360:Core/Src/mpiCommandHandling.c **** 	// TODO: Need more clarity on the data being sent here to parse them into the send method...
+ 361:Core/Src/mpiCommandHandling.c **** 	uint8_t params[] = {};
+ 1042              		.loc 1 361 2 is_stmt 1 view .LVU249
+ 362:Core/Src/mpiCommandHandling.c **** 	// Error check CRC parameter
+ 363:Core/Src/mpiCommandHandling.c **** 	return sendTelecommand(BL_STORE_APPSW_CHUNK, params);
+ 1043              		.loc 1 363 2 view .LVU250
+ 1044              		.loc 1 363 9 is_stmt 0 view .LVU251
+ 1045 0002 6946     		mov	r1, sp
+ 1046              	.LVL62:
+ 1047              		.loc 1 363 9 view .LVU252
+ 1048 0004 1120     		movs	r0, #17
+ 1049              	.LVL63:
+ 1050              		.loc 1 363 9 view .LVU253
+ 1051 0006 FFF7FEFF 		bl	sendTelecommand
+ 1052              	.LVL64:
+ 364:Core/Src/mpiCommandHandling.c **** }
+ 1053              		.loc 1 364 1 view .LVU254
+ 1054 000a 08BD     		pop	{r3, pc}
+ 1055              		.cfi_endproc
+ 1056              	.LFE171:
+ 1058              		.section	.text.sendTC_BL_UPGRADE_FIRMWARE,"ax",%progbits
+ 1059              		.align	1
+ 1060              		.global	sendTC_BL_UPGRADE_FIRMWARE
+ 1061              		.syntax unified
+ 1062              		.thumb
+ 1063              		.thumb_func
+ 1065              	sendTC_BL_UPGRADE_FIRMWARE:
+ 1066              	.LFB172:
+ 365:Core/Src/mpiCommandHandling.c **** 
+ 366:Core/Src/mpiCommandHandling.c **** uint8_t sendTC_BL_UPGRADE_FIRMWARE()
+ 367:Core/Src/mpiCommandHandling.c **** {
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 28
+
+
+ 1067              		.loc 1 367 1 is_stmt 1 view -0
+ 1068              		.cfi_startproc
+ 1069              		@ args = 0, pretend = 0, frame = 0
+ 1070              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1071 0000 08B5     		push	{r3, lr}
+ 1072              		.cfi_def_cfa_offset 8
+ 1073              		.cfi_offset 3, -8
+ 1074              		.cfi_offset 14, -4
+ 368:Core/Src/mpiCommandHandling.c **** 	// No parameters in this command, create an empty array
+ 369:Core/Src/mpiCommandHandling.c **** 	uint8_t params[] = {};
+ 1075              		.loc 1 369 2 view .LVU256
+ 370:Core/Src/mpiCommandHandling.c **** 
+ 371:Core/Src/mpiCommandHandling.c **** 	// Command ready to be sent to the MPI
+ 372:Core/Src/mpiCommandHandling.c **** 	return sendTelecommand(BL_UPGRADE_FIRMWARE, params);
+ 1076              		.loc 1 372 2 view .LVU257
+ 1077              		.loc 1 372 9 is_stmt 0 view .LVU258
+ 1078 0002 6946     		mov	r1, sp
+ 1079 0004 1220     		movs	r0, #18
+ 1080 0006 FFF7FEFF 		bl	sendTelecommand
+ 1081              	.LVL65:
+ 373:Core/Src/mpiCommandHandling.c **** }
+ 1082              		.loc 1 373 1 view .LVU259
+ 1083 000a 08BD     		pop	{r3, pc}
+ 1084              		.cfi_endproc
+ 1085              	.LFE172:
+ 1087              		.section	.text.sendTC_AGC_SET_THRESHOLDS,"ax",%progbits
+ 1088              		.align	1
+ 1089              		.global	sendTC_AGC_SET_THRESHOLDS
+ 1090              		.syntax unified
+ 1091              		.thumb
+ 1092              		.thumb_func
+ 1094              	sendTC_AGC_SET_THRESHOLDS:
+ 1095              	.LVL66:
+ 1096              	.LFB173:
+ 374:Core/Src/mpiCommandHandling.c **** 
+ 375:Core/Src/mpiCommandHandling.c **** uint8_t sendTC_AGC_SET_THRESHOLDS(uint32_t threshold)
+ 376:Core/Src/mpiCommandHandling.c **** {
+ 1097              		.loc 1 376 1 is_stmt 1 view -0
+ 1098              		.cfi_startproc
+ 1099              		@ args = 0, pretend = 0, frame = 8
+ 1100              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1101              		.loc 1 376 1 is_stmt 0 view .LVU261
+ 1102 0000 00B5     		push	{lr}
+ 1103              		.cfi_def_cfa_offset 4
+ 1104              		.cfi_offset 14, -4
+ 1105 0002 83B0     		sub	sp, sp, #12
+ 1106              		.cfi_def_cfa_offset 16
+ 377:Core/Src/mpiCommandHandling.c **** 	// Extract lower and upper thresholds from the 32-bit threshold value
+ 378:Core/Src/mpiCommandHandling.c **** 	uint16_t lowerThreshold = (uint16_t)(threshold);
+ 1107              		.loc 1 378 2 is_stmt 1 view .LVU262
+ 1108              	.LVL67:
+ 379:Core/Src/mpiCommandHandling.c **** 	uint16_t upperThreshold = (uint16_t)(threshold >> 16);
+ 1109              		.loc 1 379 2 view .LVU263
+ 380:Core/Src/mpiCommandHandling.c **** 
+ 381:Core/Src/mpiCommandHandling.c **** 	// Check if thresholds are within valid range (0 to 65535)
+ 382:Core/Src/mpiCommandHandling.c **** 	if (lowerThreshold < 0 || lowerThreshold > 65535 || upperThreshold < 0 || upperThreshold > 65535)
+ 1110              		.loc 1 382 2 view .LVU264
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 29
+
+
+ 383:Core/Src/mpiCommandHandling.c **** 	{
+ 384:Core/Src/mpiCommandHandling.c **** 		return 3; // Invalid voltage parameter (custom code to distinguish from MPI response codes)
+ 385:Core/Src/mpiCommandHandling.c **** 	}
+ 386:Core/Src/mpiCommandHandling.c **** 
+ 387:Core/Src/mpiCommandHandling.c **** 	// Prepare parameters for the command
+ 388:Core/Src/mpiCommandHandling.c **** 	uint8_t params[4];							// 2 bytes for lower threshold + 2 bytes for upper threshold
+ 1111              		.loc 1 388 2 view .LVU265
+ 389:Core/Src/mpiCommandHandling.c **** 	params[0] = (uint8_t)(lowerThreshold);		// LSB of lower threshold
+ 1112              		.loc 1 389 2 view .LVU266
+ 1113              		.loc 1 389 12 is_stmt 0 view .LVU267
+ 1114 0004 8DF80400 		strb	r0, [sp, #4]
+ 390:Core/Src/mpiCommandHandling.c **** 	params[1] = (uint8_t)(lowerThreshold >> 8); // MSB of lower threshold
+ 1115              		.loc 1 390 2 is_stmt 1 view .LVU268
+ 1116              		.loc 1 390 14 is_stmt 0 view .LVU269
+ 1117 0008 C0F30723 		ubfx	r3, r0, #8, #8
+ 1118              		.loc 1 390 12 view .LVU270
+ 1119 000c 8DF80530 		strb	r3, [sp, #5]
+ 391:Core/Src/mpiCommandHandling.c **** 	params[2] = (uint8_t)(upperThreshold);		// LSB of upper threshold
+ 1120              		.loc 1 391 2 is_stmt 1 view .LVU271
+ 1121              		.loc 1 391 14 is_stmt 0 view .LVU272
+ 1122 0010 C0F30743 		ubfx	r3, r0, #16, #8
+ 1123              		.loc 1 391 12 view .LVU273
+ 1124 0014 8DF80630 		strb	r3, [sp, #6]
+ 392:Core/Src/mpiCommandHandling.c **** 	params[3] = (uint8_t)(upperThreshold >> 8); // MSB of upper threshold
+ 1125              		.loc 1 392 2 is_stmt 1 view .LVU274
+ 1126              		.loc 1 392 14 is_stmt 0 view .LVU275
+ 1127 0018 000E     		lsrs	r0, r0, #24
+ 1128              	.LVL68:
+ 1129              		.loc 1 392 12 view .LVU276
+ 1130 001a 8DF80700 		strb	r0, [sp, #7]
+ 393:Core/Src/mpiCommandHandling.c **** 
+ 394:Core/Src/mpiCommandHandling.c **** 	// Command has been verified and parsed to be sent to the MPI (Returns MPI response)
+ 395:Core/Src/mpiCommandHandling.c **** 	return sendTelecommand(AGC_SET_THRESHOLDS, params);
+ 1131              		.loc 1 395 2 is_stmt 1 view .LVU277
+ 1132              		.loc 1 395 9 is_stmt 0 view .LVU278
+ 1133 001e 01A9     		add	r1, sp, #4
+ 1134 0020 1420     		movs	r0, #20
+ 1135 0022 FFF7FEFF 		bl	sendTelecommand
+ 1136              	.LVL69:
+ 396:Core/Src/mpiCommandHandling.c **** }
+ 1137              		.loc 1 396 1 view .LVU279
+ 1138 0026 03B0     		add	sp, sp, #12
+ 1139              		.cfi_def_cfa_offset 4
+ 1140              		@ sp needed
+ 1141 0028 5DF804FB 		ldr	pc, [sp], #4
+ 1142              		.cfi_endproc
+ 1143              	.LFE173:
+ 1145              		.section	.text.sendTC_AGC_SET_DISABLED_SHUTTER_DUTY_CYCLE,"ax",%progbits
+ 1146              		.align	1
+ 1147              		.global	sendTC_AGC_SET_DISABLED_SHUTTER_DUTY_CYCLE
+ 1148              		.syntax unified
+ 1149              		.thumb
+ 1150              		.thumb_func
+ 1152              	sendTC_AGC_SET_DISABLED_SHUTTER_DUTY_CYCLE:
+ 1153              	.LVL70:
+ 1154              	.LFB174:
+ 397:Core/Src/mpiCommandHandling.c **** 
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 30
+
+
+ 398:Core/Src/mpiCommandHandling.c **** uint8_t sendTC_AGC_SET_DISABLED_SHUTTER_DUTY_CYCLE(uint16_t shutterDutyCycle)
+ 399:Core/Src/mpiCommandHandling.c **** {
+ 1155              		.loc 1 399 1 is_stmt 1 view -0
+ 1156              		.cfi_startproc
+ 1157              		@ args = 0, pretend = 0, frame = 8
+ 1158              		@ frame_needed = 0, uses_anonymous_args = 0
+ 400:Core/Src/mpiCommandHandling.c **** 	// Check if shutterDutyCycle is within valid range (0 to 50000)
+ 401:Core/Src/mpiCommandHandling.c **** 	if (shutterDutyCycle < 0 || shutterDutyCycle > 50000)
+ 1159              		.loc 1 401 2 view .LVU281
+ 1160              		.loc 1 401 5 is_stmt 0 view .LVU282
+ 1161 0000 4CF25033 		movw	r3, #50000
+ 1162 0004 9842     		cmp	r0, r3
+ 1163 0006 0DD8     		bhi	.L70
+ 399:Core/Src/mpiCommandHandling.c **** 	// Check if shutterDutyCycle is within valid range (0 to 50000)
+ 1164              		.loc 1 399 1 view .LVU283
+ 1165 0008 00B5     		push	{lr}
+ 1166              		.cfi_def_cfa_offset 4
+ 1167              		.cfi_offset 14, -4
+ 1168 000a 83B0     		sub	sp, sp, #12
+ 1169              		.cfi_def_cfa_offset 16
+ 402:Core/Src/mpiCommandHandling.c **** 	{
+ 403:Core/Src/mpiCommandHandling.c **** 		return 3; // Invalid voltage parameter (custom code to distinguish from MPI response codes)
+ 404:Core/Src/mpiCommandHandling.c **** 	}
+ 405:Core/Src/mpiCommandHandling.c **** 
+ 406:Core/Src/mpiCommandHandling.c **** 	// Prepare parameters for the command
+ 407:Core/Src/mpiCommandHandling.c **** 	uint8_t params[2];
+ 1170              		.loc 1 407 2 is_stmt 1 view .LVU284
+ 408:Core/Src/mpiCommandHandling.c **** 	params[0] = (uint8_t)(shutterDutyCycle >> 8); // Byte 1 of shutterDutyCycle
+ 1171              		.loc 1 408 2 view .LVU285
+ 1172              		.loc 1 408 14 is_stmt 0 view .LVU286
+ 1173 000c 030A     		lsrs	r3, r0, #8
+ 1174              		.loc 1 408 12 view .LVU287
+ 1175 000e 8DF80430 		strb	r3, [sp, #4]
+ 409:Core/Src/mpiCommandHandling.c **** 	params[1] = (uint8_t)(shutterDutyCycle);	  // Byte 0 of shutterDutyCycle
+ 1176              		.loc 1 409 2 is_stmt 1 view .LVU288
+ 1177              		.loc 1 409 12 is_stmt 0 view .LVU289
+ 1178 0012 8DF80500 		strb	r0, [sp, #5]
+ 410:Core/Src/mpiCommandHandling.c **** 
+ 411:Core/Src/mpiCommandHandling.c **** 	// Command has been verified and parsed to be sent to the MPI (Returns MPI response)
+ 412:Core/Src/mpiCommandHandling.c **** 	return sendTelecommand(AGC_SET_DISABLED_SHUTTER_DUTY_CYCLE, params);
+ 1179              		.loc 1 412 2 is_stmt 1 view .LVU290
+ 1180              		.loc 1 412 9 is_stmt 0 view .LVU291
+ 1181 0016 01A9     		add	r1, sp, #4
+ 1182 0018 1520     		movs	r0, #21
+ 1183              	.LVL71:
+ 1184              		.loc 1 412 9 view .LVU292
+ 1185 001a FFF7FEFF 		bl	sendTelecommand
+ 1186              	.LVL72:
+ 413:Core/Src/mpiCommandHandling.c **** }
+ 1187              		.loc 1 413 1 view .LVU293
+ 1188 001e 03B0     		add	sp, sp, #12
+ 1189              		.cfi_def_cfa_offset 4
+ 1190              		@ sp needed
+ 1191 0020 5DF804FB 		ldr	pc, [sp], #4
+ 1192              	.LVL73:
+ 1193              	.L70:
+ 1194              		.cfi_def_cfa_offset 0
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 31
+
+
+ 1195              		.cfi_restore 14
+ 403:Core/Src/mpiCommandHandling.c **** 	}
+ 1196              		.loc 1 403 10 view .LVU294
+ 1197 0024 0320     		movs	r0, #3
+ 1198              	.LVL74:
+ 1199              		.loc 1 413 1 view .LVU295
+ 1200 0026 7047     		bx	lr
+ 1201              		.cfi_endproc
+ 1202              	.LFE174:
+ 1204              		.section	.text.sendTC_AGC_SET_PIXEL_RANGE,"ax",%progbits
+ 1205              		.align	1
+ 1206              		.global	sendTC_AGC_SET_PIXEL_RANGE
+ 1207              		.syntax unified
+ 1208              		.thumb
+ 1209              		.thumb_func
+ 1211              	sendTC_AGC_SET_PIXEL_RANGE:
+ 1212              	.LVL75:
+ 1213              	.LFB175:
+ 414:Core/Src/mpiCommandHandling.c **** 
+ 415:Core/Src/mpiCommandHandling.c **** uint8_t sendTC_AGC_SET_PIXEL_RANGE(uint32_t index)
+ 416:Core/Src/mpiCommandHandling.c **** {
+ 1214              		.loc 1 416 1 is_stmt 1 view -0
+ 1215              		.cfi_startproc
+ 1216              		@ args = 0, pretend = 0, frame = 8
+ 1217              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1218              		.loc 1 416 1 is_stmt 0 view .LVU297
+ 1219 0000 00B5     		push	{lr}
+ 1220              		.cfi_def_cfa_offset 4
+ 1221              		.cfi_offset 14, -4
+ 1222 0002 83B0     		sub	sp, sp, #12
+ 1223              		.cfi_def_cfa_offset 16
+ 417:Core/Src/mpiCommandHandling.c **** 	// Extract lower and upper index from the 32-bit index value
+ 418:Core/Src/mpiCommandHandling.c **** 	uint16_t lowerIndex = (uint16_t)(index);
+ 1224              		.loc 1 418 2 is_stmt 1 view .LVU298
+ 1225              	.LVL76:
+ 419:Core/Src/mpiCommandHandling.c **** 	uint16_t upperIndex = (uint16_t)(index >> 16);
+ 1226              		.loc 1 419 2 view .LVU299
+ 420:Core/Src/mpiCommandHandling.c **** 
+ 421:Core/Src/mpiCommandHandling.c **** 	// TODO: Need to know the bounds of the index for error checks
+ 422:Core/Src/mpiCommandHandling.c **** 
+ 423:Core/Src/mpiCommandHandling.c **** 	// Prepare parameters for the command
+ 424:Core/Src/mpiCommandHandling.c **** 	uint8_t params[4];
+ 1227              		.loc 1 424 2 view .LVU300
+ 425:Core/Src/mpiCommandHandling.c **** 	params[0] = (uint8_t)(lowerIndex);		// LSB of lower threshold
+ 1228              		.loc 1 425 2 view .LVU301
+ 1229              		.loc 1 425 12 is_stmt 0 view .LVU302
+ 1230 0004 8DF80400 		strb	r0, [sp, #4]
+ 426:Core/Src/mpiCommandHandling.c **** 	params[1] = (uint8_t)(lowerIndex >> 8); // MSB of lower threshold
+ 1231              		.loc 1 426 2 is_stmt 1 view .LVU303
+ 1232              		.loc 1 426 14 is_stmt 0 view .LVU304
+ 1233 0008 C0F30723 		ubfx	r3, r0, #8, #8
+ 1234              		.loc 1 426 12 view .LVU305
+ 1235 000c 8DF80530 		strb	r3, [sp, #5]
+ 427:Core/Src/mpiCommandHandling.c **** 	params[2] = (uint8_t)(upperIndex);		// LSB of upper threshold
+ 1236              		.loc 1 427 2 is_stmt 1 view .LVU306
+ 1237              		.loc 1 427 14 is_stmt 0 view .LVU307
+ 1238 0010 C0F30743 		ubfx	r3, r0, #16, #8
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 32
+
+
+ 1239              		.loc 1 427 12 view .LVU308
+ 1240 0014 8DF80630 		strb	r3, [sp, #6]
+ 428:Core/Src/mpiCommandHandling.c **** 	params[3] = (uint8_t)(upperIndex >> 8); // MSB of upper threshold
+ 1241              		.loc 1 428 2 is_stmt 1 view .LVU309
+ 1242              		.loc 1 428 14 is_stmt 0 view .LVU310
+ 1243 0018 000E     		lsrs	r0, r0, #24
+ 1244              	.LVL77:
+ 1245              		.loc 1 428 12 view .LVU311
+ 1246 001a 8DF80700 		strb	r0, [sp, #7]
+ 429:Core/Src/mpiCommandHandling.c **** 
+ 430:Core/Src/mpiCommandHandling.c **** 	// Command has been verified and parsed to be sent to the MPI (Returns MPI response)
+ 431:Core/Src/mpiCommandHandling.c **** 	return sendTelecommand(AGC_SET_PIXEL_RANGE, params);
+ 1247              		.loc 1 431 2 is_stmt 1 view .LVU312
+ 1248              		.loc 1 431 9 is_stmt 0 view .LVU313
+ 1249 001e 01A9     		add	r1, sp, #4
+ 1250 0020 1620     		movs	r0, #22
+ 1251 0022 FFF7FEFF 		bl	sendTelecommand
+ 1252              	.LVL78:
+ 432:Core/Src/mpiCommandHandling.c **** }
+ 1253              		.loc 1 432 1 view .LVU314
+ 1254 0026 03B0     		add	sp, sp, #12
+ 1255              		.cfi_def_cfa_offset 4
+ 1256              		@ sp needed
+ 1257 0028 5DF804FB 		ldr	pc, [sp], #4
+ 1258              		.cfi_endproc
+ 1259              	.LFE175:
+ 1261              		.section	.text.sendTC_AGC_SET_NUMBER_OF_MAXIMA_FOR_CONTROL_VALUE,"ax",%progbits
+ 1262              		.align	1
+ 1263              		.global	sendTC_AGC_SET_NUMBER_OF_MAXIMA_FOR_CONTROL_VALUE
+ 1264              		.syntax unified
+ 1265              		.thumb
+ 1266              		.thumb_func
+ 1268              	sendTC_AGC_SET_NUMBER_OF_MAXIMA_FOR_CONTROL_VALUE:
+ 1269              	.LVL79:
+ 1270              	.LFB176:
+ 433:Core/Src/mpiCommandHandling.c **** 
+ 434:Core/Src/mpiCommandHandling.c **** uint8_t sendTC_AGC_SET_NUMBER_OF_MAXIMA_FOR_CONTROL_VALUE(uint8_t n)
+ 435:Core/Src/mpiCommandHandling.c **** {
+ 1271              		.loc 1 435 1 is_stmt 1 view -0
+ 1272              		.cfi_startproc
+ 1273              		@ args = 0, pretend = 0, frame = 8
+ 1274              		@ frame_needed = 0, uses_anonymous_args = 0
+ 436:Core/Src/mpiCommandHandling.c **** 	// Check if N is within valid range (1 to 10)
+ 437:Core/Src/mpiCommandHandling.c **** 	if (n < 1 || n > 10)
+ 1275              		.loc 1 437 2 view .LVU316
+ 1276              		.loc 1 437 12 is_stmt 0 view .LVU317
+ 1277 0000 431E     		subs	r3, r0, #1
+ 1278 0002 DBB2     		uxtb	r3, r3
+ 1279              		.loc 1 437 5 view .LVU318
+ 1280 0004 092B     		cmp	r3, #9
+ 1281 0006 0AD8     		bhi	.L79
+ 435:Core/Src/mpiCommandHandling.c **** 	// Check if N is within valid range (1 to 10)
+ 1282              		.loc 1 435 1 view .LVU319
+ 1283 0008 00B5     		push	{lr}
+ 1284              		.cfi_def_cfa_offset 4
+ 1285              		.cfi_offset 14, -4
+ 1286 000a 83B0     		sub	sp, sp, #12
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 33
+
+
+ 1287              		.cfi_def_cfa_offset 16
+ 438:Core/Src/mpiCommandHandling.c **** 	{
+ 439:Core/Src/mpiCommandHandling.c **** 		return 3; // Invalid voltage parameter (custom code to distinguish from MPI response codes)
+ 440:Core/Src/mpiCommandHandling.c **** 	}
+ 441:Core/Src/mpiCommandHandling.c **** 
+ 442:Core/Src/mpiCommandHandling.c **** 	// Prepare parameters for the command
+ 443:Core/Src/mpiCommandHandling.c **** 	uint8_t params[] = {n};
+ 1288              		.loc 1 443 2 is_stmt 1 view .LVU320
+ 1289              		.loc 1 443 10 is_stmt 0 view .LVU321
+ 1290 000c 8DF80400 		strb	r0, [sp, #4]
+ 444:Core/Src/mpiCommandHandling.c **** 
+ 445:Core/Src/mpiCommandHandling.c **** 	// Command has been verified and parsed to be sent to the MPI (Returns MPI response)
+ 446:Core/Src/mpiCommandHandling.c **** 	return sendTelecommand(AGC_SET_NUMBER_OF_MAXIMA_FOR_CONTROL_VALUE, params);
+ 1291              		.loc 1 446 2 is_stmt 1 view .LVU322
+ 1292              		.loc 1 446 9 is_stmt 0 view .LVU323
+ 1293 0010 01A9     		add	r1, sp, #4
+ 1294 0012 1720     		movs	r0, #23
+ 1295              	.LVL80:
+ 1296              		.loc 1 446 9 view .LVU324
+ 1297 0014 FFF7FEFF 		bl	sendTelecommand
+ 1298              	.LVL81:
+ 447:Core/Src/mpiCommandHandling.c **** }
+ 1299              		.loc 1 447 1 view .LVU325
+ 1300 0018 03B0     		add	sp, sp, #12
+ 1301              		.cfi_def_cfa_offset 4
+ 1302              		@ sp needed
+ 1303 001a 5DF804FB 		ldr	pc, [sp], #4
+ 1304              	.LVL82:
+ 1305              	.L79:
+ 1306              		.cfi_def_cfa_offset 0
+ 1307              		.cfi_restore 14
+ 439:Core/Src/mpiCommandHandling.c **** 	}
+ 1308              		.loc 1 439 10 view .LVU326
+ 1309 001e 0320     		movs	r0, #3
+ 1310              	.LVL83:
+ 1311              		.loc 1 447 1 view .LVU327
+ 1312 0020 7047     		bx	lr
+ 1313              		.cfi_endproc
+ 1314              	.LFE176:
+ 1316              		.section	.text.sendTC_AGC_SET_NUMBER_OF_PIXELS_FOR_BASELINE_VALUE,"ax",%progbits
+ 1317              		.align	1
+ 1318              		.global	sendTC_AGC_SET_NUMBER_OF_PIXELS_FOR_BASELINE_VALUE
+ 1319              		.syntax unified
+ 1320              		.thumb
+ 1321              		.thumb_func
+ 1323              	sendTC_AGC_SET_NUMBER_OF_PIXELS_FOR_BASELINE_VALUE:
+ 1324              	.LVL84:
+ 1325              	.LFB177:
+ 448:Core/Src/mpiCommandHandling.c **** 
+ 449:Core/Src/mpiCommandHandling.c **** uint8_t sendTC_AGC_SET_NUMBER_OF_PIXELS_FOR_BASELINE_VALUE(uint8_t n)
+ 450:Core/Src/mpiCommandHandling.c **** {
+ 1326              		.loc 1 450 1 is_stmt 1 view -0
+ 1327              		.cfi_startproc
+ 1328              		@ args = 0, pretend = 0, frame = 8
+ 1329              		@ frame_needed = 0, uses_anonymous_args = 0
+ 451:Core/Src/mpiCommandHandling.c **** 	// Check if N is within valid range (1 to 10)
+ 452:Core/Src/mpiCommandHandling.c **** 	if (n < 1 || n > 10)
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 34
+
+
+ 1330              		.loc 1 452 2 view .LVU329
+ 1331              		.loc 1 452 12 is_stmt 0 view .LVU330
+ 1332 0000 431E     		subs	r3, r0, #1
+ 1333 0002 DBB2     		uxtb	r3, r3
+ 1334              		.loc 1 452 5 view .LVU331
+ 1335 0004 092B     		cmp	r3, #9
+ 1336 0006 0AD8     		bhi	.L86
+ 450:Core/Src/mpiCommandHandling.c **** 	// Check if N is within valid range (1 to 10)
+ 1337              		.loc 1 450 1 view .LVU332
+ 1338 0008 00B5     		push	{lr}
+ 1339              		.cfi_def_cfa_offset 4
+ 1340              		.cfi_offset 14, -4
+ 1341 000a 83B0     		sub	sp, sp, #12
+ 1342              		.cfi_def_cfa_offset 16
+ 453:Core/Src/mpiCommandHandling.c **** 	{
+ 454:Core/Src/mpiCommandHandling.c **** 		return 3; // Invalid voltage parameter (custom code to distinguish from MPI response codes)
+ 455:Core/Src/mpiCommandHandling.c **** 	}
+ 456:Core/Src/mpiCommandHandling.c **** 
+ 457:Core/Src/mpiCommandHandling.c **** 	// Prepare parameters for the command
+ 458:Core/Src/mpiCommandHandling.c **** 	uint8_t params[] = {n};
+ 1343              		.loc 1 458 2 is_stmt 1 view .LVU333
+ 1344              		.loc 1 458 10 is_stmt 0 view .LVU334
+ 1345 000c 8DF80400 		strb	r0, [sp, #4]
+ 459:Core/Src/mpiCommandHandling.c **** 
+ 460:Core/Src/mpiCommandHandling.c **** 	// Command has been verified and parsed to be sent to the MPI (Returns MPI response)
+ 461:Core/Src/mpiCommandHandling.c **** 	return sendTelecommand(AGC_SET_NUMBER_OF_PIXELS_FOR_BASELINE_VALUE, params);
+ 1346              		.loc 1 461 2 is_stmt 1 view .LVU335
+ 1347              		.loc 1 461 9 is_stmt 0 view .LVU336
+ 1348 0010 01A9     		add	r1, sp, #4
+ 1349 0012 1820     		movs	r0, #24
+ 1350              	.LVL85:
+ 1351              		.loc 1 461 9 view .LVU337
+ 1352 0014 FFF7FEFF 		bl	sendTelecommand
+ 1353              	.LVL86:
+ 462:Core/Src/mpiCommandHandling.c **** }
+ 1354              		.loc 1 462 1 view .LVU338
+ 1355 0018 03B0     		add	sp, sp, #12
+ 1356              		.cfi_def_cfa_offset 4
+ 1357              		@ sp needed
+ 1358 001a 5DF804FB 		ldr	pc, [sp], #4
+ 1359              	.LVL87:
+ 1360              	.L86:
+ 1361              		.cfi_def_cfa_offset 0
+ 1362              		.cfi_restore 14
+ 454:Core/Src/mpiCommandHandling.c **** 	}
+ 1363              		.loc 1 454 10 view .LVU339
+ 1364 001e 0320     		movs	r0, #3
+ 1365              	.LVL88:
+ 1366              		.loc 1 462 1 view .LVU340
+ 1367 0020 7047     		bx	lr
+ 1368              		.cfi_endproc
+ 1369              	.LFE177:
+ 1371              		.section	.text.sendTC_AGC_SET_STEP_FACTOR,"ax",%progbits
+ 1372              		.align	1
+ 1373              		.global	sendTC_AGC_SET_STEP_FACTOR
+ 1374              		.syntax unified
+ 1375              		.thumb
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 35
+
+
+ 1376              		.thumb_func
+ 1378              	sendTC_AGC_SET_STEP_FACTOR:
+ 1379              	.LVL89:
+ 1380              	.LFB178:
+ 463:Core/Src/mpiCommandHandling.c **** 
+ 464:Core/Src/mpiCommandHandling.c **** uint8_t sendTC_AGC_SET_STEP_FACTOR(uint8_t n)
+ 465:Core/Src/mpiCommandHandling.c **** {
+ 1381              		.loc 1 465 1 is_stmt 1 view -0
+ 1382              		.cfi_startproc
+ 1383              		@ args = 0, pretend = 0, frame = 8
+ 1384              		@ frame_needed = 0, uses_anonymous_args = 0
+ 466:Core/Src/mpiCommandHandling.c **** 	// Check if N is within valid range (1 to 10)
+ 467:Core/Src/mpiCommandHandling.c **** 	if (n < 1 || n > 255)
+ 1385              		.loc 1 467 2 view .LVU342
+ 1386              		.loc 1 467 5 is_stmt 0 view .LVU343
+ 1387 0000 50B1     		cbz	r0, .L93
+ 465:Core/Src/mpiCommandHandling.c **** 	// Check if N is within valid range (1 to 10)
+ 1388              		.loc 1 465 1 view .LVU344
+ 1389 0002 00B5     		push	{lr}
+ 1390              		.cfi_def_cfa_offset 4
+ 1391              		.cfi_offset 14, -4
+ 1392 0004 83B0     		sub	sp, sp, #12
+ 1393              		.cfi_def_cfa_offset 16
+ 468:Core/Src/mpiCommandHandling.c **** 	{
+ 469:Core/Src/mpiCommandHandling.c **** 		return 3; // Invalid voltage parameter (custom code to distinguish from MPI response codes)
+ 470:Core/Src/mpiCommandHandling.c **** 	}
+ 471:Core/Src/mpiCommandHandling.c **** 
+ 472:Core/Src/mpiCommandHandling.c **** 	// TODO: Confirm if n needs to be passed or AGC step factor = (1+N/100.0)
+ 473:Core/Src/mpiCommandHandling.c **** 
+ 474:Core/Src/mpiCommandHandling.c **** 	// Prepare parameters for the command
+ 475:Core/Src/mpiCommandHandling.c **** 	uint8_t params[] = {n};
+ 1394              		.loc 1 475 2 is_stmt 1 view .LVU345
+ 1395              		.loc 1 475 10 is_stmt 0 view .LVU346
+ 1396 0006 8DF80400 		strb	r0, [sp, #4]
+ 476:Core/Src/mpiCommandHandling.c **** 
+ 477:Core/Src/mpiCommandHandling.c **** 	// Command has been verified and parsed to be sent to the MPI (Returns MPI response)
+ 478:Core/Src/mpiCommandHandling.c **** 	return sendTelecommand(AGC_SET_STEP_FACTOR, params);
+ 1397              		.loc 1 478 2 is_stmt 1 view .LVU347
+ 1398              		.loc 1 478 9 is_stmt 0 view .LVU348
+ 1399 000a 01A9     		add	r1, sp, #4
+ 1400 000c 1920     		movs	r0, #25
+ 1401              	.LVL90:
+ 1402              		.loc 1 478 9 view .LVU349
+ 1403 000e FFF7FEFF 		bl	sendTelecommand
+ 1404              	.LVL91:
+ 479:Core/Src/mpiCommandHandling.c **** }
+ 1405              		.loc 1 479 1 view .LVU350
+ 1406 0012 03B0     		add	sp, sp, #12
+ 1407              		.cfi_def_cfa_offset 4
+ 1408              		@ sp needed
+ 1409 0014 5DF804FB 		ldr	pc, [sp], #4
+ 1410              	.LVL92:
+ 1411              	.L93:
+ 1412              		.cfi_def_cfa_offset 0
+ 1413              		.cfi_restore 14
+ 469:Core/Src/mpiCommandHandling.c **** 	}
+ 1414              		.loc 1 469 10 view .LVU351
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 36
+
+
+ 1415 0018 0320     		movs	r0, #3
+ 1416              	.LVL93:
+ 1417              		.loc 1 479 1 view .LVU352
+ 1418 001a 7047     		bx	lr
+ 1419              		.cfi_endproc
+ 1420              	.LFE178:
+ 1422              		.section	.text.sendTC_SET_BASELINE_FIRST_PIXEL,"ax",%progbits
+ 1423              		.align	1
+ 1424              		.global	sendTC_SET_BASELINE_FIRST_PIXEL
+ 1425              		.syntax unified
+ 1426              		.thumb
+ 1427              		.thumb_func
+ 1429              	sendTC_SET_BASELINE_FIRST_PIXEL:
+ 1430              	.LVL94:
+ 1431              	.LFB179:
+ 480:Core/Src/mpiCommandHandling.c **** 
+ 481:Core/Src/mpiCommandHandling.c **** uint8_t sendTC_SET_BASELINE_FIRST_PIXEL(uint8_t n)
+ 482:Core/Src/mpiCommandHandling.c **** {
+ 1432              		.loc 1 482 1 is_stmt 1 view -0
+ 1433              		.cfi_startproc
+ 1434              		@ args = 0, pretend = 0, frame = 8
+ 1435              		@ frame_needed = 0, uses_anonymous_args = 0
+ 483:Core/Src/mpiCommandHandling.c **** 	// Check if N is within valid range (1 to 10)
+ 484:Core/Src/mpiCommandHandling.c **** 	if (n < 0 || n > 50)
+ 1436              		.loc 1 484 2 view .LVU354
+ 1437              		.loc 1 484 5 is_stmt 0 view .LVU355
+ 1438 0000 3228     		cmp	r0, #50
+ 1439 0002 0AD8     		bhi	.L100
+ 482:Core/Src/mpiCommandHandling.c **** 	// Check if N is within valid range (1 to 10)
+ 1440              		.loc 1 482 1 view .LVU356
+ 1441 0004 00B5     		push	{lr}
+ 1442              		.cfi_def_cfa_offset 4
+ 1443              		.cfi_offset 14, -4
+ 1444 0006 83B0     		sub	sp, sp, #12
+ 1445              		.cfi_def_cfa_offset 16
+ 485:Core/Src/mpiCommandHandling.c **** 	{
+ 486:Core/Src/mpiCommandHandling.c **** 		return 3; // Invalid voltage parameter (custom code to distinguish from MPI response codes)
+ 487:Core/Src/mpiCommandHandling.c **** 	}
+ 488:Core/Src/mpiCommandHandling.c **** 
+ 489:Core/Src/mpiCommandHandling.c **** 	// Prepare parameters for the command
+ 490:Core/Src/mpiCommandHandling.c **** 	uint8_t params[] = {n};
+ 1446              		.loc 1 490 2 is_stmt 1 view .LVU357
+ 1447              		.loc 1 490 10 is_stmt 0 view .LVU358
+ 1448 0008 8DF80400 		strb	r0, [sp, #4]
+ 491:Core/Src/mpiCommandHandling.c **** 
+ 492:Core/Src/mpiCommandHandling.c **** 	// Command has been verified and parsed to be sent to the MPI (Returns MPI response)
+ 493:Core/Src/mpiCommandHandling.c **** 	return sendTelecommand(SET_BASELINE_FIRST_PIXEL, params);
+ 1449              		.loc 1 493 2 is_stmt 1 view .LVU359
+ 1450              		.loc 1 493 9 is_stmt 0 view .LVU360
+ 1451 000c 01A9     		add	r1, sp, #4
+ 1452 000e 1D20     		movs	r0, #29
+ 1453              	.LVL95:
+ 1454              		.loc 1 493 9 view .LVU361
+ 1455 0010 FFF7FEFF 		bl	sendTelecommand
+ 1456              	.LVL96:
+ 494:Core/Src/mpiCommandHandling.c **** }
+ 1457              		.loc 1 494 1 view .LVU362
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 37
+
+
+ 1458 0014 03B0     		add	sp, sp, #12
+ 1459              		.cfi_def_cfa_offset 4
+ 1460              		@ sp needed
+ 1461 0016 5DF804FB 		ldr	pc, [sp], #4
+ 1462              	.LVL97:
+ 1463              	.L100:
+ 1464              		.cfi_def_cfa_offset 0
+ 1465              		.cfi_restore 14
+ 486:Core/Src/mpiCommandHandling.c **** 	}
+ 1466              		.loc 1 486 10 view .LVU363
+ 1467 001a 0320     		movs	r0, #3
+ 1468              	.LVL98:
+ 1469              		.loc 1 494 1 view .LVU364
+ 1470 001c 7047     		bx	lr
+ 1471              		.cfi_endproc
+ 1472              	.LFE179:
+ 1474              		.section	.bss.doubleBufferInitialized.0,"aw",%nobits
+ 1475              		.align	2
+ 1478              	doubleBufferInitialized.0:
+ 1479 0000 00000000 		.space	4
+ 1480              		.global	MPIFrameBuffer
+ 1481              		.section	.bss.MPIFrameBuffer,"aw",%nobits
+ 1482              		.align	2
+ 1485              	MPIFrameBuffer:
+ 1486 0000 00000000 		.space	1040
+ 1486      00000000 
+ 1486      00000000 
+ 1486      00000000 
+ 1486      00000000 
+ 1487              		.text
+ 1488              	.Letext0:
+ 1489              		.file 2 "C:/Users/vaibh/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-to
+ 1490              		.file 3 "C:/Users/vaibh/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-to
+ 1491              		.file 4 "Drivers/CMSIS/Device/ST/STM32L4xx/Include/stm32l4r5xx.h"
+ 1492              		.file 5 "C:/Users/vaibh/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-to
+ 1493              		.file 6 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_def.h"
+ 1494              		.file 7 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_dma.h"
+ 1495              		.file 8 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_spi.h"
+ 1496              		.file 9 "Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h"
+ 1497              		.file 10 "Core/Inc/../Inc/main.h"
+ 1498              		.file 11 "Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h"
+ 1499              		.file 12 "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h"
+ 1500              		.file 13 "Middlewares/Third_Party/FreeRTOS/Source/include/task.h"
+ 1501              		.file 14 "Middlewares/Third_Party/FreeRTOS/Source/include/queue.h"
+ 1502              		.file 15 "Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h"
+ 1503              		.file 16 "Core/Inc/../Inc/DoubleBuffer.h"
+ 1504              		.file 17 "Core/Inc/../Inc/mpiCommandHandling.h"
+ 1505              		.file 18 "Core/Inc/memory_utilities.h"
+ 1506              		.file 19 "C:/Users/vaibh/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-t
+ 1507              		.file 20 "C:/Users/vaibh/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-t
+ 1508              		.file 21 "<built-in>"
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 38
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 mpiCommandHandling.c
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:21     .text.receiveIncomingMPIFramesTask:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:27     .text.receiveIncomingMPIFramesTask:00000000 receiveIncomingMPIFramesTask
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:229    .text.receiveIncomingMPIFramesTask:00000120 $d
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:1478   .bss.doubleBufferInitialized.0:00000000 doubleBufferInitialized.0
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:1485   .bss.MPIFrameBuffer:00000000 MPIFrameBuffer
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:237    .text.sendTelecommand:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:243    .text.sendTelecommand:00000000 sendTelecommand
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:333    .text.sendTelecommand:00000050 $d
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:338    .rodata.StartMPIProcessingTasks.str1.4:00000000 $d
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:345    .text.StartMPIProcessingTasks:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:351    .text.StartMPIProcessingTasks:00000000 StartMPIProcessingTasks
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:392    .text.StartMPIProcessingTasks:0000002c $d
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:552    .text.processIncomingMPIFramesTask:00000000 processIncomingMPIFramesTask
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:400    .rodata.writeFrameToMemory.str1.4:00000000 $d
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:407    .text.writeFrameToMemory:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:413    .text.writeFrameToMemory:00000000 writeFrameToMemory
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:465    .text.writeFrameToMemory:00000030 $d
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:472    .rodata.processFrameData.str1.4:00000000 $d
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:477    .text.processFrameData:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:483    .text.processFrameData:00000000 processFrameData
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:541    .text.processFrameData:0000004c $d
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:546    .text.processIncomingMPIFramesTask:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:607    .text.processIncomingMPIFramesTask:00000038 $d
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:613    .text.sendTC_HV_INNER_DOME_SCAN_MODE:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:619    .text.sendTC_HV_INNER_DOME_SCAN_MODE:00000000 sendTC_HV_INNER_DOME_SCAN_MODE
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:669    .text.sendTC_HV_SET_FACEPLATE_VOLTAGE:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:675    .text.sendTC_HV_SET_FACEPLATE_VOLTAGE:00000000 sendTC_HV_SET_FACEPLATE_VOLTAGE
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:694    .text.sendTC_HV_SET_SCAN_MIDPOINT_VOLTAGE:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:700    .text.sendTC_HV_SET_SCAN_MIDPOINT_VOLTAGE:00000000 sendTC_HV_SET_SCAN_MIDPOINT_VOLTAGE
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:719    .text.sendTC_HV_SET_SCAN_AMPLITUDE_VOLTAGE:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:725    .text.sendTC_HV_SET_SCAN_AMPLITUDE_VOLTAGE:00000000 sendTC_HV_SET_SCAN_AMPLITUDE_VOLTAGE
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:744    .text.sendTC_HV_SET_SCAN_NUMBER_OF_STEPS:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:750    .text.sendTC_HV_SET_SCAN_NUMBER_OF_STEPS:00000000 sendTC_HV_SET_SCAN_NUMBER_OF_STEPS
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:789    .text.sendTC_SET_INTEGRATION_PERIOD:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:795    .text.sendTC_SET_INTEGRATION_PERIOD:00000000 sendTC_SET_INTEGRATION_PERIOD
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:834    .text.sendTC_AGC_ENABLE:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:840    .text.sendTC_AGC_ENABLE:00000000 sendTC_AGC_ENABLE
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:863    .text.sendTC_AGC_DISABLE:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:869    .text.sendTC_AGC_DISABLE:00000000 sendTC_AGC_DISABLE
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:892    .text.sendTC_BL_ENTER_BOOTLOADER:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:898    .text.sendTC_BL_ENTER_BOOTLOADER:00000000 sendTC_BL_ENTER_BOOTLOADER
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:921    .text.sendTC_BL_EXIT_BOOTLOADER:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:927    .text.sendTC_BL_EXIT_BOOTLOADER:00000000 sendTC_BL_EXIT_BOOTLOADER
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:950    .text.sendTC_BL_SET_APPSW_CRC:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:956    .text.sendTC_BL_SET_APPSW_CRC:00000000 sendTC_BL_SET_APPSW_CRC
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:995    .text.sendTC_BL_ERASE_TEMP_APP_MEMORY:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:1001   .text.sendTC_BL_ERASE_TEMP_APP_MEMORY:00000000 sendTC_BL_ERASE_TEMP_APP_MEMORY
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:1024   .text.sendTC_BL_STORE_APPSW_CHUNK:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:1030   .text.sendTC_BL_STORE_APPSW_CHUNK:00000000 sendTC_BL_STORE_APPSW_CHUNK
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:1059   .text.sendTC_BL_UPGRADE_FIRMWARE:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:1065   .text.sendTC_BL_UPGRADE_FIRMWARE:00000000 sendTC_BL_UPGRADE_FIRMWARE
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:1088   .text.sendTC_AGC_SET_THRESHOLDS:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:1094   .text.sendTC_AGC_SET_THRESHOLDS:00000000 sendTC_AGC_SET_THRESHOLDS
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:1146   .text.sendTC_AGC_SET_DISABLED_SHUTTER_DUTY_CYCLE:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:1152   .text.sendTC_AGC_SET_DISABLED_SHUTTER_DUTY_CYCLE:00000000 sendTC_AGC_SET_DISABLED_SHUTTER_DUTY_CYCLE
+ARM GAS  C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s 			page 39
+
+
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:1205   .text.sendTC_AGC_SET_PIXEL_RANGE:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:1211   .text.sendTC_AGC_SET_PIXEL_RANGE:00000000 sendTC_AGC_SET_PIXEL_RANGE
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:1262   .text.sendTC_AGC_SET_NUMBER_OF_MAXIMA_FOR_CONTROL_VALUE:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:1268   .text.sendTC_AGC_SET_NUMBER_OF_MAXIMA_FOR_CONTROL_VALUE:00000000 sendTC_AGC_SET_NUMBER_OF_MAXIMA_FOR_CONTROL_VALUE
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:1317   .text.sendTC_AGC_SET_NUMBER_OF_PIXELS_FOR_BASELINE_VALUE:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:1323   .text.sendTC_AGC_SET_NUMBER_OF_PIXELS_FOR_BASELINE_VALUE:00000000 sendTC_AGC_SET_NUMBER_OF_PIXELS_FOR_BASELINE_VALUE
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:1372   .text.sendTC_AGC_SET_STEP_FACTOR:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:1378   .text.sendTC_AGC_SET_STEP_FACTOR:00000000 sendTC_AGC_SET_STEP_FACTOR
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:1423   .text.sendTC_SET_BASELINE_FIRST_PIXEL:00000000 $t
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:1429   .text.sendTC_SET_BASELINE_FIRST_PIXEL:00000000 sendTC_SET_BASELINE_FIRST_PIXEL
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:1475   .bss.doubleBufferInitialized.0:00000000 $d
+C:\Users\vaibh\AppData\Local\Temp\cc0zeCD4.s:1482   .bss.MPIFrameBuffer:00000000 $d
+
+UNDEFINED SYMBOLS
+DoubleBuffer_Init
+DoubleBuffer_Write
+HAL_UART_Receive_DMA
+huart1
+strlen
+HAL_UART_Transmit
+xTaskCreate
+WRITE_FILE
+PRINT_STRING_UART
+hspi1
+sprintf
+memcpy
+xQueueSemaphoreTake
+DoubleBuffer_Read

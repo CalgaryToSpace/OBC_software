@@ -6,15 +6,15 @@
 
 void debug_uart_print_str(const char *str)
 {
-    HAL_UART_Transmit(&huart1, (uint8_t *)str, strlen(str), 100);
+    HAL_UART_Transmit(&hlpuart1, (uint8_t *)str, strlen(str), 100);
 }
 
 void debug_uart_print_str_new_line(const char *str)
 {
-    HAL_UART_Transmit(&huart1, (uint8_t *)str, strlen(str), 100);
+    HAL_UART_Transmit(&hlpuart1, (uint8_t *)str, strlen(str), 100);
 
     char buf[] = "\r\n";
-    HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 100);
+    HAL_UART_Transmit(&hlpuart1, (uint8_t *)buf, strlen(buf), 100);
 }
 
 // Function to convert an integer to a string

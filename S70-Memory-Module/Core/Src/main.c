@@ -109,8 +109,10 @@ void StartDefaultTask(void *argument);
  * @brief  The application entry point.
  * @retval int
  */
+// entry point
 int main(void)
 {
+
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -145,124 +147,318 @@ int main(void)
   MX_SPI1_Init();
   MX_I2C3_Init();
   /* USER CODE BEGIN 2 */
+  // uint8_t rxBuf[1];
+  // PULL_CS();
+  // HAL_SPI_Transmit(&hspi1, (uint8_t *)&FLASH_STATREG1, 1, 100);
+  // HAL_SPI_Receive(&hspi1, (uint8_t *)rxBuf, 1, 100);
+  // SET_CS();
 
-  // Turn on LED1 to indicate program starting
-  HAL_GPIO_WritePin(PIN_LED1_OUT_GPIO_Port, PIN_LED1_OUT_Pin, GPIO_PIN_SET);
+  // Testing basics
+  char spiRxBuffer[513] = {0};
+  char spiTxBuffer[513] = {0};
+  // uint8_t sRegBuf[1];
+  // MEM_CLEAR_LFS(&hspi1, 0);
+  // // ENABLE_WRDI(&hspi1);
+  // READ_STATUS_REGISTER(&hspi1, sRegBuf);
 
-  uint8_t boot_count = 0;
-  int8_t result;
-  char result_read;
+  debug_uart_print_str("Starting Test\n");
 
-  // Initialize LittleFS Values, and pass SPI pointer
-  INITIALIZE(&hspi1);
+  strcpy((char *)spiTxBuffer, "Test 1234 String");
+  WRITE_LFS(&hspi1, (uint8_t *)spiTxBuffer, 1, sizeof(spiTxBuffer));
+  READ_LFS(&hspi1, (uint8_t *)spiRxBuffer, 1, sizeof(spiRxBuffer));
+  debug_uart_print_str(spiRxBuffer);
 
-  result = FORMAT();
-  if (result < 0)
-  {
-    INT_TO_STRING(result, &result_read);
-    debug_uart_print_str("Formatting Error");
-    debug_uart_print_str_new_line(&result_read);
-    return -1;
-  }
+  debug_uart_print_str("Ending Test\n");
+  // // variables used by the filesystem
+  // lfs_t lfs;
+  // lfs_file_t file;
+  // uint8_t lfs_read_buf[512];
+  // uint8_t lfs_prog_buf[512];
 
-  for (int i = 0; i < 1; i++)
-  {
-    // Use FORCE_MOUNT to FORMAT the Memory if needed
-    result = MOUNT();
-    if (result < 0)
-    {
-      INT_TO_STRING(result, &result_read);
-      debug_uart_print_str("Mounting Error");
-      debug_uart_print_str_new_line(&result_read);
-      break;
-    }
+  // // configuration of the filesystem is provided by this struct
+  // const struct lfs_config cfg = {
+  //     // block device operations
+  //     .read = block_device_read,
+  //     .prog = block_device_prog,
+  //     .erase = block_device_erase,
+  //     .sync = block_device_sync,
 
-    char read_buffer[32];
-    char write_buffer[32];
+  //     // block device configuration
+  //     .read_size = 512,
+  //     .prog_size = 512,
+  //     .block_size = 1024, // 262144
+  //     .block_count = 8196,
+  //     .block_cycles = 100, // ASK ABOUT THIS (HOW FREQUENT ARE WE USING THE MODULE)
+  //     .cache_size = 512,
+  //     .lookahead_size = 16,
+  //     .compact_thresh = -1, // Defaults to ~88% block_size when zero (lfs.h, line 232)
 
-    result = READ_FILE("test", read_buffer, sizeof(read_buffer));
-    if (result < 0)
-    {
-      INT_TO_STRING(result, &result_read);
-      debug_uart_print_str("Reading Error");
-      debug_uart_print_str_new_line(&result_read);
-      break;
-    }
+  //     .read_buffer = lfs_read_buf,
+  //     .prog_buffer = lfs_prog_buf,
+  // };
 
-    debug_uart_print_str_new_line("Read Value:");
-    debug_uart_print_str_new_line(read_buffer);
+  // // mount the filesystem
+  // int err = lfs_mount(&lfs, &cfg);
 
-    boot_count = STRING_TO_INT(read_buffer);
-    boot_count += 1;
+  // // reformat if we can't mount the filesystem
+  // // this should only happen on the first boot
+  // if (err)
+  // {
+  //   lfs_format(&lfs, &cfg);
+  //   lfs_mount(&lfs, &cfg);
+  // }
 
-    INT_TO_STRING(boot_count, write_buffer);
+  // // read current count
+  // uint32_t boot_count = 0;
+  // lfs_file_open(&lfs, &file, "boot_count", LFS_O_RDWR | LFS_O_CREAT);
+  // lfs_file_read(&lfs, &file, &boot_count, sizeof(boot_count));
 
-    result = WRITE_FILE("test", write_buffer, sizeof(write_buffer));
-    if (result < 0)
-    {
-      INT_TO_STRING(result, &result_read);
-      debug_uart_print_str("Writing Error");
-      debug_uart_print_str_new_line(&result_read);
-      break;
-    }
+  // // update boot count
+  // boot_count += 1;
+  // lfs_file_rewind(&lfs, &file);
+  // lfs_file_write(&lfs, &file, &boot_count, sizeof(boot_count));
 
-    memset(read_buffer, 0, strlen((char *)read_buffer));
+  // // remember the storage is not updated until the file is closed successfully
+  // lfs_file_close(&lfs, &file);
 
-    UNMOUNT();
-  }
+  // // release any resources we were using
+  // lfs_unmount(&lfs);
 
-  // Turn off LED1 to indicate Program End
-  HAL_GPIO_WritePin(PIN_LED1_OUT_GPIO_Port, PIN_LED1_OUT_Pin, GPIO_PIN_RESET);
+  // // print the boot count
+  // printf("boot_count: %d\n", boot_count);
 
-  /* USER CODE END 2 */
+  // debug_uart_print_str("LFS Base complete\n");
+  // // Test UART
 
-  /* Init scheduler */
-  osKernelInitialize();
+  // // Initialize LittleFS Values, and pass SPI pointer
+  // char *debug = "INITIALIZING\n";
+  // HAL_UART_Transmit(&hlpuart1, (uint8_t *)debug, strlen(debug), 100);
+  // INITIALIZE(&hspi1);
+  // debug_uart_print_str("Initailize complete\n");
 
-  /* USER CODE BEGIN RTOS_MUTEX */
-  /* add mutexes, ... */
-  /* USER CODE END RTOS_MUTEX */
+  // // uint8_t boot_count = 0;
+  // int8_t result;
+  // char result_read;
+  // result = FORMAT();
+  // debug_uart_print_str("Format Called\n");
+  // if (result < 0)
+  // {
+  //   INT_TO_STRING(result, &result_read);
+  //   debug_uart_print_str("Formatting Error");
+  //   debug_uart_print_str_new_line(&result_read);
+  //   return -1;
+  // }
+  // else
+  // {
+  //   debug_uart_print_str("Formatting Successful\n");
+  // }
 
-  /* USER CODE BEGIN RTOS_SEMAPHORES */
-  /* add semaphores, ... */
-  /* USER CODE END RTOS_SEMAPHORES */
+  // char *str = "TESTING FILE";
+  // char *test = "Sample Text";
+  // char *read;
+  // HAL_UART_Transmit(&hlpuart1, (uint8_t *)str, strlen(str), 100);
 
-  /* USER CODE BEGIN RTOS_TIMERS */
-  /* start timers, add new ones, ... */
-  /* USER CODE END RTOS_TIMERS */
+  // // Test Basic Read/Write
+  // // lfs_block_t block;
+  // // WRITE_LFS(&hlpuart1, (uint8_t*) str, block, sizeof(str));
+  // WRITE_FILE(str, test, sizeof(test));
+  // READ_FILE(str, read, sizeof(str));
 
-  /* USER CODE BEGIN RTOS_QUEUES */
-  /* add queues, ... */
-  /* USER CODE END RTOS_QUEUES */
-
-  /* Create the thread(s) */
-  /* creation of defaultTask */
-  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
-
-  /* USER CODE BEGIN RTOS_THREADS */
-  TASK_debug_print_heartbeat_Handle = osThreadNew(TASK_debug_print_heartbeat, NULL, &TASK_debug_print_heartbeat_Attributes);
-
-  /* USER CODE END RTOS_THREADS */
-
-  /* USER CODE BEGIN RTOS_EVENTS */
-  /* add events, ... */
-  /* USER CODE END RTOS_EVENTS */
-
-  /* Start scheduler */
-  osKernelStart();
-
-  /* We should never get here as control is now taken by the scheduler */
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-    debug_uart_print_str("This superloop point should never be reached, because the FreeRTOS Kernel is running...\n");
-    /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
-  }
-  /* USER CODE END 3 */
+  // HAL_UART_Transmit(&hlpuart1, (uint8_t *)read, strlen(read), 100);
 }
+
+// int main(void)
+// {
+//   /* USER CODE BEGIN 1 */
+
+//   /* USER CODE END 1 */
+
+//   /* MCU Configuration--------------------------------------------------------*/
+
+//   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+//   HAL_Init();
+
+//   /* USER CODE BEGIN Init */
+
+//   /* USER CODE END Init */
+
+//   /* Configure the system clock */
+//   SystemClock_Config();
+
+//   /* USER CODE BEGIN SysInit */
+
+//   /* USER CODE END SysInit */
+
+//   /* Initialize all configured peripherals */
+//   MX_GPIO_Init();
+//   MX_I2C1_Init();
+//   MX_I2C2_Init();
+//   MX_I2C4_Init();
+//   MX_LPUART1_UART_Init();
+//   MX_UART4_Init();
+//   MX_UART5_Init();
+//   MX_USART1_UART_Init();
+//   MX_USART2_UART_Init();
+//   MX_USART3_UART_Init();
+//   MX_SPI1_Init();
+//   MX_I2C3_Init();
+//   /* USER CODE BEGIN 2 */
+
+//   // Test UART
+
+//   // Initialize LittleFS Values, and pass SPI pointer
+//   char *debug = "INITIALIZING\n";
+//   HAL_UART_Transmit(&hlpuart1, (uint8_t *)debug, strlen(debug), 100);
+//   INITIALIZE(&hspi1);
+//   debug_uart_print_str("Initailize complete\n");
+
+//   uint8_t boot_count = 0;
+//   int8_t result;
+//   char result_read;
+//   result = FORMAT();
+//   debug_uart_print_str("Format Called\n");
+//   if (result < 0)
+//   {
+//     INT_TO_STRING(result, &result_read);
+//     debug_uart_print_str("Formatting Error");
+//     debug_uart_print_str_new_line(&result_read);
+//     return -1;
+//   }
+//   else
+//   {
+//     debug_uart_print_str("Formatting Successful\n");
+//   }
+
+//   char *str = "TESTING FILE";
+//   char *test = "Sample Text";
+//   char *read;
+//   HAL_UART_Transmit(&hlpuart1, (uint8_t *)str, strlen(str), 100);
+
+//   // Test Basic Read/Write
+//   // lfs_block_t block;
+//   // WRITE_LFS(&hlpuart1, (uint8_t*) str, block, sizeof(str));
+//   WRITE_FILE(str, test, sizeof(test));
+//   READ_FILE(str, read, sizeof(str));
+
+//   HAL_UART_Transmit(&hlpuart1, (uint8_t *)read, strlen(read), 100);
+
+//   // Turn on LED1 to indicate program starting
+//   HAL_GPIO_WritePin(PIN_LED1_OUT_GPIO_Port, PIN_LED1_OUT_Pin, GPIO_PIN_SET);
+
+//   // uint8_t boot_count = 0;
+//   // int8_t result;
+//   // char result_read;
+
+//   // // Initialize LittleFS Values, and pass SPI pointer
+//   // INITIALIZE(&hspi1);
+
+//   // result = FORMAT();
+//   // if (result < 0)
+//   // {
+//   //   INT_TO_STRING(result, &result_read);
+//   //   debug_uart_print_str("Formatting Error");
+//   //   debug_uart_print_str_new_line(&result_read);
+//   //   return -1;
+//   // }
+
+//   for (int i = 0; i < 1; i++)
+//   {
+//     // Use FORCE_MOUNT to FORMAT the Memory if needed
+//     result = MOUNT();
+//     if (result < 0)
+//     {
+//       INT_TO_STRING(result, &result_read);
+//       debug_uart_print_str("Mounting Error");
+//       debug_uart_print_str_new_line(&result_read);
+//       break;
+//     }
+
+//     char read_buffer[32];
+//     char write_buffer[32];
+
+//     result = READ_FILE("test", read_buffer, sizeof(read_buffer));
+//     if (result < 0)
+//     {
+//       INT_TO_STRING(result, &result_read);
+//       debug_uart_print_str("Reading Error");
+//       debug_uart_print_str_new_line(&result_read);
+//       break;
+//     }
+
+//     debug_uart_print_str_new_line("Read Value:");
+//     debug_uart_print_str_new_line(read_buffer);
+
+//     boot_count = STRING_TO_INT(read_buffer);
+//     boot_count += 1;
+
+//     INT_TO_STRING(boot_count, write_buffer);
+
+//     result = WRITE_FILE("test", write_buffer, sizeof(write_buffer));
+//     if (result < 0)
+//     {
+//       INT_TO_STRING(result, &result_read);
+//       debug_uart_print_str("Writing Error");
+//       debug_uart_print_str_new_line(&result_read);
+//       break;
+//     }
+
+//     memset(read_buffer, 0, strlen((char *)read_buffer));
+
+//     UNMOUNT();
+//   }
+
+//   // Turn off LED1 to indicate Program End
+//   HAL_GPIO_WritePin(PIN_LED1_OUT_GPIO_Port, PIN_LED1_OUT_Pin, GPIO_PIN_RESET);
+
+//   /* USER CODE END 2 */
+
+//   /* Init scheduler */
+//   osKernelInitialize();
+
+//   /* USER CODE BEGIN RTOS_MUTEX */
+//   /* add mutexes, ... */
+//   /* USER CODE END RTOS_MUTEX */
+
+//   /* USER CODE BEGIN RTOS_SEMAPHORES */
+//   /* add semaphores, ... */
+//   /* USER CODE END RTOS_SEMAPHORES */
+
+//   /* USER CODE BEGIN RTOS_TIMERS */
+//   /* start timers, add new ones, ... */
+//   /* USER CODE END RTOS_TIMERS */
+
+//   /* USER CODE BEGIN RTOS_QUEUES */
+//   /* add queues, ... */
+//   /* USER CODE END RTOS_QUEUES */
+
+//   /* Create the thread(s) */
+//   /* creation of defaultTask */
+//   defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+
+//   /* USER CODE BEGIN RTOS_THREADS */
+//   TASK_debug_print_heartbeat_Handle = osThreadNew(TASK_debug_print_heartbeat, NULL, &TASK_debug_print_heartbeat_Attributes);
+
+//   /* USER CODE END RTOS_THREADS */
+
+//   /* USER CODE BEGIN RTOS_EVENTS */
+//   /* add events, ... */
+//   /* USER CODE END RTOS_EVENTS */
+
+//   /* Start scheduler */
+//   osKernelStart();
+
+//   /* We should never get here as control is now taken by the scheduler */
+//   /* Infinite loop */
+//   /* USER CODE BEGIN WHILE */
+//   while (1)
+//   {
+//     debug_uart_print_str("This superloop point should never be reached, because the FreeRTOS Kernel is running...\n");
+//     /* USER CODE END WHILE */
+
+//     /* USER CODE BEGIN 3 */
+//   }
+//   /* USER CODE END 3 */
+// }
 
 /**
  * @brief System Clock Configuration
@@ -651,17 +847,17 @@ static void MX_USART1_UART_Init(void)
   /* USER CODE BEGIN USART1_Init 1 */
 
   /* USER CODE END USART1_Init 1 */
-	huart1.Instance = USART1;
-	huart1.Init.BaudRate = 115200;
-	huart1.Init.WordLength = UART_WORDLENGTH_8B;
-	huart1.Init.StopBits = UART_STOPBITS_1;
-	huart1.Init.Parity = UART_PARITY_NONE;
-	huart1.Init.Mode = UART_MODE_TX_RX;
-	huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-	huart1.Init.OverSampling = UART_OVERSAMPLING_16;
-	huart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-	huart1.Init.ClockPrescaler = UART_PRESCALER_DIV1;
-	huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 115200;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart1.Init.ClockPrescaler = UART_PRESCALER_DIV1;
+  huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
   if (HAL_UART_Init(&huart1) != HAL_OK)
   {
     Error_Handler();

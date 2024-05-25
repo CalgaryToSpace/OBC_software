@@ -22,7 +22,7 @@ static const uint8_t FLASH_ER4 = 0x20;
 static const uint8_t FLASH_ER32 = 0x52;
 static const uint8_t FLASH_ER64 = 0xd8;
 static const uint8_t FLASH_ERCP = 0xC7;
-static const uint8_t FLASH_STATREG1 = 0X05;
+static const uint8_t FLASH_STATREG1 = 0X35;
 static const uint8_t FLASH_SECTOR_ERASE = 0xD8;
 
 /*---------------------------SETUP FUNCTIONS---------------------------*/
@@ -46,7 +46,7 @@ void MEM_CLEAR_LFS(SPI_HandleTypeDef *, lfs_block_t);
 uint8_t WRITE_LFS(SPI_HandleTypeDef *, uint8_t *, lfs_block_t, lfs_size_t);
 uint8_t READ_LFS(SPI_HandleTypeDef *, uint8_t *, lfs_block_t, lfs_size_t);
 
-void INITIALIZE();
+void INITIALIZE(SPI_HandleTypeDef *ptr);
 int8_t MOUNT();
 int8_t FORCE_MOUNT();
 int8_t UNMOUNT();
