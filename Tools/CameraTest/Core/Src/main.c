@@ -23,6 +23,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -105,37 +106,57 @@ int main(void)
   MX_UART4_Init();
   /* USER CODE BEGIN 2 */
 
+  void rec2(){
+	  uint8_t sen[67*300] = {0};
+	  uint8_t sen1[67*300] = {0};
+	  uint8_t sen2[67*300] = {0};
+	  uint8_t sen3[67*300] = {0};
+		  HAL_UART_Receive(&huart4, sen, 67*300, 10000);
+		  HAL_UART_Receive(&huart4, sen1, 67*300, 10000);
+		  HAL_UART_Receive(&huart4, sen2, 67*300, 10000);
+		  HAL_UART_Receive(&huart4, sen3, 67*300, 10000);
+		  HAL_UART_Transmit(&hlpuart1, (uint8_t*)sen, 67*300, 10000);
+		  HAL_UART_Transmit(&hlpuart1, (uint8_t*)sen1, 67*300, 10000);
+		  HAL_UART_Transmit(&hlpuart1, (uint8_t*)sen2, 67*300, 10000);
+		  HAL_UART_Transmit(&hlpuart1, (uint8_t*)sen3, 67*300, 10000);
+  }
+
 
   void receiveImage(){
   	 // receive first sentence, get total number of sentences and send
-  		  char sentence[64];
+	  	  uint8_t sentence[300*67];
   		  // create group of 100 sentences
-  		  char group[100][64];
+	  	  uint8_t group[100][69];
   		  // create counter for number of sentences
-  		  int SentencesNum = 0;
+  		  int32_t SentencesNum = 0;
   		  // Declaration of enum for bool for loop
-  		  typedef enum { F, T } boolean;
-  		  boolean loop = T;
+//  		  typedef enum { F, T } boolean;
+  		  bool loop = 1;
   		  // initialize chars and ints for hex values
-  		  char hexTotal[6];
-  		  int totalSentences;
+  		  uint8_t hexTotal[6] = "000000";
+  		  uint8_t hexTotalcmp[6] = "000000";
+//  		  memset(hexTotal, '0', 6);
+  		  memset(sentence, '0', 67);
+  		  int32_t totalSentences = 0;
 
-  		  while(loop == T){
+  		  while(loop == 1){
 
   			  // get sentence
-  			  HAL_UART_Receive(&huart4, (uint8_t*)sentence, 64, HAL_MAX_DELAY);
-//  		  HAL_UART_Transmit(&hlpuart1, (uint8_t*)sentence, 10, HAL_MAX_DELAY);
+  			  HAL_UART_Receive(&huart4, sentence, 300*67, 10000);
+  			  HAL_UART_Transmit(&hlpuart1, (uint8_t*)sentence, 300*67, 1000);
 
   			  // if no total exists, get it
-  			 hexTotal[0] = '0';
-  			 hexTotal[1] = 'x';
-  				  strncpy(&hexTotal[2], &sentence[4], 4);
+  			  if(memcmp(hexTotal, hexTotalcmp, 3) == 0){
+				  hexTotal[0] = '0';
+				  hexTotal[1] = 'x';
+				  strncpy(&hexTotal[2], &sentence[5], 4);
 
-//  		  			  HAL_UART_Transmit(&hlpuart1, (uint8_t*)hexTotal, 5, HAL_MAX_DELAY);
+				 //HAL_UART_Transmit(&hlpuart1, (uint8_t*)hexTotal, 5, HAL_MAX_DELAY);
 
-  		    		  char *ptr;
+				  char *ptr;
 
-  				  	  totalSentences = (int)strtol(hexTotal, &ptr, 0);
+				  totalSentences = (int)strtol(hexTotal, &ptr, 0);
+  			  }
 
 
   			  // add sentence to group at index SentenceNum(starts at 0 and increases by 1 every iteration)
@@ -154,7 +175,7 @@ int main(void)
 
   			  // if totalSentences becomes less than 100 then break out of loop and use for loop to get the remaining sentences
   			  if(totalSentences < 100){
-  				  loop = F;
+  				  loop = 0;
   			  }
   		  }
 
@@ -163,8 +184,8 @@ int main(void)
   		  		HAL_UART_Transmit(&hlpuart1, (uint8_t*)"L", 1, HAL_MAX_DELAY);
   		  		  for(int i=0; i<totalSentences; i++){
   		  			// get sentence
-  		  			HAL_UART_Receive(&huart4, (uint8_t*)sentence, 64, HAL_MAX_DELAY);
-  		  			// add to group
+  		  			HAL_UART_Receive(&huart4, (uint8_t*)sentence, 69, HAL_MAX_DELAY);
+  		  			HAL_UART_Transmit(&hlpuart1, (uint8_t*)sentence, 69, HAL_MAX_DELAY);
   		  			strcpy(group[i],sentence);
   		  			SentencesNum += 1;
   		  		  }
@@ -174,7 +195,7 @@ int main(void)
   		  	  }
 
   		  // receive final telemetry sentence
-  		  	HAL_UART_Receive(&huart4, (uint8_t*)sentence, 64, HAL_MAX_DELAY);
+  		  	HAL_UART_Receive(&huart4, (uint8_t*)sentence, 69, 1000);
   		  	//memWrite(CAMERA_DATA, group, 67);
   }
 
@@ -189,22 +210,23 @@ int main(void)
      * 			n - night ambient light
      * 			s - solar sail contrast and light
      */
-    enum Capture_Status Capture_Image(bool flash, char lighting){
+    enum Capture_Status Capture_Image(bool enable_flash, uint8_t lighting_mode){
 
-  	  switch(lighting){
+  	  switch(lighting_mode){
   	  case 'd':
-  		  if(flash){
-  			  HAL_UART_Transmit(&huart4, "D", 1, HAL_MAX_DELAY);
+  		  if(enable_flash){
+  			  HAL_UART_Transmit(&huart4, (uint8_t*)"D", 1, HAL_MAX_DELAY);
   			  HAL_Delay(25);
   		  }
   		  else{
   			  HAL_UART_Transmit(&huart4, (uint8_t*)"d", 1, HAL_MAX_DELAY);
   			  HAL_Delay(25);
   		  }
-  		  receiveImage();
+//  		  receiveImage();
+  		  rec2();
   		  return Transmit_Success;
   	  case 'm':
-  	  		  if(flash){
+  	  		  if(enable_flash){
   	  			  HAL_UART_Transmit(&hlpuart1, (uint8_t*)"M", 1, HAL_MAX_DELAY);
   	  			  HAL_Delay(25);
   	  		  }
@@ -215,7 +237,7 @@ int main(void)
   	  		receiveImage();
   	  		return Transmit_Success;
   	  case 'n':
-  	  		  if(flash){
+  	  		  if(enable_flash){
   	  			  HAL_UART_Transmit(&hlpuart1, (uint8_t*)"N", 1, HAL_MAX_DELAY);
   	  			  HAL_Delay(25);
   	  		  }
@@ -226,15 +248,16 @@ int main(void)
   	  		receiveImage();
   	  		return Transmit_Success;
   	  case 's':
-  	  		  if(flash){
+  	  		  if(enable_flash){
   	  			  HAL_UART_Transmit(&hlpuart1, (uint8_t*)"S", 1, HAL_MAX_DELAY);
   	  			  HAL_Delay(25);
   	  		  }
   	  		  else{
-  	  			  HAL_UART_Transmit(&hlpuart1, (uint8_t*)"s", 1, HAL_MAX_DELAY);
+  	  			  HAL_UART_Transmit(&huart4, (uint8_t*)"s", 1, HAL_MAX_DELAY);
   	  			  HAL_Delay(25);
   	  		  }
-  	  		  receiveImage();
+//  	  		  receiveImage();
+  	  		rec2();
   	  		return Transmit_Success;
   	  default:
   		  return Wrong_input;
